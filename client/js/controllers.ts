@@ -21,7 +21,7 @@ class LoginController {
 
     constructor(
         private $scope: ILoginScope,
-        private $rootScope: MoneyCirclesRootScope,
+        private $rootScope: BuyCoRootScope,
         private $http: ng.IHttpService,
         private $location: ng.ILocationService,
         private $window: ng.IWindowService,
@@ -33,8 +33,8 @@ class LoginController {
         }
 
         // See if sessionStorage contains valid login info. If so, we can consider the user to be logged in.
-        var tokenFromSession = $window.sessionStorage.getItem("bitReserveToken");
-        var userStringFromSession = $window.sessionStorage.getItem("bitReserveUserInfo");
+        var tokenFromSession = $window.sessionStorage.getItem("upholdToken");
+        var userStringFromSession = $window.sessionStorage.getItem("upholdUserInfo");
 
         // We prefer a login from the session, even when processing the callback from the OAuth provider. If the
         // token is stale, it should be cleared before a new login attempt.
@@ -45,7 +45,7 @@ class LoginController {
             && !this.$scope.isAuthenticated()) {
             // Restore from session
             var userDataFromSession = <IUser>JSON.parse(userStringFromSession);
-            var brip = new BitReserveIdentityProvider();
+            var brip = new UpholdIdentityProvider();
             brip.setToken(tokenFromSession, null);
             brip.setUserInfo(userDataFromSession, null);
 
@@ -54,7 +54,7 @@ class LoginController {
 
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
-        } else if (this.$location.path() == "/auth/bitreserve/callback"
+        } else if (this.$location.path() == "/auth/uphold/callback"
         // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
@@ -84,17 +84,17 @@ class LoginController {
 
             var t = this;
 
-            // Call API /auth/bitreserve/callback
+            // Call API /auth/uphold/callback
             $http({
                 method: 'POST',
-                url: apiUrl + '/auth/bitreserve/callback',
+                url: apiUrl + '/auth/uphold/callback',
                 data: theParams
             }).success(function (resultData: any) {
                 console.log("Successful call to OAuth callback on API. Result:");
                 console.log(resultData);
 
                 // Store token in Uphold identity provider
-                var brip = new BitReserveIdentityProvider();
+                var brip = new UpholdIdentityProvider();
                 brip.setToken(resultData.user.accessToken, $window);
                 brip.setUserInfo(resultData.user, $window);
 
@@ -137,7 +137,7 @@ class DashboardController {
 
     constructor(
         private $scope: IDashboardScope,
-        private $rootScope: MoneyCirclesRootScope,
+        private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService,
         private $http: ng.IHttpService) {
 
@@ -169,7 +169,7 @@ class DashboardController {
 
         this.$http({
             method: 'GET',
-            url: apiUrl + '/bitreserve/me/cards',
+            url: apiUrl + '/uphold/me/cards',
             headers: { AccessToken: t.$scope.userInfo.accessToken }
         }).success(function (cards: any) {
             console.log("Success on Uphold call through our API. Result:");
@@ -213,7 +213,7 @@ class UserAccountController {
 
     constructor(
         private $scope: IUserAccountScope,
-        private $rootScope: MoneyCirclesRootScope,
+        private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService) {
 
         this.$rootScope.$on('loggedOn', function (event, data) {

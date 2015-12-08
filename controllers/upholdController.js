@@ -29,7 +29,6 @@ var UpholdController = (function () {
                 });
             }
             else {
-                // Extract cards with non-zero balance
                 var cardsWithBalance = _(cards).filter(function (c) {
                     return c.balance > 0;
                 });

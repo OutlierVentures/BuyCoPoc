@@ -6,7 +6,7 @@
  */
 var apiUrl = "/api";
 
-interface MoneyCirclesRootScope extends ng.IRootScopeService {
+interface BuyCoRootScope extends ng.IRootScopeService {
     isLoggedIn: boolean;
     isGlobalAdmin: boolean;
     // The variables below belong in the login controller. Currently placed here as a workaround to be able to show error
@@ -17,40 +17,41 @@ interface MoneyCirclesRootScope extends ng.IRootScopeService {
     userInfo: IUser;
 }
 
-module MoneyCircles {
+module BuyCo {
     'use strict';
 
     // All controllers are registered here.
-    var moneyCirclesApp = angular.module('moneyCirclesApp', ['ngResource', 'ngRoute', 'ngSanitize', 'mgcrea.ngStrap'])
+    var BuyCoApp = angular.module('BuyCoApp', ['ngResource', 'ngRoute', 'ngSanitize', 'mgcrea.ngStrap'])
         .controller('NavigationController', NavigationController)
         .controller('LoginController', LoginController)
         .controller('UserAccountController', UserAccountController)
-        .controller('CircleController', CircleController);
+        //.controller('CircleController', CircleController)
+        ;
 
-    moneyCirclesApp.config(function ($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
+    BuyCoApp.config(function ($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
         $routeProvider
             .when('/', { controller: DashboardController, templateUrl: 'views/dashboard.html' })
-            .when('/auth/bitreserve/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
+            .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         //.when('/user/profile', { controller: UserAccountController, templateUrl: 'views/user-profile.html' })
             .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
             .when('/not-found', { templateUrl: 'views/not-found.html' })
-            .when('/circle/new', { controller: CircleController, templateUrl: 'views/circle-form.html' })
-            .when('/circle/list', { controller: CircleListController, templateUrl: 'views/circle-list.html' })
+            //.when('/circle/new', { controller: CircleController, templateUrl: 'views/circle-form.html' })
+            //.when('/circle/list', { controller: CircleListController, templateUrl: 'views/circle-list.html' })
         // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
         // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't
         // seem to be such an option in Angular.
-            .when('/circle/:id/join', { controller: CircleController, templateUrl: 'views/circle-join.html', name: 'join' })
-            .when('/circle/:id', { controller: CircleController, templateUrl: 'views/circle-details.html', name: 'details' })
-            .when('/circle/:id/deposit', { controller: CircleController, templateUrl: 'views/circle-deposit.html', name: 'deposit' })
-            .when('/circle/:id/loan', { controller: CircleController, templateUrl: 'views/loan-request.html', name: 'loan-request' })
-            .when('/loan/list', { controller: LoanListController, templateUrl: 'views/loan-list.html' })
-            .when('/loan/:id/repay', { controller: LoanController, templateUrl: 'views/loan-repay.html', name: 'repay' })
-            .when('/audit', { controller: AuditListController, templateUrl: 'views/audit-list.html' })
+            //.when('/circle/:id/join', { controller: CircleController, templateUrl: 'views/circle-join.html', name: 'join' })
+            //.when('/circle/:id', { controller: CircleController, templateUrl: 'views/circle-details.html', name: 'details' })
+            //.when('/circle/:id/deposit', { controller: CircleController, templateUrl: 'views/circle-deposit.html', name: 'deposit' })
+            //.when('/circle/:id/loan', { controller: CircleController, templateUrl: 'views/loan-request.html', name: 'loan-request' })
+            //.when('/loan/list', { controller: LoanListController, templateUrl: 'views/loan-list.html' })
+            //.when('/loan/:id/repay', { controller: LoanController, templateUrl: 'views/loan-repay.html', name: 'repay' })
+            //.when('/audit', { controller: AuditListController, templateUrl: 'views/audit-list.html' })
             .otherwise({ redirectTo: 'not-found' });
         $locationProvider.html5Mode(true);
         $locationProvider.hashPrefix('!');
 
-    }).run(['$rootScope', function ($rootScope: MoneyCirclesRootScope) {
+    }).run(['$rootScope', function ($rootScope: BuyCoRootScope) {
         /**
          * Returns whether this is a public page.
          */
@@ -66,7 +67,7 @@ module MoneyCircles {
 
     // Note: the string name provided to angular has to match the parameter names as used in the controllers,
     // case-sensitive. 
-    moneyCirclesApp.service('identityService', IdentityService);
+    BuyCoApp.service('identityService', IdentityService);
 }
 
 /**

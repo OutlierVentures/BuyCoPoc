@@ -34,7 +34,7 @@ interface IIdentityProvider {
 /**
  * Identity provider for Uphold using OAuth backend. The OAuth token is stored in the session storage.
  */
-class BitReserveIdentityProvider implements IIdentityProvider {
+class UpholdIdentityProvider implements IIdentityProvider {
     /**
      * OAuth token as received from Uphold.
      */
@@ -50,7 +50,7 @@ class BitReserveIdentityProvider implements IIdentityProvider {
     setUserInfo(userInfo: IUser, w: Window) {
         this._userInfo = userInfo;
         if (w)
-            w.sessionStorage.setItem('bitReserveUserInfo', JSON.stringify(userInfo));
+            w.sessionStorage.setItem('upholdUserInfo', JSON.stringify(userInfo));
 
     }
 
@@ -62,7 +62,7 @@ class BitReserveIdentityProvider implements IIdentityProvider {
         this._oauthToken = token;
         // Store in session storage
         if (w)
-            w.sessionStorage.setItem('bitReserveToken', token);
+            w.sessionStorage.setItem('upholdToken', token);
     }
 
     isAuthenticated(): boolean {
@@ -107,7 +107,7 @@ class IdentityService {
     $inject = ['$rootScope'];
 
     constructor(
-        private $rootScope: MoneyCirclesRootScope
+        private $rootScope: BuyCoRootScope
         ) {
         this.providers = [];
     }

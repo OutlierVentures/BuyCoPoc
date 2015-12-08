@@ -5,12 +5,9 @@ var ConfigurationService = (function () {
         this.getConfiguration = function () {
             if (cachedConfig)
                 return cachedConfig;
-            /*************** Configuration ********************/
             var CONFIG_FILE = './config.json';
             var config;
             var configString;
-            // We don't use fs.exists() to try to read the file; the recommended method is just opening and
-            // handling an error: https://nodejs.org/api/fs.html#fs_fs_exists_path_callback
             try {
                 configString = fs.readFileSync(CONFIG_FILE, 'utf8');
             }
@@ -24,10 +21,8 @@ var ConfigurationService = (function () {
                 }
             }
             console.log("Using configuration from " + CONFIG_FILE);
-            // Strip the BOM character as readFileSync doesn't do that.
             configString = configString.replace(/^\uFEFF/, '');
             try {
-                // Parse config file.
                 config = JSON.parse(configString);
             }
             catch (e) {

@@ -21,7 +21,7 @@
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://poc1-dev.buyco.io:8101",
+        "jsonRpcUrl": "http://poc1-dev.buyco.io:8001",
         "nodeUrl": "poc1-dev.buyco.io:30301"
     }
 }

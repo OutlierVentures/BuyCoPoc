@@ -103,15 +103,15 @@ export class OAuthController {
      * Gets the route used for callbacks.
      */
     getCallbackPublicRoute(): string {
-        // The callback should be to the world-facing URL (e.g. /auth/bitreserve/callback) and not to 
-        // the API (e.g. /api/auth/bitreserve/callback). So strip '/api/'.
+        // The callback should be to the world-facing URL (e.g. /auth/uphold/callback) and not to 
+        // the API (e.g. /api/auth/uphold/callback). So strip '/api/'.
         // TODO: allow configuring this specifically, or improve convention so that no string replace has to be done.
         return this.config.basePath.replace('/api/', '/') + '/callback';
     }
 
     /**
      * Gets the full callback URL that the OAuth provider has to redirect back to.
-     * Example: http://localhost:3124/#/auth/bitreserve/callback
+     * Example: http://localhost:3124/#/auth/uphold/callback
      */
     getCallbackUrl(): string {
         return this.config.baseUrl + this.getCallbackPublicRoute();

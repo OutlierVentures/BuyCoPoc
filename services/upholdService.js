@@ -1,10 +1,5 @@
 var request = require('request');
-// Enable request debugging
-// TODO: make configurable (config debug option)
 require('request').debug = true;
-/**
- * Handle an error for a call to the Uphold API.
- */
 function handleUpholdApiError(error, body, callback) {
     var errorResponse;
     try {
@@ -19,7 +14,6 @@ function handleUpholdApiError(error, body, callback) {
     catch (e) {
         errorResponse = error;
     }
-    // Ensure that errorResponse is not falsey so callback is always handled as error.
     if (!errorResponse)
         errorResponse = "Unknown error";
     callback(errorResponse, null);
@@ -33,9 +27,6 @@ var UpholdService = (function () {
     function UpholdService(authorizationToken) {
         var _this = this;
         this.authorizationToken = authorizationToken;
-        /**
-         * Gets info about the current user.
-         */
         this.getUser = function (callback) {
             console.log("Calling API with token: " + _this.authorizationToken);
             request.get('https://api.uphold.com/v0/me', {
@@ -45,8 +36,6 @@ var UpholdService = (function () {
             }, function (error, response, body) {
                 if (!error && isSuccessStatusCode(response.statusCode)) {
                     var userData = JSON.parse(body);
-                    // Create a new user array.
-                    // TODO: create an interface for this (can't be IUser because that extends Mongoose.Document).
                     var user = {
                         name: userData.name,
                         externalId: userData.username,
@@ -93,9 +82,6 @@ var UpholdService = (function () {
                 }
             });
         };
-        /**
-         * Create a new card.
-         */
         this.createCard = function (label, callback) {
             console.log("Calling API with token: " + _this.authorizationToken);
             request.post('https://api.uphold.com/v0/me/cards', {
@@ -108,8 +94,6 @@ var UpholdService = (function () {
                 }
             }, function (error, response, body) {
                 if (!error && isSuccessStatusCode(response.statusCode)) {
-                    // In this case the request module returns the data as already parsed. 
-                    // Possibly because the request is done with the 'json' parameter.
                     var card = body;
                     callback(null, card);
                 }
@@ -120,7 +104,6 @@ var UpholdService = (function () {
             });
         };
         this.createTransaction = function (fromCard, amount, currency, recipient, callback) {
-            // denomination[currency]=BTC&denomination[amount]=0.1&destination=foo@bar.com
             request.post('https://api.uphold.com/v0/me/cards/' + fromCard + '/transactions', {
                 headers: {
                     "Authorization": "Bearer " + _this.authorizationToken
@@ -132,7 +115,6 @@ var UpholdService = (function () {
                 }
             }, function (error, response, body) {
                 if (!error && isSuccessStatusCode(response.statusCode)) {
-                    // Transaction created
                     callback(null, JSON.parse(body));
                 }
                 else {
@@ -149,7 +131,6 @@ var UpholdService = (function () {
                 },
             }, function (error, response, body) {
                 if (!error && isSuccessStatusCode(response.statusCode)) {
-                    // Transaction committed
                     callback(null, JSON.parse(body));
                 }
                 else {

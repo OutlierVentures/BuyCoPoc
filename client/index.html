@@ -4,7 +4,7 @@
     <base href="/" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>MoneyCircles Proof of Concept</title>
+    <title>BuyCo Proof of Concept</title>
     <!-- Bootstrap Core CSS -->
     <link href="vendors/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
@@ -40,7 +40,7 @@
     </style>
 </head>
 <body>
-    <div ng-app="moneyCirclesApp">
+    <div ng-app="buyCoApp">
         <div class="navbar navbar-default navbar-fixed-top" ng-show="!isGlobalAdmin" bs-navbar>
             <div class="container">
                 <div class="navbar-header">
@@ -50,11 +50,12 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" ng-show="isLoggedIn">
-                        <img src="images/logo-dot.png">
+                        <!--<img src="images/logo-dot.png">-->
                         <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
                     </a>
                     <a class="navbar-brand" href="/" ng-hide="isLoggedIn">
-                        <img class="logo" src="images/logo.png">
+                        <h1>BuyCo</h1>
+<!--                        <img class="logo" src="images/logo.png">-->
                     </a>
                 </div>
                 <div class="navbar-collapse collapse">
@@ -62,15 +63,13 @@
                         <li data-match-route="/audit"><a href="/audit">Audit</a></li>
                     </ul>
                     <ul class="nav navbar-nav" ng-show="isLoggedIn">
-                        <li data-match-route="/circle/*"><a href="/circle/list">Circles</a></li>
-                        <li data-match-route="/loan/"><a href="/loan/list">Loans</a></li>
                         <li data-match-route="/audit"><a href="/audit">Audit</a></li>
                     </ul>
                     <!-- <form class="navbar-form navbar-left">
                         <input type="text" class="form-control" placeholder="Search">
                     </form> -->
                     <ul class="nav navbar-nav navbar-right" ng-controller="UserAccountController" ng-show="isLoggedIn">
-                        <li data-match-route="/user/login"><a href="/user/login"><img class="mc-avatar pull-left" src="images/avatar.png">{{userInfo.name}}</a></li>
+                        <li data-match-route="/user/login"><a href="/user/login">{{userInfo.name}}</a></li>
                     </ul>
                 </div>
             </div>
@@ -79,7 +78,7 @@
             <div id="app">
                 <!-- Login screen, only shown when not logged in. -->
                 <div class="container">
-                    <div class="mc-login" ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
+                    <div ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
                     <div class="panel panel-warning ng-hide" ng-show="loginErrorMessage">
                         <div class="panel-heading">Oops</div>
                         <div class="panel-body">{{loginErrorMessage}}</div>
@@ -109,11 +108,11 @@
             <div class="container">
                 <img src="images/logo-footer.png">
                 <br>
-                <a class="mc-license" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
-                     src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" class="mc-license"/></a>
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
+                     src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a>
                 <br />
                 <br />
-                <p><a href="http://www.moneycircles.com/proofofconcept" target="_blank">This is a proof of concept implementation. Please read the disclaimer.</a></p>
+                <p><a href="http://www.buyco.io/proofofconcept" target="_blank">This is a proof of concept implementation. Please read the disclaimer.</a></p>
             </div>
         </footer>
     </div>
