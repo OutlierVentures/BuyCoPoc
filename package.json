@@ -1,0 +1,33 @@
+{
+    "name": "BuyCo",
+    "version": "0.0.0",
+    "description": "BuyCo",
+    "main": "app.js",
+    "author": {
+        "name": "Aron van Ammers",
+        "email": "aron@blockstars.io"
+    },
+    "dependencies": {
+        "body-parser": "*",
+        "express": "^4.13.3",
+        "mongoose": "^4.1.3",
+        "morgan": "^1.6.1",
+        "q": "^1.4.1",
+        "request": "^2.61.0",
+        "simple-oauth2": "*",
+        "underscore": "^1.8.3",
+        "web3": "0.13.x",
+        "web3plus": "git+https://4c2b0edc3e30d3d1e28479782f8f1ee64f4ca812:x-oauth-basic@github.com/OutlierVentures/web3plus.git"
+    },
+    "devDependencies": {
+        "grunt": "^0.4.5",
+        "grunt-concurrent": "*",
+        "grunt-contrib-less": "^1.0.1",
+        "grunt-contrib-watch": "*",
+        "grunt-newer": "*",
+        "grunt-nodemon": "*",
+        "grunt-ts": "*",
+        "mocha": "^2.3.3"
+    }
+
+}

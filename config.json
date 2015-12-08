@@ -1,0 +1,37 @@
+﻿{
+    "__comment": "This is the default configuration file. If you want custom configuration, copy this file to 'config.json' and adapt.",
+    "_useStubs": true,
+    "server": {
+        "httpPort": 3123,
+        "httpsPort": 3124,
+        "baseUrl": "https://poc1-dev.moneycircles.com"
+    },
+    "database": {
+        "url": "mongodb://moneycircles-bitreserve-poc-dev-user:iPBNE0ZeQRPbsHOVWEUi@ds035593.mongolab.com:35593/moneycircles-bitreserve-poc-dev",
+        "url_": "mongodb://aron:test1234@downtonabbey:27017/test"
+    },
+    "bitReserve": {
+        "app": {
+            "clientID": "e75aef1e3bfc8f6f49fcf4f1ebf0bbf30dd8988c",
+            "clientSecret": "b3df38816602d936c304774c43420d56eda8358f"
+        },
+        "_circleVaultAccount": {
+            "userName": "UserstubToken81440.23246131837",
+            "cardBitcoinAddress": "1Abc",
+            "cardId": "card1"
+        },
+        "circleVaultAccount": {
+            "__comment": "The main account that stores funds of Circles.",
+            "userName": "AronVanAmmers",
+            "cardBitcoinAddress": "1HT1oxAg13RU4gMZrDc2yv1PrPKGKSUwd2",
+            "cardId": "b3756d23-bc23-4919-81aa-1d1411938e99"
+        }
+    },
+    "ethereum": {
+        "jsonRpcUrl": "http://blockchain:8101",
+        "jsonRpcUrl_": "http://americano.servers.blockstars.io:8101",
+        "nodeUrl": "downtonabbey:30301",
+        "nodeUrl_": "americano.servers.blockstars.io:30301"
+    }
+
+}

@@ -1,0 +1,45 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "node/node.d.ts": {
+      "commit": "38fb591c6eba840e0b53d1110302b8e4fb04651c"
+    },
+    "express/express.d.ts": {
+      "commit": "dbf239733104cebd1fbb92578abdc929a8dac2da"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "dbf239733104cebd1fbb92578abdc929a8dac2da"
+    },
+    "mime/mime.d.ts": {
+      "commit": "dbf239733104cebd1fbb92578abdc929a8dac2da"
+    },
+    "mongoose/mongoose.d.ts": {
+      "commit": "c87a7c70b463ba23e0ba0721daa37d1c460ddd58"
+    },
+    "request/request.d.ts": {
+      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
+    },
+    "form-data/form-data.d.ts": {
+      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
+    },
+    "morgan/morgan.d.ts": {
+      "commit": "af81415504b4edce8dac8446d96857f8018c6e9f"
+    },
+    "body-parser/body-parser.d.ts": {
+      "commit": "c5a2f44bab06cf9f2bcc14530171daac1cebff6c"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "7f07bd88d1083e995a0dae317a333c9641320cc8"
+    },
+    "q/Q.d.ts": {
+      "commit": "32029fcb4e1a3ef8968711b545d77b584435729d"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "32029fcb4e1a3ef8968711b545d77b584435729d"
+    }
+  }
+}

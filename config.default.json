@@ -1,0 +1,27 @@
+﻿{
+    "__comment": "This is the default configuration file. If you want custom configuration, copy this file to 'config.json' and adapt.",
+    "server": {
+        "httpPort": 4123,
+        "httpsPort": 4124,
+        "baseUrl": "https://poc1-dev.buyco.io"
+    },
+    "database": {
+        "url": "mongodb://buyco-poc-dev-user:iPBNE0ZeQRPbsHOVWEUi@ds035593.mongolab.com:35593/moneycircles-bitreserve-poc-dev"
+    },
+    "uphold": {
+        "app": {
+            "clientID": "e75aef1e3bfc8f6f49fcf4f1ebf0bbf30dd8988c",
+            "clientSecret": "b3df38816602d936c304774c43420d56eda8358f"
+        },
+        "vaultAccount": {
+            "__comment": "The main Uphold account that stores funds of Circles.",
+            "userName": "BuyCo",
+            "cardId": "",
+            "cardBitcoinAddress":  ""
+        }
+    },
+    "ethereum": {
+        "jsonRpcUrl": "http://poc1-dev.buyco.io:8101",
+        "nodeUrl": "poc1-dev.buyco.io:30301"
+    }
+}

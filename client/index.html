@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <base href="/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>MoneyCircles Proof of Concept</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="vendors/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/images/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/images/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/images/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <style type="text/css">
+        /* Override ng-hide here to hide panels before angular loads */
+        .ng-hide {
+            /* this is just another form of hiding an element */
+            display: block !important;
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+    </style>
+</head>
+<body>
+    <div ng-app="moneyCirclesApp">
+        <div class="navbar navbar-default navbar-fixed-top" ng-show="!isGlobalAdmin" bs-navbar>
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/" ng-show="isLoggedIn">
+                        <img src="images/logo-dot.png">
+                        <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
+                    </a>
+                    <a class="navbar-brand" href="/" ng-hide="isLoggedIn">
+                        <img class="logo" src="images/logo.png">
+                    </a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav" ng-show="!isLoggedIn">
+                        <li data-match-route="/audit"><a href="/audit">Audit</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav" ng-show="isLoggedIn">
+                        <li data-match-route="/circle/*"><a href="/circle/list">Circles</a></li>
+                        <li data-match-route="/loan/"><a href="/loan/list">Loans</a></li>
+                        <li data-match-route="/audit"><a href="/audit">Audit</a></li>
+                    </ul>
+                    <!-- <form class="navbar-form navbar-left">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </form> -->
+                    <ul class="nav navbar-nav navbar-right" ng-controller="UserAccountController" ng-show="isLoggedIn">
+                        <li data-match-route="/user/login"><a href="/user/login"><img class="mc-avatar pull-left" src="images/avatar.png">{{userInfo.name}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="body-content">
+            <div id="app">
+                <!-- Login screen, only shown when not logged in. -->
+                <div class="container">
+                    <div class="mc-login" ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
+                    <div class="panel panel-warning ng-hide" ng-show="loginErrorMessage">
+                        <div class="panel-heading">Oops</div>
+                        <div class="panel-body">{{loginErrorMessage}}</div>
+                    </div>
+                    <div ng-include="'views/login-processing.html'" ng-show="isProcessingLogin"></div>
+                </div>
+
+                <!-- When not logged in, the whole wrapper is hidden. We use the property $rootScope.isLoggedIn
+                which is set to true after a succesful login.-->
+                <div id="wrapper" ng-show="isLoggedIn || isPublicPage()">
+                    <!-- Navigation. The navbar view includes the NavigationController. -->
+                    <!--                <nav ng-include="'views/navbar.html'"></nav>-->
+
+
+                    <div id="page-wrapper">
+                        <!-- Main view. The view for the current ngRoute will be shown here. -->
+                        <div ng-view></div>
+                    </div>
+
+                    <!-- /#page-wrapper -->
+                </div>
+                <!-- /#wrapper -->
+            </div>
+
+        </div>
+        <footer>
+            <div class="container">
+                <img src="images/logo-footer.png">
+                <br>
+                <a class="mc-license" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
+                     src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" class="mc-license"/></a>
+                <br />
+                <br />
+                <p><a href="http://www.moneycircles.com/proofofconcept" target="_blank">This is a proof of concept implementation. Please read the disclaimer.</a></p>
+            </div>
+        </footer>
+    </div>
+
+
+    <!--START from bower-->
+    <!-- jQuery -->
+    <script src="vendors/jquery/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="vendors/angular/angular.js"></script>
+    <script src="vendors/angular-resource/angular-resource.min.js"></script>
+    <script src="vendors/angular-route/angular-route.min.js"></script>
+    <script src="vendors/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="vendors/angular-strap/dist/angular-strap.min.js"></script>
+    <script src="vendors/angular-strap/dist/angular-strap.tpl.min.js"></script>
+
+    <script src="vendors/async/lib/async.js"></script>
+    <script src="vendors/underscore/underscore-min.js"></script>
+
+    <script src="vendors/bignumber.js/bignumber.min.js"></script>
+
+    <!--END from bower-->
+    <!--Angular assets and app-->
+    <script src="js/models.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/controllers/circleController.js"></script>
+    <script src="js/controllers/circleListController.js"></script>
+    <script src="js/controllers/loanController.js"></script>
+    <script src="js/controllers/loanListController.js"></script>
+    <script src="js/controllers/auditListController.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
