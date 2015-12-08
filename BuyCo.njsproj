@@ -70,6 +70,10 @@
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
     <TypeScriptCompile Include="services\upholdService.ts" />
+    <TypeScriptCompile Include="test\contracts\testProposalRegistry.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\web3config.ts" />
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\express\express.d.ts" />
     <TypeScriptCompile Include="typings\form-data\form-data.d.ts" />
@@ -99,6 +103,8 @@
     <Folder Include="contracts\" />
     <Folder Include="models\" />
     <Folder Include="routes\" />
+    <Folder Include="test\" />
+    <Folder Include="test\contracts\" />
     <Folder Include="typings\" />
     <Folder Include="services\" />
     <Folder Include="typings\body-parser\" />
