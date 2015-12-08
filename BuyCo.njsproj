@@ -63,6 +63,7 @@
     <Content Include="client\views\login.html" />
     <Content Include="client\views\not-found.html" />
     <Content Include="config.default.json" />
+    <Content Include="key.default.pem" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="services\configurationService.ts" />

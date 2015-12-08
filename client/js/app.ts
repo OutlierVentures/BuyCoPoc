@@ -21,7 +21,7 @@ module BuyCo {
     'use strict';
 
     // All controllers are registered here.
-    var BuyCoApp = angular.module('BuyCoApp', ['ngResource', 'ngRoute', 'ngSanitize', 'mgcrea.ngStrap'])
+    var BuyCoApp = angular.module('buyCoApp', ['ngResource', 'ngRoute', 'ngSanitize', 'mgcrea.ngStrap'])
         .controller('NavigationController', NavigationController)
         .controller('LoginController', LoginController)
         .controller('UserAccountController', UserAccountController)

@@ -4,16 +4,15 @@
     "server": {
         "httpPort": 4123,
         "httpsPort": 4124,
-        "baseUrl": "https://poc.buyco.io"
+        "baseUrl": "https://buyco-poc-dev.projects.blockstars.io"
     },
     "database": {
-        "url": "mongodb://buyco-poc-dev-user:iPBNE0ZeQRPbsHOVWEUi@ds035593.mongolab.com:35593/moneycircles-bitreserve-poc-dev",
-        "url_": "mongodb://aron:test1234@downtonabbey:27017/test"
+        "url": "mongodb://buyco-poc-dev-user:Uiwjde84ybeqwZEJWho2@ds027505.mongolab.com:27505/buyco-poc-dev"
     },
     "uphold": {
         "app": {
-            "clientID": "e75aef1e3bfc8f6f49fcf4f1ebf0bbf30dd8988c__",
-            "clientSecret": "b3df38816602d936c304774c43420d56eda8358f__s"
+            "clientID": "46f9da061028333040829045a01314ab73531cfc",
+            "clientSecret": "1cb1b7c7bd45c67447c265034fd05e69856b1b2a"
         },
         "_vaultAccount": {
             "userName": "UserstubToken81440.23246131837",
@@ -23,12 +22,12 @@
         "vaultAccount": {
             "__comment": "The main account that stores funds of Circles.",
             "userName": "AronVanAmmers",
-            "cardBitcoinAddress": "1HT1oxAg13RU4gMZrDc2yv1PrPKGKSUwd2",
-            "cardId": "b3756d23-bc23-4919-81aa-1d1411938e99"
+            "cardBitcoinAddress": "1EXgEzs3qGbMooHt89xmrmwXbbKxTNqVjh",
+            "cardId": "fdbe3f64-93db-4666-872b-68ffbc11db4a"
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://blockchain:8001",
+        "jsonRpcUrl": "http://blockchain:8101",
         "nodeUrl": "blockstars.io:40301",
         "nodeUrl_": "americano.servers.blockstars.io:30301"
     }
