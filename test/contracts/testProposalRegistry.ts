@@ -14,6 +14,8 @@ describe("ProposalRegistry", () => {
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
 
+    var testRegistryName = "BuyCo proposals registry";
+
     before(function (done) {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
@@ -29,8 +31,17 @@ describe("ProposalRegistry", () => {
                 timeAfterDeployment = Date.now();
                 registryContract = res;
                 done(err);
-            });
+            },
+            testRegistryName);
     });
+
+    it("should have the properties set at construction", function (done) {
+        this.timeout(10000);
+
+        assert.equal(registryContract.name(), testRegistryName);
+        done();
+    });
+
 
     it("should have a correct creation time", function (done) {
         this.timeout(10000);
