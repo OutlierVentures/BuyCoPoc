@@ -3,7 +3,7 @@ import path = require('path');
 
 export function createWeb3() {
     // TODO: read from config file.
-    var jsonRpcUrl = "http://blockchain:8101";
+    var jsonRpcUrl = "http://blockchain:8001";
     w3p.initialize(jsonRpcUrl, path.resolve(__dirname + '/../../contracts'));
 
     return w3p;

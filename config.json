@@ -27,7 +27,7 @@
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://blockchain:8101",
+        "jsonRpcUrl": "http://blockchain:8001",
         "nodeUrl": "blockstars.io:40301",
         "nodeUrl_": "americano.servers.blockstars.io:30301"
     }

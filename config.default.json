@@ -21,7 +21,7 @@
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://buyco-poc-dev.projects.blockstars.io:8101",
+        "jsonRpcUrl": "http://buyco-poc-dev.projects.blockstars.io:8001",
         "nodeUrl": "buyco-poc-dev.projects.blockstars.io:30301"
     }
 }
