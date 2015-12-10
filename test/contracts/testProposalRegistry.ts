@@ -78,7 +78,7 @@ describe("ProposalRegistry", () => {
         var proposalContractDefinition;
         var proposalContract;
 
-        registryContract.addProposal(name1, price1, { gas: 2500000 })
+        registryContract.addProposal(name1, "A very special product", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
@@ -88,10 +88,10 @@ describe("ProposalRegistry", () => {
                 proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
                 proposalContract = proposalContractDefinition.at(newProposalAddress);
 
-                assert.equal(proposalContract.product(), name1);
-                assert.equal(proposalContract.price().toNumber(), price1);
+                assert.equal(proposalContract.productName(), name1);
+                assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                return registryContract.addProposal(name2, price2, { gas: 2500000 });
+                return registryContract.addProposal(name2, "Another exeptional product", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
@@ -100,8 +100,8 @@ describe("ProposalRegistry", () => {
                 proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
                 proposalContract = proposalContractDefinition.at(newProposalAddress);
 
-                assert.equal(proposalContract.product(), name2);
-                assert.equal(proposalContract.price().toNumber(), price2);
+                assert.equal(proposalContract.productName(), name2);
+                assert.equal(proposalContract.maxPrice().toNumber(), price2);
 
                 done();
             })
