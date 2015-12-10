@@ -70,6 +70,12 @@
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
     <TypeScriptCompile Include="services\upholdService.ts" />
+    <TypeScriptCompile Include="test\contracts\testProposalCalculations.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\testProposalClose.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\testProposalOffers.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
