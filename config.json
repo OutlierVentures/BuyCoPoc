@@ -1,14 +1,14 @@
 ﻿{
     "__comment": "This is the default configuration file. If you want custom configuration, copy this file to 'config.json' and adapt.",
-    "useStubs": true,
+    "_useStubs": true,
     "server": {
         "httpPort": 4123,
         "httpsPort": 4124,
         "baseUrl": "https://buyco-poc-dev.projects.blockstars.io"
     },
     "database": {
-        "_url": "mongodb://buyco-poc-dev-user:Uiwjde84ybeqwZEJWho2@ds027505.mongolab.com:27505/buyco-poc-dev",
-        "url": "mongodb://aron:test1234@downtonabbey:27017/test"
+        "url": "mongodb://buyco-poc-dev-user:Uiwjde84ybeqwZEJWho2@ds027505.mongolab.com:27505/buyco-poc-dev",
+        "_url": "mongodb://aron:test1234@downtonabbey:27017/test"
     },
     "uphold": {
         "app": {
@@ -30,7 +30,10 @@
     "ethereum": {
         "jsonRpcUrl": "http://blockchain:8001",
         "nodeUrl": "blockstars.io:40301",
-        "nodeUrl_": "americano.servers.blockstars.io:30301"
+        "nodeUrl_": "americano.servers.blockstars.io:30301",
+        "contracts": {
+            "proposalRegistry": "0x717053c7d898724242d4faad478c6873a75a5f43"
+        }
     }
 
 }

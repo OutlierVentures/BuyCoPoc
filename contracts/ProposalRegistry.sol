@@ -235,7 +235,7 @@ contract ProposalRegistry {
      * All current and historical proposals.
      */
     mapping (uint=>Proposal) public proposals;
-    uint proposalIndex;
+    uint public proposalIndex;
 
     function addProposal(string productName, string description, uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
         proposalIndex++;

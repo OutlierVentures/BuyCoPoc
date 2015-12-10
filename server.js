@@ -82,6 +82,10 @@ var upholdController = require('./controllers/upholdController');
 var uc = new upholdController.UpholdController();
 app.get("/api/uphold/me/cards", uc.getCards);
 app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
+// Proposals
+var proposalController = require('./controllers/proposalController');
+var pc = new proposalController.ProposalController();
+app.get("/api/proposal", pc.getAll);
 /*********************** HTTP server setup ********************/
 var httpsOptions;
 try {

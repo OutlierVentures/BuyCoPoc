@@ -45,10 +45,12 @@
     <TypeScriptCompile Include="client\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
+    <TypeScriptCompile Include="controllers\proposalController.ts" />
     <TypeScriptCompile Include="controllers\stubOauthController.ts" />
     <TypeScriptCompile Include="controllers\upholdController.ts" />
     <TypeScriptCompile Include="lib\web3config.ts" />
     <TypeScriptCompile Include="models\configModel.ts" />
+    <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="server.ts" />
@@ -67,6 +69,7 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="services\configurationService.ts" />
+    <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
     <TypeScriptCompile Include="services\upholdService.ts" />

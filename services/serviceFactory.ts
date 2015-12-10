@@ -1,6 +1,8 @@
 ﻿import upholdService = require('./upholdService');
 import stubUpholdService = require('./stubUpholdService');
 import configurationService = require('./configurationService');
+import proposalService = require('./proposalService');
+import Q = require('q');
 
 export interface IUpholdService {
     getCards: (callback: upholdService.IUpholdCardsCallback) => void;
@@ -26,4 +28,20 @@ export function createUpholdService(token: string): IUpholdService {
     else {
         return new upholdService.UpholdService(token);
     }
+}
+
+export function createProposalService(): Q.Promise<proposalService.ProposalService> {
+    var defer = Q.defer<proposalService.ProposalService>();
+
+    var ps = new proposalService.ProposalService();
+
+    ps.initialize()
+        .then(function () {
+            defer.resolve(ps);
+        })
+        .catch(function (initializeErr) {
+            defer.reject(initializeErr);
+        });
+
+    return defer.promise;
 }

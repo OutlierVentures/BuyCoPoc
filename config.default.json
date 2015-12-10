@@ -22,6 +22,9 @@
     },
     "ethereum": {
         "jsonRpcUrl": "http://buyco-poc-dev.projects.blockstars.io:8001",
-        "nodeUrl": "buyco-poc-dev.projects.blockstars.io:30301"
+        "nodeUrl": "buyco-poc-dev.projects.blockstars.io:30301",
+        "contracts": {
+            "proposalRegistry": "0x0 fill this after deploying the contract"
+        }
     }
 }
