@@ -64,6 +64,12 @@ export class ProposalService {
                 var proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
                 var proposal = proposalContractDefinition.at(proposalAddress);
 
+                // Construct a local object with all the properties of the proposal.
+                // This is extremely slow (seconds), presumably because each of the properties 
+                // requires a separate JSON RPC call. Still wouldn't expect it to be
+                // THAT slow though.
+                // Could change them all to async calls, but that would make the code really
+                // hard to read.
                 var p: proposalModel.IProposal = {
                     productName: proposal.productName(),
                     productDescription: proposal.productName(),
