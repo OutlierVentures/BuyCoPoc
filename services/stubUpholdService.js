@@ -2,8 +2,12 @@ var StubUpholdService = (function () {
     function StubUpholdService(authorizationToken) {
         var _this = this;
         this.authorizationToken = authorizationToken;
+        /**
+         * Gets info about the current user.
+         */
         this.getUser = function (callback) {
             var newUserId = "User" + _this.authorizationToken;
+            // Create a new user array.
             var user = {
                 name: "Stub user",
                 externalId: newUserId,
@@ -141,6 +145,9 @@ var StubUpholdService = (function () {
             ];
             callback(null, transactions);
         };
+        /**
+         * Create a new card.
+         */
         this.createCard = function (label, callback) {
             var newId = "card" + Math.random() * 1000000;
             var card = {

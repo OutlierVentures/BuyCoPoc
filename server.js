@@ -15,12 +15,16 @@ console.log(config);
 var HTTP_PORT = config.server.httpPort;
 var HTTPS_PORT = config.server.httpsPort;
 var baseUrl = config.server.baseUrl + ":" + HTTPS_PORT;
+/************** OAuth controllers ****************/
 var upholdConfig = {
     baseUrl: baseUrl,
     basePath: "/api/auth/uphold",
     clientID: config.uphold.app.clientID,
     clientSecret: config.uphold.app.clientSecret,
     scope: "cards:read,cards:write,transactions:read,transactions:write,user:read",
+    // Uphold uses a different domain for the authorization URL. simple-oauth2 doesn't support that.
+    // The "site" parameter also may not be empty.
+    // As a workaround, we use the greatest common denominator of the two URLs: "https://".
     oauthSite: "https://",
     oauthTokenPath: 'api.uphold.com/oauth2/token',
     oauthAuthorizationPath: 'uphold.com/authorize/' + config.uphold.app.clientID,
@@ -28,6 +32,9 @@ var upholdConfig = {
 };
 var upholdOauthController = new oauthController.OAuthController(upholdConfig);
 var serviceFactory = require('./services/serviceFactory');
+/**
+ * Create a new Uphold service and get user info from it.
+ */
 function getBitReserveUserInfo(token, callback) {
     var brs = serviceFactory.createUpholdService(token);
     brs.getUser(callback);
@@ -35,18 +42,34 @@ function getBitReserveUserInfo(token, callback) {
 upholdOauthController.setGetUserInfoFunction(getBitReserveUserInfo);
 var stubOauthController = require('./controllers/stubOauthController');
 if (config.useStubs) {
+    // Create a stub controller from the real controller.
     var stubController = new stubOauthController.StubOAuthController(upholdOauthController);
+    // Replace the handlers of the real controller by the stubs.
     upholdOauthController.auth = stubController.auth;
     upholdOauthController.callback = stubController.callback;
 }
+/******** Ethereum / web3 setup *************/
+// TODO: make the server not crash badly when the eth connection fails.
 var web3plus = web3config.createWeb3(config.ethereum.jsonRpcUrl);
+/******** Express and route setup ***********/
 var app = express();
 app.use(bodyParser.json());
+// Logging
 var morgan = require('morgan');
 app.use(morgan('dev'));
+// Initialize database connection.
+// The MongoDB connection is currently only created at the node app startup. It could
+// disconnect for some reason.
+// TODO: make this more stable, in a way that doesn't require a specific call to Mongoose
+// before every request (because that will be forgotten).
 var db = mongoose.connect(config.database.url);
+// Client folder containing the Angular SPA, serve as static assets
 var clientDir = path.join(__dirname, 'client');
 app.use(express.static(clientDir));
+// All routes which are directly accessible (i.e. not only from within the Angular SPA).
+// All open index.html, where Angular handles further routing to the right controller/ view.
+// Ideally all routes not matched by server-side routes are forwarded to Angular.
+// TODO: introduce an "other" wildcard handler for this.
 app.get('/', indexRoute.index);
 app.get('/user/profile', indexRoute.index);
 app.get('/user/login', indexRoute.index);
@@ -54,10 +77,12 @@ app.get('/not-found', indexRoute.index);
 app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
 app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
 app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
+// Uphold API wrapper
 var upholdController = require('./controllers/upholdController');
 var uc = new upholdController.UpholdController();
 app.get("/api/uphold/me/cards", uc.getCards);
 app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
+/*********************** HTTP server setup ********************/
 var httpsOptions;
 try {
     console.log("Trying custom certificate.");
