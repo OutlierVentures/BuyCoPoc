@@ -45,7 +45,7 @@ contract Proposal {
      * Prospective buyers backing this proposal.
      */
     mapping(uint => Backing) public backers;
-    uint backerIndex;
+    uint public backerIndex;
 
     /**
      * Index to help access the backer mapping.
@@ -64,8 +64,16 @@ contract Proposal {
      * Back the proposal, i.e. pledge to buy a certain amount.
      */
     function back(uint am) {
+        // TODO: check that the proposal hasn't been closed. Use newer Solidity
+        // functions with precorditions in signature?
         if(am == 0)
             return;
+
+        if(backerIndexByAddress[tx.origin] > 0 ){
+            // Existing backer. Update the amount.
+            backers[backerIndexByAddress[tx.origin]].amount = am;
+            return;
+        }
 
         backerIndex++;
 
@@ -74,8 +82,24 @@ contract Proposal {
         backers[backerIndex].buyerAddress = tx.origin;
     }
 
+    /**
+     * Make an offer
+     */
     function offer(uint price) {
+        // No free offers allowed. Also for safety purposes (empty might end up as 0).
+        if(price = 0) return;
+        if(price > maxPrice) return;
+
         // TODO: implement
+
+
+    }
+
+    /**
+     * Cancel the offer of a seller if the proposal is still open.
+     */
+    function cancelOffer(){
+
     }
 }
 
