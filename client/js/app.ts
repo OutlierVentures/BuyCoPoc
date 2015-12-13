@@ -25,7 +25,6 @@ module BuyCo {
         .controller('NavigationController', NavigationController)
         .controller('LoginController', LoginController)
         .controller('UserAccountController', UserAccountController)
-        //.controller('CircleController', CircleController)
         ;
 
     BuyCoApp.config(function ($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
@@ -36,7 +35,7 @@ module BuyCo {
             .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
             .when('/not-found', { templateUrl: 'views/not-found.html' })
             //.when('/circle/new', { controller: CircleController, templateUrl: 'views/circle-form.html' })
-            //.when('/circle/list', { controller: CircleListController, templateUrl: 'views/circle-list.html' })
+            .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
         // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
         // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't
         // seem to be such an option in Angular.
