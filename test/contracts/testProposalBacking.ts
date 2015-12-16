@@ -45,7 +45,7 @@ describe("ProposalRegistry", () => {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
-        var name1 = "iPhone 6S";
+        var name1 = "Ethiopia Adado Coop";
         var price1 = 10299;
         var amount1 = 15;
 

@@ -47,7 +47,7 @@ describe("ProposalRegistry", () => {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
-        var name1 = "iPhone 6S";
+        var name1 = "Ethiopia Adado Coop";
         var askPrice1 = 10100;
         var askAmount1 = 550;
 
@@ -99,7 +99,7 @@ describe("ProposalRegistry", () => {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
-        var name1 = "iPhone 6S";
+        var name1 = "Ethiopia Adado Coop";
         var askPrice1 = 10100;
         var askAmount1 = 550;
         var sellPrice1 = 10000;
