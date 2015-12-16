@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTAINER_BASE_NAME=bcpoc_server
+CONTAINER_BASE_NAME=buyco_server
 ENVIRONMENT=$1
 
 if [[ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]]; then
@@ -20,5 +20,5 @@ fi
 # Update the version number here after building an image with a new version number.
 docker run -p 4124:4124 \
 	-v /`pwd`/..:/app \
-	--link bcpoc_blockchain_$ENVIRONMENT:blockchain \
-	--name $CONTAINER_NAME -t -i blockstars/bcpoc_server:1.0.0 bash
+	--link buyco_blockchain_$ENVIRONMENT:blockchain \
+	--name $CONTAINER_NAME -t -i blockstars/buyco_server:1.0.0 bash
