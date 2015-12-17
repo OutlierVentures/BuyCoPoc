@@ -9,8 +9,12 @@
     <link href="vendors/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
     <style type="text/css">
+        /* Quick fix for navbar overlapping content */
+        #app {
+            padding: 40px 0px;
+        }
+
         /* Override ng-hide here to hide panels before angular loads */
         .ng-hide {
             /* this is just another form of hiding an element */
@@ -23,7 +27,7 @@
 </head>
 <body>
     <div ng-app="buyCoApp">
-        <div class="navbar navbar-default navbar-fixed-top" ng-show="!isGlobalAdmin" bs-navbar>
+        <div class="navbar navbar-default navbar-fixed-top" ng-show="!isGlobalAdmin">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -38,7 +42,7 @@
                     </a>
                     <a class="navbar-brand" href="/" ng-hide="isLoggedIn">
                         BuyCo
-<!--                        <img class="logo" src="images/logo.png">-->
+                        <!--                        <img class="logo" src="images/logo.png">-->
                     </a>
                 </div>
                 <div class="navbar-collapse collapse">
@@ -69,32 +73,30 @@
                     </div>
                     <div ng-include="'views/login-processing.html'" ng-show="isProcessingLogin"></div>
                 </div>
-
                 <!-- When not logged in, the whole wrapper is hidden. We use the property $rootScope.isLoggedIn
                 which is set to true after a succesful login.-->
                 <div id="wrapper" ng-show="isLoggedIn || isPublicPage()">
                     <!-- Navigation. The navbar view includes the NavigationController. -->
                     <!--                <nav ng-include="'views/navbar.html'"></nav>-->
 
-
                     <div id="page-wrapper">
                         <!-- Main view. The view for the current ngRoute will be shown here. -->
                         <div ng-view></div>
                     </div>
-
                     <!-- /#page-wrapper -->
                 </div>
                 <!-- /#wrapper -->
             </div>
-
         </div>
         <footer>
             <div class="container">
                 BuyCo
                 <!--<img src="images/logo-footer.png">-->
                 <br>
-                <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
-                     src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a>
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+                    <img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
+                         src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
+                </a>
                 <br />
                 <br />
                 <p><a href="http://www.buyco.io/proofofconcept" target="_blank">This is a proof of concept implementation. Please read the disclaimer.</a></p>
@@ -102,34 +104,26 @@
         </footer>
     </div>
 
-
     <!--START from bower-->
     <!-- jQuery -->
     <script src="vendors/jquery/jquery.js"></script>
-
     <!-- Bootstrap Core JavaScript -->
     <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-
     <script src="vendors/angular/angular.js"></script>
     <script src="vendors/angular-resource/angular-resource.min.js"></script>
     <script src="vendors/angular-route/angular-route.min.js"></script>
     <script src="vendors/angular-sanitize/angular-sanitize.min.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.min.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.tpl.min.js"></script>
-
     <script src="vendors/async/lib/async.js"></script>
     <script src="vendors/underscore/underscore-min.js"></script>
-
     <script src="vendors/bignumber.js/bignumber.min.js"></script>
-
     <!--END from bower-->
     <!--Angular assets and app-->
     <script src="js/models.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers/proposalListController.js"></script>
-
     <script src="js/app.js"></script>
-
 </body>
 </html>
