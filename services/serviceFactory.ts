@@ -9,17 +9,21 @@ export interface IUpholdService {
     getUser: (callback: any) => void;
     createCard: (label: string, callback: upholdService.IUpholdCardCallback) => void;
     createTransaction: (
-    fromCard: string,
-    amount: number,
-    currency: string,
-    recipient: string,
-    callback: upholdService.IUpholdTransactionCallback) => void;
+        fromCard: string,
+        amount: number,
+        currency: string,
+        recipient: string,
+        callback: upholdService.IUpholdTransactionCallback) => void;
 
     commitTransaction: (transaction: IUpholdTransaction, callback: upholdService.IUpholdTransactionCallback) => void
     getCardTransactions: (cardiId: string, callback: upholdService.IUpholdTransactionsCallback) => void;
 }
 
 var config = new configurationService.ConfigurationService().getConfiguration();
+
+export function getConfiguration() {
+    return config;
+}
 
 export function createUpholdService(token: string): IUpholdService {
     if (config.useStubs) {

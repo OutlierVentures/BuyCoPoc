@@ -105,6 +105,9 @@ app.use(express.static(clientDir));
 app.get('/', indexRoute.index);
 app.get('/user/profile', indexRoute.index);
 app.get('/user/login', indexRoute.index);
+
+app.get('/proposal/list', indexRoute.index);
+
 app.get('/not-found', indexRoute.index);
 
 app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
@@ -121,6 +124,11 @@ app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
 import proposalController = require('./controllers/proposalController');
 var pc = new proposalController.ProposalController();
 app.get("/api/proposal", pc.getAll);
+
+// Migrations
+import migrationController = require('./controllers/migrationController');
+var mc = new migrationController.MigrationController();
+app.post("/api/migration/update", mc.update);
 
 
 /*********************** HTTP server setup ********************/
