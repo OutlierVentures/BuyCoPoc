@@ -15,17 +15,16 @@ So you'll have to have at least a GitHub Micro subscription, to clone the repo t
 Code submission is then done using pull requests.
 
 Check out your own fork from your own `Code` or `dev` folder, or whatever
-
-    git clone https://github.com/bartvanderwal/BuyCo.git
+`git clone https://github.com/bartvanderwal/BuyCo.git`
 
 Go into the just cloned folder, and add the original repo as a remote named `upstream`.
 
     cd BuyCo/
-    git remote -v             // Before there's only origin
+    git remote -v // Before there's only `origin
     git remote add upstream https://github.com/OutlierVentures/BuyCo.git
-    git remote -v            // After there's also and the new upstream
+    git remote -v // After there's both your own `origin` and the new `upstream` (a `fetch` and `push` for both, so 4 in total) 
 
-When you want to resync your local folder with the main one do:
+When you want to resync your local folder with the main one do: (you might need to do merging, stashing beforehand etc.)
 
     git fetch origin
 
