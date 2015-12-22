@@ -15,7 +15,8 @@ So you'll have to have at least a GitHub Micro subscription, to clone the repo t
 Code submission is then done using pull requests.
 
 Check out your own fork from your own `Code` or `dev` folder, or whatever
-`git clone https://github.com/bartvanderwal/BuyCo.git`
+
+    git clone https://github.com/bartvanderwal/BuyCo.git
 
 Go into the just cloned folder, and add the original repo as a remote named `upstream`.
 
