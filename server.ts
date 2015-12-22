@@ -129,6 +129,7 @@ app.get("/api/proposal", pc.getAll);
 import migrationController = require('./controllers/migrationController');
 var mc = new migrationController.MigrationController();
 app.post("/api/migration/update", mc.update);
+app.post("/api/migration/test/seed", mc.seedTestData);
 
 
 /*********************** HTTP server setup ********************/

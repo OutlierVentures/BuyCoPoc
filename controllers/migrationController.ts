@@ -77,17 +77,13 @@ export class MigrationController {
         var deferLoadRegistry = Q.defer<any>();
 
         web3plus.loadContractFromFile("ProposalRegistry.sol", "ProposalRegistry", this.config.ethereum.contracts.proposalRegistry,
-            true, function (deployErr, deployRes) {
-                if (deployErr) {
-                    deferLoadRegistry.reject(deployErr);
+            true, function (loadErr, loadRes) {
+                if (loadErr) {
+                    deferLoadRegistry.reject(loadErr);
                     return;
                 }
 
-                // Return the contract address so it can be added to the configuration file.
-                // COULD DO: write config file here, or provide result values in a
-                // format that can be easily incorporated in the config file.
-                // ... or use a/the namereg contract...
-                deferLoadRegistry.resolve({ "registryContractAddress": deployRes });
+                deferLoadRegistry.resolve(loadRes);
             });
 
         var registryContract;
