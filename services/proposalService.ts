@@ -48,37 +48,49 @@ export class ProposalService {
         // Get the details of each proposal in separate promises. Each of those requires
         // one or more JSON RPC calls to the blockchain node.
         var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
+        var proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
 
         for (var i = 1; i <= t.registryContract.proposalIndex(); i++) {
             var defer = Q.defer<proposalModel.IProposal>();
 
             getProposalDetailsPromises.push(defer.promise);
 
-            // Call the getter asynchronously by passing a callback.
-            t.registryContract.proposals(i, function (proposalErr, proposalAddress) {
-                if (proposalErr) {
-                    defer.reject(proposalErr);
-                    return;
-                }
+            /**
+             * Create a function to handle a callback from the proposals() of the contract.
+             * It has to be a specific function because the Q.Deferred has to be within
+             * the closure of the function. If not, all callbacks call the last value of
+             * the "defer" variable in the scope of the loop, i.e. the last one.
+             * @param d
+             */
+            function buildGetProposalCallback(d: Q.Deferred<proposalModel.IProposal>) {
+                return function (proposalErr, proposalAddress) {
+                    if (proposalErr) {
+                        d.reject(proposalErr);
+                        return;
+                    }
 
-                var proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
-                var proposal = proposalContractDefinition.at(proposalAddress);
+                    var proposal = proposalContractDefinition.at(proposalAddress);
 
-                // Construct a local object with all the properties of the proposal.
-                // This is extremely slow (seconds), presumably because each of the properties 
-                // requires a separate JSON RPC call. Still wouldn't expect it to be
-                // THAT slow though.
-                // Could change them all to async calls, but that would make the code really
-                // hard to read.
-                var p: proposalModel.IProposal = {
-                    productName: proposal.productName(),
-                    productDescription: proposal.productName(),
-                    maxPrice: proposal.maxPrice().toNumber(),
-                    endDate: proposal.endDate(),
-                    ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
+                    // Construct a local object with all the properties of the proposal.
+                    // This is extremely slow (seconds), presumably because each of the properties 
+                    // requires a separate JSON RPC call. Still wouldn't expect it to be
+                    // THAT slow though.
+                    // Could change them all to async calls, but that would make the code really
+                    // hard to read.
+                    var p: proposalModel.IProposal = {
+                        id: proposalAddress,
+                        productName: proposal.productName(),
+                        productDescription: proposal.productDescription(),
+                        maxPrice: proposal.maxPrice().toNumber(),
+                        endDate: proposal.endDate(),
+                        ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
+                    };
+                    d.resolve(p);
                 };
-                defer.resolve(p);
-            });
+            }
+
+            // Call the getter asynchronously by passing a callback.
+            t.registryContract.proposals(i, buildGetProposalCallback(defer));           
         }
 
         Q.all(getProposalDetailsPromises)

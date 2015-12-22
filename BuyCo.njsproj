@@ -361,6 +361,9 @@
     <TypeScriptCompile Include="test\contracts\testProposalBacking.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\testProposalList.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\testProposalRegistry.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
