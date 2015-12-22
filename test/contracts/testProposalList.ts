@@ -100,6 +100,8 @@ describe("ProposalRegistry", () => {
 
                         var p = <proposalModel.IProposal>{};
 
+                        // We get each of the properties of the proposal async.
+                        // TODO: document further.
                         p.id = proposalAddress;
                         getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                         getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
@@ -175,6 +177,13 @@ describe("ProposalRegistry", () => {
         // have been solved.
         this.timeout(20000);
 
+        // This test gets the 3 contracts and their properties asynchronously. The properties
+        // themselves are still retrieved synchronously. We would expect this method to take
+        // roughly 1/3 of the time of the synchronous calls, as the same amount of work is done
+        // for 3 proposals, but in parallel.
+        // That is however not the case. It's a bit faster than the synchronous variant, but
+        // not much. 
+
         var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
 
         var proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
@@ -196,8 +205,16 @@ describe("ProposalRegistry", () => {
                     }
 
                     proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
+                        // Surprisingly, the proposals are processed / almost / synchronously.
+                        // These console.logs appear about every 2 seconds and the whole thing 
+                        // takes almost 6. 
+                        // This likely means that the contents of this method block execution.
+                        // While the first proposal is processed, no work can be started on the
+                        // second proposal and so on. We get just a slight performance benefit
+                        // because the contract is instantiated async.
                         console.log(Date() + " Got contract object at " + proposalAddress);
-
+                        
+                        
                         var p: proposalModel.IProposal = {
                             id: proposalAddress,
                             productName: proposal.productName(),
@@ -217,6 +234,19 @@ describe("ProposalRegistry", () => {
                         //};
 
                         d.resolve(p);
+
+
+                        // Alternative dummy resolve to test performance characteristics without
+                        // contract calls. Then runs as expected: resolving costs around 2000ms,
+                        // so the same time as a single promise.
+
+                        //function buildResolveFunction(d2: Q.Deferred<proposalModel.IProposal>) {
+                        //    return function () {                       
+                        //        d2.resolve(null);
+                        //    }
+                        //}
+
+                        //setTimeout(buildResolveFunction(d), 2000);
                     });
                 };
             }
