@@ -23,12 +23,12 @@ echo "My environment is: $BCPOC_ENVIRONMENT"
 echo "Starting embark blockchain..."
 embark blockchain $BCPOC_ENVIRONMENT
 
-if [ ! -e /blockchain/BCPOC_$BCPOC_ENVIRONMENT/dapp ]; then
+if [ ! -e /blockchain/bcpoc_$BCPOC_ENVIRONMENT/dapp ]; then
     echo "Blockchain dapp data dir not created. You are on Windows, right? Trying again..."
     embark blockchain $BCPOC_ENVIRONMENT
 fi
 
-if [ ! -e /blockchain/BCPOC_$BCPOC_ENVIRONMENT/nodes ]; then
+if [ ! -e /blockchain/bcpoc_$BCPOC_ENVIRONMENT/nodes ]; then
     echo "Blockchain nodes dir not created. You are on Windows, right? Trying again..."
     embark blockchain $BCPOC_ENVIRONMENT
 fi
