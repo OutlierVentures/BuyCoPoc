@@ -154,7 +154,10 @@ class DashboardController {
         $rootScope.$on('loggedOn', function () {
             t.loadData();
         });
-
+        
+        t.$scope.showAllCards = true;
+        
+        t.$scope.cardsToShow = t.$scope.showAllCards ? t.$scope.allCards : ;
     }
 
     private loadData() {
@@ -184,8 +187,8 @@ class DashboardController {
 
             // TODO: further handling
         });
-
     }
+
 }
 
 class NavigationController {
