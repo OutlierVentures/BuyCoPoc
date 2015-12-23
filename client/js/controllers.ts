@@ -171,6 +171,9 @@ class DashboardController {
                 t.determineCardsToShow();
             }
         });   
+        t.$scope.showAllCards = true;
+        
+        t.$scope.cardsToShow = t.$scope.showAllCards ? t.$scope.allCards : ;
     }
 
     private loadData() {
@@ -212,6 +215,7 @@ class DashboardController {
         var result = _.filter(t.$scope.allCards, { starred: true });
         return result;
     }
+
 }
 
 class NavigationController {
@@ -245,6 +249,5 @@ class UserAccountController {
         this.$rootScope.$on('loggedOn', function (event, data) {
             $scope.userInfo = $rootScope.userInfo;
         });
-
     }
 }
