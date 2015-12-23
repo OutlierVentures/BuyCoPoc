@@ -15,6 +15,8 @@ describe("ProposalRegistry", () => {
 
     var proposalContractDefinition;
 
+    var firstProposal;
+
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
 
@@ -50,14 +52,15 @@ describe("ProposalRegistry", () => {
                 var name3 = "Peru Ciriaco Quispe";
                 var price3 = 189456;
 
-                var proposalContract;
-
                 registryContract.addProposal(name1, "A very special product", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
                 registryContract.addProposal(name2, "A very special product", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
                 registryContract.addProposal(name3, "A very special product", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
                     .then(web3plus.promiseCommital)
                     .then(function (tx) {
+                        var firstProposalAddress = registryContract.proposals(1);
+                        firstProposal = registryContract.allContractTypes.Proposal.contractDefinition.at(firstProposalAddress);
+
                         done();
                     })
                     .catch(function (proposalErr) {
@@ -100,8 +103,16 @@ describe("ProposalRegistry", () => {
 
                         var p = <proposalModel.IProposal>{};
 
-                        // We get each of the properties of the proposal async.
-                        // TODO: document further.
+                        // We get each of the properties of the proposal async. Q.denodeify converts
+                        // each of the contract method taking a callback method into a function that 
+                        // returns a promise.
+                        // We wait for these promises with Q.all, which makes them all execute in 
+                        // parallel.
+                        // Since we are doing 5 similar actions not synchronous but asynchronous, we 
+                        // would expect approximately a 5x speedup over the variant that executes
+                        // these synchronously and the proposals asynchronously. The speedup however
+                        // is far larger.
+                        
                         p.id = proposalAddress;
                         getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                         getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
@@ -171,6 +182,50 @@ describe("ProposalRegistry", () => {
             });
     });
 
+
+    it("should get properties of proposals within a reasonable time, but it doesn't", function (done) {
+        // Getting should be fast.
+        this.timeout(10000);
+
+
+        console.time("getProperty");
+
+        // Result with remote geth node with 10 calls: +-400ms per call
+
+        var numTimes = 10;
+        for (var j = 0; j < numTimes; j++) {
+            //var price = firstProposal.maxPrice();
+            var name = firstProposal.productName();
+        }
+
+        console.timeEnd("getProperty");
+
+        done();
+    });
+
+    it("should get properties of proposals within a reasonable time when using a callback", function (done) {
+        // Getting should be fast.
+        this.timeout(30000);
+
+        console.time("getProperty");
+
+        var numTimes = 20;
+        var numResults = 0;
+
+        // Results with a remote geth node with 10 calls: total 135ms for ALL calls.
+        function getPropertyCallback(value) {
+            numResults++;
+            if (numResults == numTimes) {
+                console.timeEnd("getProperty");
+                done();
+            }
+        }
+
+        for (var j = 0; j < numTimes; j++) {
+            firstProposal.productName(getPropertyCallback);
+        }
+    });
+
     it("should add proposals and then return the list asynchronously using callbacks", function (done) {
         // Getting should be fast.
         // TODO: lower this number once performance problems
@@ -213,8 +268,8 @@ describe("ProposalRegistry", () => {
                         // second proposal and so on. We get just a slight performance benefit
                         // because the contract is instantiated async.
                         console.log(Date() + " Got contract object at " + proposalAddress);
-                        
-                        
+
+
                         var p: proposalModel.IProposal = {
                             id: proposalAddress,
                             productName: proposal.productName(),
