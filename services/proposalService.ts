@@ -113,6 +113,13 @@ export class ProposalService {
 
         var defer = Q.defer<proposalModel.IProposal>();
 
+        // Workaround for empty dates in current implementation
+        var anyP = <any>p;
+        if (!p.endDate)
+            anyP.endDate = "";
+        if (!p.ultimateDeliveryDate)
+            anyP.ultimateDeliveryDate = "";
+
         this.registryContract.addProposal(p.productName,
             p.productDescription, p.maxPrice,
             p.endDate, p.ultimateDeliveryDate, { gas: 2500000 })

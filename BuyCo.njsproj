@@ -37,6 +37,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="client\js\app.ts" />
     <TypeScriptCompile Include="client\js\controllers.ts" />
+    <TypeScriptCompile Include="client\js\controllers\proposalController.ts" />
     <TypeScriptCompile Include="client\js\controllers\proposalListController.ts" />
     <TypeScriptCompile Include="client\js\models.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />
@@ -334,6 +335,7 @@
     <Content Include="client\vendors\underscore\package.json" />
     <Content Include="client\vendors\underscore\README.md" />
     <Content Include="client\vendors\underscore\underscore-min.map" />
+    <Content Include="client\views\proposal-form.html" />
     <Content Include="client\views\proposal-list.html" />
     <Content Include="client\views\dashboard.html" />
     <Content Include="client\views\login-finished.html" />

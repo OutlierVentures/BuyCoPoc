@@ -34,7 +34,7 @@ module BuyCo {
         //.when('/user/profile', { controller: UserAccountController, templateUrl: 'views/user-profile.html' })
             .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
             .when('/not-found', { templateUrl: 'views/not-found.html' })
-            //.when('/circle/new', { controller: CircleController, templateUrl: 'views/circle-form.html' })
+            .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html' })
             .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
         // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
         // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't

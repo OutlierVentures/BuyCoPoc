@@ -1,0 +1,69 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>Create a new proposal</h2>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>
+                                Please describe your new buying proposal.
+                            </p>
+                            <form role="form" name="proposalForm" novalidate>
+                                <fieldset ng-disabled="processMessage || successMessage">
+                                    <div class="form-group">
+                                        <label>Product name</label>
+                                        <p class="help-block">
+                                            Which product to you want to buy?
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.productName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product description</label>
+                                        <p class="help-block">
+                                            Please provide a unique description of the product.
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.productDescription" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Maximum price</label>
+                                        <p class="help-block">
+                                            What is the maximum price you're willing to pay?
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.maxPrice" required>
+                                    </div>
+                                    <button name="saveButton" ng-click="vm.create()" ng-disabled="proposalForm.$invalid" class="btn btn-primary">
+                                        Create my proposal
+                                    </button>
+                                </fieldset>
+                            </form>
+                            <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
+                                <div class="panel-heading">Processing</div>
+                                <div class="panel-body">{{processMessage}}</div>
+                            </div>
+                            <div class="panel panel-danger" style="margin-top:1em;" ng-show="errorMessage">
+                                <div class="panel-heading">There was an error processing your request.</div>
+                                <div class="panel-body">{{errorMessage}}</div>
+                            </div>
+                            <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
+                                <div class="panel-heading">Success</div>
+                                <div class="panel-body">
+                                    <p>{{successMessage}}</p>
+                                    <p>Smart contract address: <strong>{{proposal.id}}</strong>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-lg-8 (nested) -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+</div>

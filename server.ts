@@ -107,6 +107,7 @@ app.get('/user/profile', indexRoute.index);
 app.get('/user/login', indexRoute.index);
 
 app.get('/proposal/list', indexRoute.index);
+app.get('/proposal/new', indexRoute.index);
 
 app.get('/not-found', indexRoute.index);
 
