@@ -50,18 +50,13 @@ export class ProposalService {
         var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
         var proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
 
-        for (var i = 1; i <= t.registryContract.proposalIndex(); i++) {
+        var numProposals = t.registryContract.proposalIndex().toNumber();
+
+        for (var i = 1; i <= numProposals; i++) {
             var defer = Q.defer<proposalModel.IProposal>();
 
             getProposalDetailsPromises.push(defer.promise);
 
-            /**
-             * Create a function to handle a callback from the proposals() of the contract.
-             * It has to be a specific function because the Q.Deferred has to be within
-             * the closure of the function. If not, all callbacks call the last value of
-             * the "defer" variable in the scope of the loop, i.e. the last one.
-             * @param d
-             */
             function buildGetProposalCallback(d: Q.Deferred<proposalModel.IProposal>) {
                 return function (proposalErr, proposalAddress) {
                     if (proposalErr) {
@@ -69,28 +64,35 @@ export class ProposalService {
                         return;
                     }
 
-                    var proposal = proposalContractDefinition.at(proposalAddress);
+                    proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
+                        console.log(Date() + " Got contract object at " + proposalAddress);
 
-                    // Construct a local object with all the properties of the proposal.
-                    // This is extremely slow (seconds), presumably because each of the properties 
-                    // requires a separate JSON RPC call. Still wouldn't expect it to be
-                    // THAT slow though.
-                    // Could change them all to async calls, but that would make the code really
-                    // hard to read.
-                    var p: proposalModel.IProposal = {
-                        id: proposalAddress,
-                        productName: proposal.productName(),
-                        productDescription: proposal.productDescription(),
-                        maxPrice: proposal.maxPrice().toNumber(),
-                        endDate: proposal.endDate(),
-                        ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
-                    };
-                    d.resolve(p);
+                        var getProperties = new Array<Q.Promise<void>>();
+
+                        var p = <proposalModel.IProposal>{};
+
+                        // We get each of the properties of the proposal async, all with a separate promise.
+                        // This leads to unreadable code, but it's the only known way of delivering
+                        // reasonable performance. See testProposalList.ts for more info.
+                        
+                        p.id = proposalAddress;
+                        getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
+                        getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
+                        getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber(); }));
+                        getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
+                        getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
+
+                        Q.all(getProperties)
+                            .then(function () {
+                                d.resolve(p);
+                            });
+                    });
+
                 };
             }
 
             // Call the getter asynchronously by passing a callback.
-            t.registryContract.proposals(i, buildGetProposalCallback(defer));           
+            t.registryContract.proposals(i, buildGetProposalCallback(defer));
         }
 
         Q.all(getProposalDetailsPromises)
