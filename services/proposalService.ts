@@ -12,6 +12,7 @@ interface IBigNumber {
 export class ProposalService {
     config = new configurationService.ConfigurationService().getConfiguration();
     registryContract;
+    proposalContractDefinition;
 
     constructor() {
     }
@@ -26,6 +27,7 @@ export class ProposalService {
                     return;
                 }
                 t.registryContract = con;
+                t.proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
                 
                 // Even though the defer is of type void, TypeScript wants a parameter passed
                 // to compile.
@@ -48,7 +50,7 @@ export class ProposalService {
         // Get the details of each proposal in separate promises. Each of those requires
         // one or more JSON RPC calls to the blockchain node.
         var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
-        var proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
+
 
         var numProposals = t.registryContract.proposalIndex().toNumber();
 
@@ -64,7 +66,7 @@ export class ProposalService {
                         return;
                     }
 
-                    proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
+                    t.proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
                         console.log(Date() + " Got contract object at " + proposalAddress);
 
                         var getProperties = new Array<Q.Promise<void>>();
@@ -104,6 +106,33 @@ export class ProposalService {
             });
 
         return deferred.promise;
+    }
+
+    create(p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        this.registryContract.addProposal(p.productName,
+            p.productDescription, p.maxPrice,
+            p.endDate, p.ultimateDeliveryDate, { gas: 2500000 })
+            .then(web3plus.promiseCommital)
+            .then(function getProposalResult(tx) {
+                // At this point we have no unique reference to the proposal we
+                // just added. As a workaround, we take the newest proposal.
+                // That is NOT a reliable way and has to be fixed.
+                // TODO: get the proposal by a unique identifier.
+                var proposalIndex = t.registryContract.proposalIndex().toNumber();
+                var newProposalAddress = t.registryContract.proposals(proposalIndex);
+
+                p.id = newProposalAddress;
+
+                defer.resolve(p);
+            }, function getProposalErr(err) {
+                defer.reject(err);
+            });
+
+        return defer.promise;
     }
 
 }

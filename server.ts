@@ -124,6 +124,7 @@ app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
 import proposalController = require('./controllers/proposalController');
 var pc = new proposalController.ProposalController();
 app.get("/api/proposal", pc.getAll);
+app.post("/api/proposal", pc.create);
 
 // Migrations
 import migrationController = require('./controllers/migrationController');
