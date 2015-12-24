@@ -21,10 +21,11 @@
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://buyco-poc-dev.projects.blockstars.io:8001",
-        "nodeUrl": "buyco-poc-dev.projects.blockstars.io:30301",
+        "__comment" : "This configuration uses the development Ethereum node on blockstars.io.",
+        "jsonRpcUrl": "http://blockstars.io:9001",
+        "nodeUrl": "blockstars.io:30301",
         "contracts": {
-            "proposalRegistry": "0x0 fill this after deploying the contract"
+            "proposalRegistry": "0x0b97c62080f2654bcf7204c242769d1062c31065"
         }
     }
 }
