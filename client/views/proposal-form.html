@@ -35,6 +35,20 @@
                                         </p>
                                         <input class="form-control" type="text" ng-model="proposal.maxPrice" required>
                                     </div>
+                                    <div class="form-group">
+                                        <label>End date</label>
+                                        <p class="help-block">
+                                            Until what date can people back this proposal?
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.endDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ultimate delivery date</label>
+                                        <p class="help-block">
+                                            What is the latest date when the goods have to be delivered to all buyers?
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.ultimateDeliveryDate" required>
+                                    </div>
                                     <button name="saveButton" ng-click="vm.create()" ng-disabled="proposalForm.$invalid" class="btn btn-primary">
                                         Create my proposal
                                     </button>
