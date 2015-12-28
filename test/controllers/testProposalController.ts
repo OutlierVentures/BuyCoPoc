@@ -26,10 +26,9 @@ describe("ProposalController", () => {
         done();
     });
 
-    it("should return a list of proposals on getAll()", function (done) {
+    it("should return a list of proposals on GET /api/proposal", function (done) {
         this.timeout(10000);
 
-        // TODO: call method of the controller without actually requesting
         request(theApp)
             .get('/api/proposal')
             .expect('Content-Type', /json/)
