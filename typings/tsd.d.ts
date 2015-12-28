@@ -10,3 +10,5 @@
 /// <reference path="request/request.d.ts" />
 /// <reference path="serve-static/serve-static.d.ts" />
 /// <reference path="underscore/underscore.d.ts" />
+/// <reference path="superagent/superagent.d.ts" />
+/// <reference path="supertest/supertest.d.ts" />

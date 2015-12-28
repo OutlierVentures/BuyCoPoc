@@ -4,11 +4,11 @@ import path = require('path');
 
 export function createWeb3() {
     var cs = new configurationService.ConfigurationService();
-    cs.basePath = "../../";
+    cs.basePath = path.resolve(path.dirname(__filename), "../../") + "/";
     var config = cs.getConfiguration();
-    
+
     var jsonRpcUrl = config.ethereum.jsonRpcUrl;
-    w3p.initialize(jsonRpcUrl, path.resolve(__dirname + '/../../contracts'));
+    w3p.initialize(jsonRpcUrl, cs.basePath + 'contracts');
 
     return w3p;
 }

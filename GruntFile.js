@@ -5,12 +5,12 @@ module.exports = function (grunt) {
 
 		nodemon : {
 			dev : {
-				script : 'server.js'
+				script : 'launcher.js'
 			},
 			options : {
 				ignore : ['node_modules/**', 'Gruntfile.js'],
 				env : {
-					PORT : '3123'
+					PORT : '4123'
 				}
 			}
 		},

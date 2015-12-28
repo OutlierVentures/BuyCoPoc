@@ -13,7 +13,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>89774e12-44ae-4e6a-a811-75cbdd555bda</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>server.ts</StartupFile>
+    <StartupFile>launcher.ts</StartupFile>
     <StartWebBrowser>True</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -57,6 +57,7 @@
     <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
+    <TypeScriptCompile Include="launcher.ts" />
     <TypeScriptCompile Include="server.ts" />
     <Content Include="cert.default.pem" />
     <Content Include="client\bower.json" />
@@ -370,6 +371,9 @@
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\web3config.ts" />
+    <TypeScriptCompile Include="test\controllers\testProposalController.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\express\express.d.ts" />
     <TypeScriptCompile Include="typings\form-data\form-data.d.ts" />
@@ -457,6 +461,7 @@
     <Folder Include="routes\" />
     <Folder Include="test\" />
     <Folder Include="test\contracts\" />
+    <Folder Include="test\controllers\" />
     <Folder Include="typings\" />
     <Folder Include="services\" />
     <Folder Include="typings\body-parser\" />
