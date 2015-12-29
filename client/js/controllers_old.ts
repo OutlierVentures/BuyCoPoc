@@ -34,7 +34,7 @@ class LoginController {
         private $route: ng.route.IRouteService,
         private identityService: IdentityService) {
 
-        $scope.isAuthenticated = function (): boolean {
+        $scope.isAuthenticated = function(): boolean {
             return identityService.isAuthenticated();
         }
 
@@ -61,11 +61,11 @@ class LoginController {
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
         } else if (this.$location.path() === "/auth/uphold/callback"
-            // Don't handle a login attempt while already logged in
+        // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
             && !this.$rootScope.isProcessingLogin
-        ) {
+            ) {
             this.$rootScope.isProcessingLogin = true;
 
             // Handle OAuth callback
@@ -162,21 +162,21 @@ class DashboardController {
         }
 
         // The logon could happen while the controller is already loaded.
-        $rootScope.$on('loggedOn', function () {
+        $rootScope.$on('loggedOn', function() {
             t.loadData();
         });
         
         // Get underscore from global (TODO: inject!)
         t._ = t.$window._;
-
+        
         t.$scope.favoriteCardsOnly = false;
         t.determineCardsToShow();
-
+        
         t.$scope.$watch('favoriteCardsOnly', (newValue, oldValue) => {
-            if (newValue !== oldValue) {
+            if (newValue!==oldValue) {
                 t.determineCardsToShow();
             }
-        });
+        });   
     }
 
     private loadData() {
@@ -193,7 +193,7 @@ class DashboardController {
             method: 'GET',
             url: apiUrl + '/uphold/me/cards',
             headers: { AccessToken: t.$scope.userInfo.accessToken }
-        }).success(function (cards: any) {
+        }).success(function(cards: any) {
             console.log("Success on Uphold call through our API. Result:");
             console.log(cards);
 
@@ -208,17 +208,17 @@ class DashboardController {
             // TODO: further handling
         });
     }
-
+    
     private determineCardsToShow() {
         var t = this;
         t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
             // When favoriteCardsOnly then show only cards with settings.starred = true.
-            t.$scope.allCards : t._.filter(t.$scope.allCards, function (card: IUpholdCard) {
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function(card: IUpholdCard) {
                 return card.settings.starred;
             });
         ;
     }
-
+    
     private starredCards() {
         var t = this;
         var result = t._.filter(t.$scope.allCards, { starred: true });
@@ -239,7 +239,7 @@ class NavigationController {
 
 interface IUserAccountScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated(): Boolean;
+    isAuthenticated() : Boolean;
     userInfo: IUser;
 }
 
