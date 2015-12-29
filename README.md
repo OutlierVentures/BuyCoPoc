@@ -51,7 +51,7 @@ Before doing a pull request, you want to resync your local folder based on the f
 
     git status                         -- There should be no changes, otherwise push them to own remote first!
     git rebase upstream/development
-    git pull                           -- Then sync back the changes from your own remote, manually merge any changes.
+    git pull                           -- Then sync back the changes from your own remote, manually merge any changes (and after use 'git rebase --continue' et al).
     git push                           -- And then sync the changes from the fork.
 
 To get the commits nice it's best to rebase. And you have to manually merge any changes from the upstream, and push them to your own remote repo.
