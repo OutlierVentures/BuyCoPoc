@@ -27,10 +27,9 @@ module.exports = function (grunt) {
 	 //       }
 	 //     }
 	 //   },
-
-		watch : {
+        watch : {
 			scripts : {
-				files : ['**/*.ts', '!node_modules/**/*.ts'], // the watched files
+				files : ['**/*.ts', '!node_modules/**/*.ts', '!client/**/*.*'], // the watched files
 				// tasks : ["newer:tslint:all", "ts:build"], // the task to run
 				tasks : ['ts:build'], // the task to run
 				options : {
@@ -38,10 +37,28 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-
+		watchBackend : {
+			scripts : {
+				files : ['**/*.ts', '!node_modules/**/*.ts', '!client/**/*.*'], // the watched files
+				// tasks : ["newer:tslint:all", "ts:build"], // the task to run
+				tasks : ['ts:buildBackend'], // the task to run
+				options : {
+					spawn : false // makes the watch task faster
+				}
+			}
+		},
+        watchFrontend : {
+			scripts : {
+				files : ['client/**/*.ts', '!client/vendors/**/*.*'], // the watched files
+				tasks : ['ts:buildFrontend'], // the task to run
+				options : {
+					spawn : false // makes the watch task faster
+				}
+			}
+		},
 		concurrent : {
 			watchers : {
-				tasks : ['nodemon', 'watch'],
+				tasks : ['nodemon', 'watch', 'ts:build'],
 				options : {
 					logConcurrentOutput : true
 				}
@@ -59,6 +76,20 @@ module.exports = function (grunt) {
 		ts : {
 			build : {
 				src : ["**/*.ts", "!node_modules/**/*.ts"], // Avoid compiling TypeScript files in node_modules
+				options : {
+					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
+					fast : 'never' // You'll need to recompile all the files each time for NodeJS
+				}
+			},
+            buildBackend : {
+				src : ["**/*.ts", "!node_modules/**/*.ts", "!client/**/*.*"], // Avoid compiling TypeScript files in node_modules
+				options : {
+					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
+					fast : 'never' // You'll need to recompile all the files each time for NodeJS
+				}
+			},
+            buildFrontend : {
+				src : ["client/**/*.ts", "!client/vendors/**/*.ts"], // Avoid compiling TypeScript files in node_modules
 				options : {
 					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
 					fast : 'never' // You'll need to recompile all the files each time for NodeJS

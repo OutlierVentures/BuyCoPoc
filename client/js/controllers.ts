@@ -122,9 +122,11 @@ class LoginController {
     }
 }
 
-interface IDashboardScope {
+interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
     allCards: any;
+    cardsToShow: any;
+    favoriteCardsOnly: boolean;
 }
 
 
@@ -133,13 +135,16 @@ class DashboardController {
         "$scope",
         "$rootScope",
         "$location",
-        "$http"];
+        "$http",
+        "$window"];
 
     constructor(
         private $scope: IDashboardScope,
         private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService,
-        private $http: ng.IHttpService) {
+        private $http: ng.IHttpService,
+        private $window: ng.IWindowService,
+        private _: any) {
 
         var t = this;
 
@@ -151,13 +156,21 @@ class DashboardController {
         }
 
         // The logon could happen while the controller is already loaded.
-        $rootScope.$on('loggedOn', function () {
+        $rootScope.$on('loggedOn', function() {
             t.loadData();
         });
         
-        t.$scope.showAllCards = true;
+        // Get underscore from global (TODO: inject!)
+        t._ = t.$window._;
         
-        t.$scope.cardsToShow = t.$scope.showAllCards ? t.$scope.allCards : ;
+        t.$scope.favoriteCardsOnly = false;
+        t.determineCardsToShow();
+        
+        t.$scope.$watch('favoriteCardsOnly', (newValue, oldValue) => {
+            if (newValue!==oldValue) {
+                t.determineCardsToShow();
+            }
+        });   
     }
 
     private loadData() {
@@ -180,6 +193,7 @@ class DashboardController {
 
             // Store in scope to show in view
             t.$scope.allCards = cards;
+            t.determineCardsToShow();
         }).error(function (error) {
             // Handle error
             console.log("Error on Uphold call through our API:");
@@ -188,7 +202,16 @@ class DashboardController {
             // TODO: further handling
         });
     }
-
+    
+    private determineCardsToShow() {
+        var t = this;
+        t.$scope.cardsToShow = t.$scope.favoriteCardsOnly ? _.filter(t.$scope.allCards, { starred: true }) : t.$scope.allCards;
+    }
+    
+    private starredCards() {
+        var result = _.filter(t.$scope.allCards, { starred: true });
+        return result;
+    }
 }
 
 class NavigationController {
