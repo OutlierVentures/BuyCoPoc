@@ -9,8 +9,7 @@ interface ILoginScope extends ng.IScope {
 }
 
 interface IOVWindowService extends ng.IWindowService {
-    _: UnderscoreStatic; // Extend with underscore.
-}
+    _: UnderscoreStatic; // Extend window with underscore.
 
 /**
  * Controller for the logon box.

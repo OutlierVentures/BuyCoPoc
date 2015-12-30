@@ -36,11 +36,14 @@ module BuyCo {
             .when('/not-found', { templateUrl: 'views/not-found.html' })
             .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html' })
             .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
+
             // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
             // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't
             // seem to be such an option in Angular.
             .when('/proposal/:id', { controller: ProposalController, templateUrl: 'views/proposal-details.html', name: 'details' })
             .when('/proposal/:id/back', { controller: ProposalController, templateUrl: 'views/proposal-back.html', name: 'back' })
+            .when('/seller/signup', { controller: SellerSignupController, templateUrl: 'sellers/seller-signup.html' })
+            .when('/seller/list', { controller: SellerListController, templateUrl: 'sellers/seller-list.html' })
             .otherwise({ redirectTo: 'not-found' });
         $locationProvider.html5Mode(true);
         $locationProvider.hashPrefix('!');

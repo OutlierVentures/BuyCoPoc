@@ -1,0 +1,14 @@
+{
+    "version": "0.1.0",
+    "command": "tsc",
+    "isShellCommand": true,
+    "tasks": [
+        {
+            "taskName": "tsc",
+            "suppressTaskName": true,
+            "isBuildCommand": true,
+            "showOutput": "silent",
+            "args": ["client/js/controllers.ts"]
+        }
+    ]
+}

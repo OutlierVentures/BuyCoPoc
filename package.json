@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Buyco Proof of Concept implementation",
   "main": "server.js",
-  "repository": "https://github.com/OutlierVentures/BuyCo",
+  "repository": {
+    "url": "https://github.com/OutlierVentures/BuyCo",
+    "type": "git"
+  },
   "private": true,
   "scripts": {
     "test": "mocha --recursive",
@@ -34,6 +37,8 @@
     "grunt-nodemon": "^0.4.0",
     "grunt-ts": "^4.2.0",
     "mocha": "^2.3.3",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "grunt-injector": "^0.6.1",
+    "grunt-wiredep": "^2.0.0",
   }
 }

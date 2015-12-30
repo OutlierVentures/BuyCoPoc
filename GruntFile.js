@@ -31,7 +31,7 @@ module.exports = function (grunt) {
 			scripts : {
 				files : ['**/*.ts', '!node_modules/**/*.ts', '!client/**/*.*'], // the watched files
 				// tasks : ["newer:tslint:all", "ts:build"], // the task to run
-				tasks : ['ts:build'], // the task to run
+				tasks : ['ts:build', 'injector'], // the task to run
 				options : {
 					spawn : false // makes the watch task faster
 				}
@@ -41,7 +41,7 @@ module.exports = function (grunt) {
 			scripts : {
 				files : ['**/*.ts', '!node_modules/**/*.ts', '!client/**/*.*'], // the watched files
 				// tasks : ["newer:tslint:all", "ts:build"], // the task to run
-				tasks : ['ts:buildBackend'], // the task to run
+				tasks : ['ts:buildBackend', 'injector'], // the task to run
 				options : {
 					spawn : false // makes the watch task faster
 				}
@@ -95,6 +95,35 @@ module.exports = function (grunt) {
 					fast : 'never' // You'll need to recompile all the files each time for NodeJS
 				}
 			}
+		},
+		wiredep: {
+			task: {
+				options: {
+					cwd: 'client'
+				},
+				src: [
+					'client/index.html'
+				]
+			}
+		},
+		injector: {
+			options: {
+				ignorePath: 'client',
+				addRootSlash: false
+			},
+			local_dependencies: {
+				files: {
+					'client/index.html': [
+						'client/js/**/*.module.js',
+						'client/js/controllers.js',
+						'client/js/services.js',
+						'client/js/**/*controller.js',
+						'client/js/app.js',
+						'client/js/**/*.js', 
+						'!**/*.spec.js'
+					]
+				}
+			}
 		}
 	});
 
@@ -103,11 +132,13 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-nodemon");
 	grunt.loadNpmTasks("grunt-concurrent");
 	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-wiredep');
+	grunt.loadNpmTasks('grunt-injector');
 
 	// Default tasks.
 	grunt.registerTask("serve", ["concurrent:watchers"]);
 	// tslint disabled for now, gives 'Warning: Task "tslint:all" not found. Use --force to continue.'
 	// Even with latest tslint.
 	// grunt.registerTask('default', ["tslint:all", "ts:build"]);
-	grunt.registerTask('default', ["ts:build"]);
+	grunt.registerTask('default', ['ts:build', 'wiredep', 'injector']);
 };
