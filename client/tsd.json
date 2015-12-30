@@ -19,6 +19,9 @@
     },
     "cryptojs/cryptojs.d.ts": {
       "commit": "c5a2f44bab06cf9f2bcc14530171daac1cebff6c"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
     }
   }
 }

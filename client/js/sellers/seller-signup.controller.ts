@@ -1,4 +1,8 @@
-﻿﻿class SellerSignupController {
+﻿﻿interface ISellerSignUpScope extends ng.IScope {
+    signupResponse: any;
+}
+
+class SellerSignupController {
     public static $inject = [
         "$scope",
         "$rootScope",
@@ -6,16 +10,17 @@
         "$location",
         "$window",
         "$route",
-        "identityService"];
+        "identityService",
+        "ngMessages"];
 
     constructor(
-        private $scope: ng.IScope,
+        private $scope: ISellerSignUpScope,
         private $rootScope: BuyCoRootScope,
         private $http: ng.IHttpService,
         private $location: ng.ILocationService,
         private $route: ng.route.IRouteService,
         private identityService: IdentityService) {
-        $scope.vm = this;
+        // $scope.vm = this;
 
         this.signup();
     }
@@ -25,7 +30,7 @@
 
         this.$http({
             method: 'POST',
-            url: apiUrl + '/signup',
+            url: apiUrl + '/seller/signup',
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: any) {
             t.$scope.signupResponse = resultData;

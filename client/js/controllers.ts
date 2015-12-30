@@ -1,9 +1,15 @@
 ﻿interface ILoginScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated();
-    login();
+    isAuthenticated(): boolean;
+    login(): any;
     userInfo: IUser;
     isGlobalAdmin: boolean;
+}
+
+
+
+interface IOVWindowService extends ng.IWindowService {
+    _: any; // Extend with underscore.
 }
 
 /**
@@ -143,7 +149,7 @@ class DashboardController {
         private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService,
         private $http: ng.IHttpService,
-        private $window: ng.IWindowService,
+        private $window: IOVWindowService,
         private _: any) {
 
         var t = this;
@@ -205,11 +211,17 @@ class DashboardController {
     
     private determineCardsToShow() {
         var t = this;
-        t.$scope.cardsToShow = t.$scope.favoriteCardsOnly ? _.filter(t.$scope.allCards, { starred: true }) : t.$scope.allCards;
+        t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
+            // When favoriteCardsOnly then show only cards with settings.starred = true.
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function(item) {
+                return item.settings.starred;
+            });
+        ;
     }
     
     private starredCards() {
-        var result = _.filter(t.$scope.allCards, { starred: true });
+        var t = this;
+        var result = t._.filter(t.$scope.allCards, { starred: true });
         return result;
     }
 }
