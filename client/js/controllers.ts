@@ -33,7 +33,7 @@ class LoginController {
         private $route: ng.route.IRouteService,
         private identityService: IdentityService) {
 
-        $scope.isAuthenticated = function (): boolean {
+        $scope.isAuthenticated = function(): boolean {
             return identityService.isAuthenticated();
         }
 

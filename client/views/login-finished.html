@@ -1,10 +1,10 @@
 ﻿<div class="jumbotron" ng-hide="isGlobalAdmin">
-	<div class="container">
-	    <h5>Welcome</h5>
-	    <p>Hello {{userInfo.name}}, you have successfully logged in.</p>
-	    <!--
+    <div class="container">
+        <h5>Welcome</h5>
+        <p>Hello {{userInfo.name}}, you have successfully logged in.</p>
+        <!--
         <a class="btn btn-brand" href="/proposal/new">Create a new buying proposal</a>
-	    <a class="btn btn-primary" href="/proposal/list">See buying proposals</a>
+        <a class="btn btn-primary" href="/proposal/list">See buying proposals</a>
         -->
         <div class="row">
             <div class="col-md-12">
@@ -14,24 +14,23 @@
                 </div>
             </div>
         </div>
-        <br/>
+        <br />
         <div class="row">
             <div class="col-md-12">
                 <div class="btn-group" role="group" aria-label="Sellers">
-                    <a type="button" href="/seller/signup" class="btn btn-default" style="width: 200px;">Sellers</a>
-                    <a type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="left" title="Sign up as seller"><span class="glyphicon glyphicon-plus"></span></a>
+                    <a type="button" href="/seller/list" class="btn btn-default" style="width: 200px;">Sellers</a>
+                    <a type="button" href="/seller/signup" class="btn btn-primary" data-toggle="tooltip" data-placement="left" title="Sign up as seller"><span class="glyphicon glyphicon-plus"></span></a>
                 </div>
             </div>
         </div>
     </div>
-    
-</div>
+
 </div>
 <div class="jumbotron" ng-show="isGlobalAdmin">
-	<div class="container">
-		<h5>Global Circle Vault</h1>
-		<p>Hello {{userInfo.name}},</p>
+    <div class="container">
+        <h5>Global Circle Vault</h5>
+        <p>Hello {{userInfo.name}},</p>
         <p>You successfully logged in!</p>
-		<p>Your access token has been stored for the app to use. The app is now able to pay out loans on your behalf. You can now close this window.</p>
+        <p>Your access token has been stored for the app to use. The app is now able to pay out loans on your behalf. You can now close this window.</p>
     </div>
 </div>

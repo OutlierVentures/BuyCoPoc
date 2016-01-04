@@ -89,7 +89,6 @@ class UpholdIdentityProvider implements IIdentityProvider {
     }
 }
 
-
 /**
  * Service managing the identity of the user on the various backends.
  */
@@ -118,7 +117,7 @@ class IdentityService {
     logon(provider: IIdentityProvider): boolean {
         if (!provider.logon())
             return false;
-        this.providers.push(provider)
+        this.providers.push(provider);
         // The first successful provider is the primary one.
         if (!this.primaryProvider)
             this.primaryProvider = provider;

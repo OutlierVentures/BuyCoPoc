@@ -1,0 +1,112 @@
+﻿[
+  {
+    "id": "2331",
+    "productName": "Nike Air max",
+    "productDescription": "The one and only",
+    "productCategory": "shoes",
+    "partNumber": "EOI1",
+    "minimumTotalAmount": 200.12,
+    "maxPrice": 120,
+    "endDate": "Date",
+    "ultimateDeliveryDate": "2016/08/01"
+  },
+  {
+    "id": "2332",
+    "productName": "Nike Air Pegasus",
+    "productDescription": "Something else altogether",
+    "productCategory": "shoes",
+    "partNumber": "EOI2",
+    "minimumTotalAmount": 1200,
+    "maxPrice": 100,
+    "endDate": "2016/04/01",
+    "ultimateDeliveryDate": "2016/08/01"
+  },
+  {
+    "id": "2333",
+    "productName": "Nike Free",
+    "productDescription": "Free your feet",
+    "productCategory": "shoes",
+    "partNumber": "EOI3",
+    "minimumTotalAmount": 10000,
+    "maxPrice": 110,
+    "endDate": "2016/05/01",
+    "ultimateDeliveryDate": "2016/05/01"
+  },
+  {
+    "id": "2334",
+    "productName": "Adidas Bottom up",
+    "productDescription": "Rebuild from the .. :)",
+    "productCategory": "shoes",
+    "partNumber": "EOI4",
+    "minimumTotalAmount": 50,
+    "maxPrice": 90,
+    "endDate": "2016/02/01",
+    "ultimateDeliveryDate": "2016/02/06"
+  },
+  {
+    "id": "2335",
+    "productName": "Adidas Zero",
+    "productDescription": "Zero is less than the one",
+    "productCategory": "shoes",
+    "partNumber": "EOI5",
+    "minimumTotalAmount": 100,
+    "maxPrice": 180,
+    "endDate": "2016/04/01",
+    "ultimateDeliveryDate": "2016/04/01"
+  },
+  {
+    "id": "3000",
+    "productName": "Bolton stitches",
+    "productDescription": "Careful with the stapler!",
+    "productCategory": "Fantasy books",
+    "partNumber": "FAN01",
+    "minimumTotalAmount": 1000,
+    "maxPrice": 30,
+    "endDate": "2016/02/01",
+    "ultimateDeliveryDate": "2016/02/01"
+  },
+  {
+    "id": "3001",
+    "productName": "Commonality",
+    "productDescription": "Easy does it",
+    "productCategory": "Fantasy books",
+    "partNumber": "FAN02",
+    "minimumTotalAmount": 1100,
+    "maxPrice": 35,
+    "endDate": "2016/02/01",
+    "ultimateDeliveryDate": "2016/02/01"
+  },
+  {
+    "id": "3003",
+    "productName": "Bolton stitches 2",
+    "productDescription": "Still careful with the stapler!",
+    "productCategory": "Fantasy books",
+    "partNumber": "FAN03",
+    "minimumTotalAmount": 1000,
+    "maxPrice": 30,
+    "endDate": "2016/02/01",
+    "ultimateDeliveryDate": "2016/02/01"
+  },
+  {
+    "id": "3004",
+    "productName": "Google Goggles",
+    "productDescription": "Glass for in the water",
+    "productCategory": "HiTech",
+    "partNumber": "TECH-A",
+    "minimumTotalAmount": 1000,
+    "maxPrice": 2980,
+    "endDate": "2018/04/01",
+    "ultimateDeliveryDate": "2018/04/02"
+  },
+  {
+    "id": "3000",
+    "productName": "Bolton stitches",
+    "productDescription": "Careful with the stapler!",
+    "productCategory": "Fantasy books",
+    "partNumber": "FAN01",
+    "minimumTotalAmount": 1000,
+    "maxPrice": 30,
+    "endDate": "2016/02/01",
+    "ultimateDeliveryDate": "2016/02/01"
+  }
+]

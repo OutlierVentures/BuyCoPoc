@@ -77,7 +77,7 @@ export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
         // TODO: use promise to wait for creating new user.
         if (!user) {
             // No user with this token.
-            cb("Not found", null)
+            cb("Not found", null);
         }
 
         // TODO: check for validity of the token.
