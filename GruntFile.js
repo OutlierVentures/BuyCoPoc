@@ -1,4 +1,5 @@
-module.exports = function (grunt) {
+/// <binding BeforeBuild='injector, ts:build' ProjectOpened='watch' />
+module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg : grunt.file.readJSON('package.json'),
@@ -102,25 +103,29 @@ module.exports = function (grunt) {
 					cwd: 'client'
 				},
 				src: [
-					'client/index.html'
+					"client/index.html"
 				]
 			}
 		},
 		injector: {
 			options: {
-				ignorePath: 'client',
+				ignorePath: "client",
 				addRootSlash: false
 			},
 			local_dependencies: {
 				files: {
-					'client/index.html': [
-						'client/js/**/*.module.js',
-						'client/js/controllers.js',
-						'client/js/services.js',
-						'client/js/**/*controller.js',
-						'client/js/app.js',
-						'client/js/**/*.js', 
-						'!**/*.spec.js'
+					"client/index.html": [
+						"client/js/**/*.module.js",
+						"client/js/models.js",
+						"client/js/services.js",
+						"client/js/controllers.js",
+						"client/js/app.routes.js",
+						"client/js/app.js",
+						"client/js/**/*controller.js",
+						"client/js/**/*.js", 
+						"!**/*.spec.js",
+						// "!client/js/sellers/seller-signup.controller.js",
+						"!js/sellers/seller-list.controller.js"
 					]
 				}
 			}
