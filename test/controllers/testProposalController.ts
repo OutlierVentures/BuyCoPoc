@@ -45,6 +45,43 @@ describe("ProposalController", () => {
             });
     });
 
+    it("should return a proposal on GET /api/proposal/:id", function (done) {
+        this.timeout(100000);
+
+        var proposalId: string;
+        var productName: string;
+
+        // Get the proposal list to obtain a valid ID
+        request(theApp)
+            .get('/api/proposal')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var list = <Array<proposalModel.IProposal>>res.body;
+                proposalId = list[0].id;
+                productName = list[0].productName;
+            })
+            .end(function (err, res) {
+
+                request(theApp)
+                    .get('/api/proposal/' + proposalId)
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        var proposal = <proposalModel.IProposal>res.body;
+                
+                        // Assert stuff on the result
+                        assert.equal(proposal.id, proposalId, "Returned proposal has correct ID");
+                        assert.equal(proposal.productName, productName, "Returned product has correct name");
+                    })
+                    .end(function (err, res) {
+                        done(err);
+                    });
+
+            });
+
+    });
+
     it("should create a proposal on POST /api/proposal", function (done) {
         this.timeout(200000);
 

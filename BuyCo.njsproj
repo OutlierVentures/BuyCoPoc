@@ -336,6 +336,8 @@
     <Content Include="client\vendors\underscore\package.json" />
     <Content Include="client\vendors\underscore\README.md" />
     <Content Include="client\vendors\underscore\underscore-min.map" />
+    <Content Include="client\views\proposal-details.html" />
+    <Content Include="client\views\proposal-join.html" />
     <Content Include="client\views\proposal-form.html" />
     <Content Include="client\views\proposal-list.html" />
     <Content Include="client\views\dashboard.html" />

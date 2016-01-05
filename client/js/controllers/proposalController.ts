@@ -35,8 +35,82 @@ class ProposalController {
 
         $scope.vm = this;
 
-        //var proposalId = this.$routeParams.id;
-        
+        var proposalId = this.$routeParams.id;
+
+        // This controller serves multiple actions. We distinguish the action by a 'name' which
+        // is set in the route configuration in app.ts.
+        if (this.$route.current.name === "join") {
+            this.join(proposalId);
+        } else if (this.$route.current.name === "details") {
+            this.view(proposalId);
+        }
+
+    }
+
+    private getProposalData(proposalId: string, cb: any) {
+        var t = this;
+
+        // Get Proposal data
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/proposal/' + proposalId,
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: IProposal) {
+            t.$scope.proposal = resultData;
+
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            console.log("Error loading proposal data:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error.error;
+
+            cb("Error getting proposal data", null);
+        });
+    }
+
+    //private getProposalStatistics(proposalId: string, cb: any) {
+    //    var t = this;
+
+    //    // Get statistics
+    //    this.$http({
+    //        method: 'GET',
+    //        url: apiUrl + '/proposal/' + proposalId + '/statistics',
+    //        headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+    //    }).success(function (resultData: IProposalStatistics) {
+    //        t.$scope.statistics = resultData;
+    //        cb(null, resultData);
+    //    }).error(function (error) {
+    //        // Handle error
+    //        console.log("Error loading proposal statistics:");
+    //        console.log(error);
+
+    //        // Show notification
+    //        t.$scope.errorMessage = error.error;
+
+    //        cb("Error getting proposal data", null);
+    //    });
+
+    //}
+
+    view(proposalId: string) {
+        var t = this;
+
+        t.getProposalData(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+    }
+
+    /**
+     * Show screen to join a proposal.
+     */
+    join(proposalId: string) {
+        var t = this;
+
+        t.getProposalData(proposalId, function (err, res) {
+        });
     }
 
     create() {

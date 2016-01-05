@@ -31,14 +31,16 @@ module BuyCo {
         $routeProvider
             .when('/', { controller: DashboardController, templateUrl: 'views/dashboard.html' })
             .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
-        //.when('/user/profile', { controller: UserAccountController, templateUrl: 'views/user-profile.html' })
+            //.when('/user/profile', { controller: UserAccountController, templateUrl: 'views/user-profile.html' })
             .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
             .when('/not-found', { templateUrl: 'views/not-found.html' })
             .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html' })
             .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
-        // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
-        // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't
-        // seem to be such an option in Angular.
+            .when('/proposal/:id', { controller: ProposalController, templateUrl: 'views/proposal-details.html', name: 'details' })
+            .when('/proposal/:id/join', { controller: ProposalController, templateUrl: 'views/proposal-join.html', name: 'join' })
+            // For multiple routes handled by the same controller we use the 'name' attribute to distinguish them. Ideally
+            // this would work as nice as Express where we provide a specific function to handle the route, but there doesn't
+            // seem to be such an option in Angular.
             //.when('/circle/:id/join', { controller: CircleController, templateUrl: 'views/circle-join.html', name: 'join' })
             //.when('/circle/:id', { controller: CircleController, templateUrl: 'views/circle-details.html', name: 'details' })
             //.when('/circle/:id/deposit', { controller: CircleController, templateUrl: 'views/circle-deposit.html', name: 'deposit' })
