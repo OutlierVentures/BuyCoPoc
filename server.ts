@@ -1,9 +1,12 @@
 ﻿/// <reference path="typings/tsd.d.ts" />
 import express = require('express');
+import morgan = require('morgan');
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
 import web3config = require('./lib/web3config');
 import assert = require('assert');
+import http = require('http');
+import https = require('https');
 
 import configModel = require('./models/configModel');
 
@@ -15,7 +18,16 @@ import fs = require('fs');
 
 import indexRoute = require('./routes/index');
 import oauthController = require('./controllers/oauthController');
+import upholdController = require('./controllers/upholdController');
+import migrationController = require('./controllers/migrationController');
+import proposalController = require('./controllers/proposalController');
+
+import bitReserveService = require('./services/upholdService');
+import serviceFactory = require('./services/serviceFactory');
 import configurationService = require('./services/configurationService');
+import stubOauthController = require('./controllers/stubOauthController');
+
+import stubBitReserveService = require('./services/stubUpholdService');
 
 export class Server {
     basePath = "./";
@@ -23,7 +35,10 @@ export class Server {
     HTTP_PORT: number;
     HTTPS_PORT: number;
 
-    createApp(): express.Application {
+    /**
+     * Create the Express application.
+     */
+    createApp(): express.Express {
         var cs = new configurationService.ConfigurationService();
 
         cs.basePath = this.basePath;
@@ -31,6 +46,8 @@ export class Server {
 
         console.log("My configuration:");
         console.log(this.config);
+
+        serviceFactory.basePath = this.basePath;
 
         this.HTTP_PORT = this.config.server.httpPort;
         this.HTTPS_PORT = this.config.server.httpsPort;
@@ -57,8 +74,6 @@ export class Server {
         }
 
         var upholdOauthController = new oauthController.OAuthController(upholdConfig);
-        var bitReserveService = require('./services/upholdService');
-        var serviceFactory = require('./services/serviceFactory');
 
         /**
          * Create a new Uphold service and get user info from it.
@@ -69,10 +84,6 @@ export class Server {
         }
 
         upholdOauthController.setGetUserInfoFunction(getBitReserveUserInfo);
-
-        var stubOauthController = require('./controllers/stubOauthController');
-
-        var stubBitReserveService = require('./services/stubUpholdService');
 
         if (this.config.useStubs) {
             // Create a stub controller from the real controller.
@@ -95,7 +106,6 @@ export class Server {
         app.use(bodyParser.json());
 
         // Logging
-        var morgan = require('morgan');
         app.use(morgan('dev'));
 
         // Initialize database connection.
@@ -128,29 +138,28 @@ export class Server {
         app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
         // Uphold API wrapper
-        var upholdController = require('./controllers/upholdController');
         var uc = new upholdController.UpholdController();
         app.get("/api/uphold/me/cards", uc.getCards);
         app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
 
         // Proposals
-        var proposalController = require('./controllers/proposalController');
         var pc = new proposalController.ProposalController();
         app.get("/api/proposal", pc.getAll);
         app.post("/api/proposal", pc.create);
 
         // Migrations
-        var migrationController = require('./controllers/migrationController');
         var mc = new migrationController.MigrationController();
         app.post("/api/migration/update", mc.update);
         app.post("/api/migration/test/seed", mc.seedTestData);
 
-
-
         return app;
     }
 
-    run(app: express.Application) {
+    /**
+     * Run the specified Express application.
+     * @param the Express application as created by createApp().
+     */
+    run(app: express.Express) {
 
         /*********************** HTTP server setup ********************/
         var httpsOptions;
@@ -191,9 +200,6 @@ export class Server {
                 cert: fs.readFileSync(this.basePath + 'cert.default.pem')
             };
         }
-
-        var http = require('http');
-        var https = require('https');
 
         http.createServer(app).listen(this.HTTP_PORT);
         https.createServer(httpsOptions, app).listen(this.HTTPS_PORT);

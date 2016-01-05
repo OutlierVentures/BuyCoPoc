@@ -371,6 +371,12 @@
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\web3config.ts" />
+    <TypeScriptCompile Include="test\controllers\testMigrationController.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="test\controllers\testProposalController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>

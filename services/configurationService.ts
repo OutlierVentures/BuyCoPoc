@@ -1,6 +1,10 @@
 ﻿import fs = require('fs');
 import configModel = require('../models/configModel');
 
+/**
+ * Globally cached configuration. No way to invalidate it yet; config changes require restarting, 
+ * and there's only one instance of the configuration.
+ */
 var cachedConfig: configModel.IApplicationConfig;
 
 export class ConfigurationService {

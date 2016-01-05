@@ -4,6 +4,8 @@ import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
 import Q = require('q');
 
+import configModel = require('../models/configModel');
+
 export interface IUpholdService {
     getCards: (callback: upholdService.IUpholdCardsCallback) => void;
     getUser: (callback: any) => void;
@@ -19,9 +21,15 @@ export interface IUpholdService {
     getCardTransactions: (cardiId: string, callback: upholdService.IUpholdTransactionsCallback) => void;
 }
 
-var config = new configurationService.ConfigurationService().getConfiguration();
+var config: configModel.IApplicationConfig;
+
+function loadConfiguration() {
+    var cs = new configurationService.ConfigurationService();
+    config = cs.getConfiguration();
+}
 
 export function getConfiguration() {
+    if (!config) loadConfiguration();
     return config;
 }
 

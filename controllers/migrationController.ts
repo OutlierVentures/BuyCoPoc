@@ -27,7 +27,7 @@ export class MigrationController {
         catch (ex) {
         }
 
-        if (!registryCode) {
+        if (registryCode == "0x") {
             var deferDeployRegistry = Q.defer<any>();
 
             web3plus.deployContractFromFile("ProposalRegistry.sol", "ProposalRegistry", true, function (deployErr, deployRes) {
