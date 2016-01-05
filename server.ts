@@ -47,8 +47,6 @@ export class Server {
         console.log("My configuration:");
         console.log(this.config);
 
-        serviceFactory.basePath = this.basePath;
-
         this.HTTP_PORT = this.config.server.httpPort;
         this.HTTPS_PORT = this.config.server.httpsPort;
 
