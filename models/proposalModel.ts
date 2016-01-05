@@ -1,5 +1,4 @@
-﻿
-export interface IProposal {
+﻿export interface IProposal {
     id: string;
     productName: string;
     productDescription: string;

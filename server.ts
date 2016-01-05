@@ -95,25 +95,14 @@ app.use(morgan('dev'));
 var db = mongoose.connect(config.database.url);
 
 // Client folder containing the Angular SPA, serve as static assets
-var clientDir = path.join(__dirname, 'client')
+var clientDir = path.join(__dirname, 'client');
 app.use(express.static(clientDir));
-
-// All routes which are directly accessible (i.e. not only from within the Angular SPA).
-// All open index.html, where Angular handles further routing to the right controller/ view.
-// Ideally all routes not matched by server-side routes are forwarded to Angular.
-// TODO: introduce an "other" wildcard handler for this.
-app.get('/', indexRoute.index);
-app.get('/user/profile', indexRoute.index);
-app.get('/user/login', indexRoute.index);
-
-app.get('/proposal/list', indexRoute.index);
-
-app.get('/not-found', indexRoute.index);
 
 app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
 app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
 app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
+// TODO refactor all '/api/...' calls to a separate ExpressAPIRouter.
 // Uphold API wrapper
 import upholdController = require('./controllers/upholdController');
 var uc = new upholdController.UpholdController();
@@ -131,6 +120,19 @@ var mc = new migrationController.MigrationController();
 app.post("/api/migration/update", mc.update);
 app.post("/api/migration/test/seed", mc.seedTestData);
 
+// Sellers
+import sellerController = require('./controllers/sellerController');
+var sc = new sellerController.SellerController();
+app.post("/api/seller/signup", function (req, res) {
+    // TODO BW Refactor, replace whole function with simply the 'save' as called in the function body.
+    return sc.save(req, res);
+});
+app.get("/api/seller/", sc.getAll);
+
+// All routes which are directly accessible (i.e. not only from within the Angular SPA).
+// All open index.html, where Angular handles further routing to the right controller/ view.
+// All remaining routes - not matched by previous server-side routes are matched with this wildcard handler and forwarded to Angular.
+app.get("*", indexRoute.index);
 
 /*********************** HTTP server setup ********************/
 var httpsOptions;
