@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Buyco Proof of Concept implementation",
   "main": "server.js",
-  "repository": "https://github.com/OutlierVentures/BuyCo",
+  "repository": {
+    "url": "https://github.com/OutlierVentures/BuyCo",
+    "type": "git"
+  },
   "private": true,
   "scripts": {
     "test": "mocha --recursive",
