@@ -1,21 +1,21 @@
-﻿interface ILoginScope extends ng.IScope {
+﻿/// <reference path="../typings/tsd.d.ts" />
+
+interface ILoginScope extends ng.IScope {
     //credentials: Credentials;
     isAuthenticated(): boolean;
     login(): any;
-    userInfo: IUser;
+    userInfo: buyCo.Models.IUser;
     isGlobalAdmin: boolean;
 }
 
-
-
 interface IOVWindowService extends ng.IWindowService {
-    _: any; // Extend with underscore.
+    _: UnderscoreStatic; // Extend with underscore.
 }
 
 /**
  * Controller for the logon box.
  */
-class LoginController {
+export class LoginController {
     public static $inject = [
         "$scope",
         "$rootScope",
@@ -50,7 +50,7 @@ class LoginController {
             // Don't authenticate when already authenticated.
             && !this.$scope.isAuthenticated()) {
             // Restore from session
-            var userDataFromSession = <IUser>JSON.parse(userStringFromSession);
+            var userDataFromSession = <buyCo.Models.IUser>JSON.parse(userStringFromSession);
             var brip = new UpholdIdentityProvider();
             brip.setToken(tokenFromSession, null);
             brip.setUserInfo(userDataFromSession, null);
@@ -60,7 +60,7 @@ class LoginController {
 
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
-        } else if (this.$location.path() == "/auth/uphold/callback"
+        } else if (this.$location.path() === "/auth/uphold/callback"
         // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
@@ -129,14 +129,14 @@ class LoginController {
 }
 
 interface IDashboardScope extends ng.IScope {
-    userInfo: IUser;
+    userInfo: buyCo.Models.IUser;
     allCards: any;
     cardsToShow: any;
     favoriteCardsOnly: boolean;
 }
 
 
-class DashboardController {
+export class DashboardController {
     public static $inject = [
         "$scope",
         "$rootScope",
@@ -213,8 +213,8 @@ class DashboardController {
         var t = this;
         t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
             // When favoriteCardsOnly then show only cards with settings.starred = true.
-            t.$scope.allCards : t._.filter(t.$scope.allCards, function(item) {
-                return item.settings.starred;
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function(card: buyCo.Models.IUpholdCard) {
+                return card.settings.starred;
             });
         ;
     }
@@ -226,7 +226,7 @@ class DashboardController {
     }
 }
 
-class NavigationController {
+export class NavigationController {
     public static $inject = [
         "$scope",
         "$location"];
@@ -239,11 +239,11 @@ class NavigationController {
 
 interface IUserAccountScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated();
-    userInfo: IUser;
+    isAuthenticated() : Boolean;
+    userInfo: buyCo.Models.IUser;
 }
 
-class UserAccountController {
+export class UserAccountController {
     public static $inject = [
         "$scope",
         "$rootScope",

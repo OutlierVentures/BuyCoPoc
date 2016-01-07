@@ -10,7 +10,8 @@
   "private": true,
   "scripts": {
     "test": "mocha --recursive",
-    "test-contracts": "mocha test/contracts/ --recursive"
+    "test-contracts": "mocha test/contracts/ --recursive",
+    "test3": "mocha test/sellers/ --recursive"
   },
   "author": {
     "name": "Aron van Ammers",
@@ -29,6 +30,7 @@
     "web3plus": "git+https://4c2b0edc3e30d3d1e28479782f8f1ee64f4ca812:x-oauth-basic@github.com/OutlierVentures/web3plus.git"
   },
   "devDependencies": {
+    "chai": "^3.4.1",
     "grunt": "^0.4.5",
     "grunt-concurrent": "^2.0.3",
     "grunt-contrib-less": "^1.0.1",
@@ -38,6 +40,8 @@
     "grunt-nodemon": "^0.4.0",
     "grunt-ts": "^4.2.0",
     "grunt-wiredep": "^2.0.0",
-    "mocha": "^2.3.3"
+    "mocha": "^2.3.3",
+    "mocha-mongoose": "^1.1.1",
+    "should": "^8.0.2"
   }
 }

@@ -5,6 +5,20 @@ import userModel = require('../models/userModel');
 // TODO: make configurable (config debug option)
 require('request').debug = true;
 
+// TODO BW dd. 2015-12-7 Come up with decent name for this type.
+export interface IUpholdTransactionNode {
+    "CardId": string,
+    "amount": number,
+    "base": number,
+    "commission": number,
+    "currency": string,
+    "description": string,
+    "fee": number,
+    "rate": number,
+    "type": string,
+    "username": string
+}
+
 export interface IUpholdTransaction {
     "id": string,
     "type": string,
@@ -18,30 +32,8 @@ export interface IUpholdTransaction {
         "pair": string,
         "rate": number
     },
-    "origin": {
-        "CardId": string,
-        "amount": number,
-        "base": number,
-        "commission": number,
-        "currency": string,
-        "description": string,
-        "fee": number,
-        "rate": number,
-        "type": string,
-        "username": string
-    },
-    "destination": {
-        "CardId": string,
-        "amount": number,
-        "base": number,
-        "commission": number,
-        "currency": string,
-        "description": string,
-        "fee": number,
-        "rate": number,
-        "type": string,
-        "username": string
-    },
+    "origin": IUpholdTransactionNode,
+    "destination": IUpholdTransactionNode,
     "params": {
         "currency": string,
         "margin": number,

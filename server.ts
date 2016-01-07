@@ -5,7 +5,6 @@ import bodyParser = require('body-parser');
 import web3config = require('./lib/web3config');
 import assert = require('assert');
 
-
 var web3 = require("web3");
 
 import path = require('path');
@@ -103,31 +102,50 @@ app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.call
 app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
 // TODO refactor all '/api/...' calls to a separate ExpressAPIRouter.
-// Uphold API wrapper
+var apiRouter = express.Router();
+
 import upholdController = require('./controllers/upholdController');
+import proposalController = require('./controllers/proposalController');
+import migrationController = require('./controllers/migrationController');
+import sellerController = require('./controllers/sellerController');
 var uc = new upholdController.UpholdController();
-app.get("/api/uphold/me/cards", uc.getCards);
-app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
+var pc = new proposalController.ProposalController();
+var mc = new migrationController.MigrationController();
+var sc = new sellerController.SellerController();
+
+// Uphold API wrapper
+apiRouter.route("/uphold/me/cards")
+    .get(uc.getCards);
+apiRouter.route("/uphold/me/cards/withBalance")
+    .get(uc.getCardsWithBalance);
 
 // Proposals
-import proposalController = require('./controllers/proposalController');
-var pc = new proposalController.ProposalController();
-app.get("/api/proposal", pc.getAll);
+apiRouter.route("/proposal")
+    .get(pc.getAll);
 
 // Migrations
-import migrationController = require('./controllers/migrationController');
-var mc = new migrationController.MigrationController();
-app.post("/api/migration/update", mc.update);
-app.post("/api/migration/test/seed", mc.seedTestData);
+apiRouter.route("/migration/update")
+    .post(mc.update);
+apiRouter.route("/migration/test/seed")
+    .post(mc.seedTestData);
 
 // Sellers
-import sellerController = require('./controllers/sellerController');
-var sc = new sellerController.SellerController();
-app.post("/api/seller/signup", function (req, res) {
-    // TODO BW Refactor, replace whole function with simply the 'save' as called in the function body.
-    return sc.save(req, res);
-});
-app.get("/api/seller/", sc.getAll);
+apiRouter.route("/seller/signup")
+    .post(function (req, res) {
+    // TODO BW Refactor, replace function with 'save' as now called in the function body.
+        return sc.save(req, res);
+    });
+apiRouter.route("/seller")
+    .get(sc.getAll);
+
+// Catch not existing api calls.
+apiRouter.route("*")
+    .all(function(req, res) {
+        res.status(404).send(`no API method at '${req.url}'`);
+    });
+
+app.use('/api', apiRouter);
+// BW END TODO
 
 // All routes which are directly accessible (i.e. not only from within the Angular SPA).
 // All open index.html, where Angular handles further routing to the right controller/ view.
