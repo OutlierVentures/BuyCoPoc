@@ -46,8 +46,9 @@
     <TypeScriptCompile Include="client\js\sellers\sellerResourceMock.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-list.controller.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-signup.controller.ts" />
-    <TypeScriptCompile Include="client\js\sellers\seller.service.ts" />
+    <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />
+    <TypeScriptCompile Include="client\js\sellers\seller.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-resource.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-sanitize.d.ts" />
@@ -55,6 +56,7 @@
     <TypeScriptCompile Include="client\typings\cryptojs\cryptojs.d.ts" />
     <TypeScriptCompile Include="client\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
+    <TypeScriptCompile Include="client\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="controllers\sellerController.ts" />
@@ -72,6 +74,8 @@
     <Content Include="cert.default.pem" />
     <Content Include="client\.bowerrc" />
     <Content Include="client\bower.json" />
+    <Content Include="client\data\users.json" />
+    <Content Include="client\data\sellers.json" />
     <Content Include="client\data\proposals.json" />
     <Content Include="client\data\countries-regions.json" />
     <Content Include="client\data\countries.json" />
@@ -276,8 +280,9 @@
     <Content Include="client\data\countries\zimbabwe.json" />
     <Content Include="client\images\uphold-connect-with-gray%401x.png" />
     <Content Include="client\index.html" />
-    <Content Include="client\views\seller-list.html" />
-    <Content Include="client\views\seller-signup.html" />
+    <Content Include="client\js\sellers\seller-list.html" />
+    <Content Include="client\js\sellers\seller-signup.html" />
+    <Content Include="client\tsconfig.json" />
     <Content Include="client\tsd.json" />
     <Content Include="client\vendors\bootstrap\less\.csscomb.json" />
     <Content Include="client\vendors\bootstrap\less\.csslintrc" />
@@ -478,6 +483,9 @@
     <TypeScriptCompile Include="test\controllers\testProposalController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="test\sellers\testPersistance.ts" />
+    <TypeScriptCompile Include="test\sellers\testSellerPersistance.ts" />
+    <TypeScriptCompile Include="test\testHelper.ts" />
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\express\express.d.ts" />
     <TypeScriptCompile Include="typings\form-data\form-data.d.ts" />
@@ -499,11 +507,13 @@
     <Folder Include="client\images\" />
     <Folder Include="client\js\" />
     <Folder Include="client\js\controllers\" />
+    <Folder Include="client\js\common\" />
     <Folder Include="client\js\sellers\" />
     <Folder Include="client\typings\" />
     <Folder Include="client\typings\angularjs\" />
     <Folder Include="client\typings\cryptojs\" />
     <Folder Include="client\typings\jquery\" />
+    <Folder Include="client\typings\underscore\" />
     <Folder Include="client\vendors\" />
     <Folder Include="client\vendors\bootstrap\" />
     <Folder Include="client\vendors\bootstrap\less\" />
@@ -517,6 +527,7 @@
     <Folder Include="test\" />
     <Folder Include="test\contracts\" />
     <Folder Include="test\controllers\" />
+    <Folder Include="test\sellers\" />
     <Folder Include="typings\" />
     <Folder Include="services\" />
     <Folder Include="typings\body-parser\" />

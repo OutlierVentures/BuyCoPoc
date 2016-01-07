@@ -1,0 +1,26 @@
+﻿[
+  {
+    "status": "Ok",
+    "user": {
+      "_id": "568bb3eccd7bbd483fec8480",
+      "name": "Bart van der Wal",
+      "externalId": "bartvanderwal",
+      "accessToken": "4b1ccf1a62b9d87dbcba0d9be4bdbb4cb3663b9f",
+      "__v": 0,
+      "circleMemberships": [ ]
+    },
+    "isGlobalAdmin": false
+  },
+  {
+    "status": "Ok",
+    "user": {
+      "_id": "0848cef384dbb7dcce3bb865",
+      "name": "Aron van Ammers",
+      "externalId": "aronvanammers",
+      "accessToken": "f9b3663bc4bbdb4eb9d0abcbd78d9b26a1fcc1b4",
+      "__v": 0,
+      "circleMemberships": [ ]
+    },
+    "isGlobalAdmin": true
+  }
+]

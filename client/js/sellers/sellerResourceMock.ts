@@ -1,46 +1,32 @@
-import Seller = require("../../../models/sellerModel");
-
 var mockResource = angular
     .module("sellerResourceMock",
         ["ngMockE2E"]);
 
 mockResource.run(mockRun);
-    
-mockRun.$inject = ["$httpBackend"];
-function mockRun($httpBackend: ng.IHttpBackendService) : void {
-    var sellers: Seller.ISeller[] = [];
-    var seller: Seller.ISeller.IProduct;
 
-    seller = new Seller(1, "Leaf Rake", "GDN-0011", new Date(2009, 2, 19), 19.95,
-        "Leaf rake with 48-inch wooden handle.",
-        "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png");
-    sellers.push(product);
+mockRun.$inject = ["$httpBackend", "$http", "_"];
+function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: any) : void {
+    var sellers: buyCo.Domain.Seller[];
+    $http.get("client/data/sellers.json").then((result: any) => {
+        sellers = result.data;
+    });
+    const sellerUrl = "/api/sellers";
+    $httpBackend.whenGET(sellerUrl).respond(sellers);
 
-    var productUrl = "/api/products";
-
-    $httpBackend.whenGET("/api/sellers").respond(sellers);
-
-    var editingRegex = new RegExp(productUrl + "/[0-9][0-9]*", '');
-    $httpBackend.whenGET(editingRegex).respond(function(method, url, data) {
-        var product = { "productId": 0 };
-        var parameters = url.split('/');
-        var length = parameters.length;
-        var id = +parameters[length - 1];
-
-        if (id > 0) {
-            for (var i = 0; i < products.length; i++) {
-                if (products[i].productId == id) {
-                    product = products[i];
-                    break;
-                }
-            }
+    const editingRegex = new RegExp(sellerUrl + "/w+/i", '');
+    $httpBackend.whenGET(editingRegex).respond(function (method, url, data) {
+        const externalIdFromUrl = url.split('/').pop();
+        if (!externalIdFromUrl) {
+            return [500, `no seller id in url`, {}];
         }
-        return [200, product, {}];
+        // var seller: buyCo.Domain.Seller = _.find(sellers, (seller: buyCo.Domain.Seller) => { return seller.userExternalId === externalIdFromUrl; };
+        const seller: buyCo.Domain.Seller = _.find(sellers, (seller: buyCo.Domain.Seller) => { return seller.userExternalId === externalIdFromUrl; });
+        return seller ? [200, seller, {}] : [500, `no seller with name ${externalIdFromUrl}`, {}];
     });
 
     // Catch all for testing purposes
-    $httpBackend.whenGET(/api/).respond(function(method, url, data) {
-        return [200, products, {}];
+    $httpBackend.whenGET(/api\/sellers/).respond(function(method, url, data) {
+        return [200, sellers, {}];
     });
                 
     // Pass through any requests for application files

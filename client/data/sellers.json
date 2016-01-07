@@ -1,0 +1,32 @@
+﻿[
+  {
+    "userExternalId": "bartvanderwal",
+    "isActive": "true",
+    "email": "bart@itoffthewall.nl",
+    "dateCreated": "2015-01-06T09:34:00+00:00",
+    "dateUpdated": "2015-01-06T09:34:30+00:00",
+    "company": "IT Off the Wall",
+    "addressLine1": "Nepveulaan 18",
+    "addressline2": "",
+    "postalCode": "3705LD",
+    "city": "Zeist",
+    "country": "The Netherlands",
+    "telephone": "+31646102065",
+    "region": "Utrecht"
+  },
+  {
+    "userExternalId": "aronvanammers",
+    "isActive": "false",
+    "email": "aron@",
+    "dateCreated": "2015-01-06T09:35:00+00:00",
+    "dateUpdated": "2015-01-06T09:35:00+00:00",
+    "company": "Outlier Ventures",
+    "addressLine1": "",
+    "addressline2": "",
+    "postalCode": "3705LD",
+    "city": "Zeist",
+    "country": "The Netherlands",
+    "telephone": "+31646102065",
+    "region": "Utrecht"
+  }
+]

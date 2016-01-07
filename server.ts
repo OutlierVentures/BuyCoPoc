@@ -34,6 +34,7 @@ export class Server {
     config: configModel.IApplicationConfig;
     HTTP_PORT: number;
     HTTPS_PORT: number;
+    db: mongoose.Mongoose;
 
     /**
      * Create the Express application.
@@ -106,14 +107,13 @@ export class Server {
         // Logging
         app.use(morgan('dev'));
 
-<<<<<<< 4638661d8385e52bf14fff6a299c9bd32f94efeb
         // Initialize database connection.
 
         // The MongoDB connection is currently only created at the node app startup. It could
         // disconnect for some reason.
         // TODO: make this more stable, in a way that doesn't require a specific call to Mongoose
         // before every request (because that will be forgotten).
-        var db = mongoose.connect(this.config.database.url);
+        this.db = mongoose.connect(this.config.database.url);
 
         // Client folder containing the Angular SPA, serve as static assets
         var clientDir = path.join(__dirname, 'client')
@@ -133,99 +133,22 @@ export class Server {
         app.get('/proposal/new', indexRoute.index);
 
         app.get('/not-found', indexRoute.index);
-=======
-// Client folder containing the Angular SPA, serve as static assets
-var clientDir = path.join(__dirname, 'client');
-app.use(express.static(clientDir));
-
-app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
-app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
-app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
-
-// TODO refactor all '/api/...' calls to a separate ExpressAPIRouter.
-// Uphold API wrapper
-import upholdController = require('./controllers/upholdController');
-var uc = new upholdController.UpholdController();
-app.get("/api/uphold/me/cards", uc.getCards);
-app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
->>>>>>> #1 Added seller form and some more. But build error.
 
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
         app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
-<<<<<<< 4638661d8385e52bf14fff6a299c9bd32f94efeb
         // Uphold API wrapper
         var uc = new upholdController.UpholdController();
         app.get("/api/uphold/me/cards", uc.getCards);
         app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
-=======
-// Migrations
-import migrationController = require('./controllers/migrationController');
-var mc = new migrationController.MigrationController();
-app.post("/api/migration/update", mc.update);
-app.post("/api/migration/test/seed", mc.seedTestData);
-
-// Sellers
-import sellerController = require('./controllers/sellerController');
-var sc = new sellerController.SellerController();
-app.post("/api/seller/signup", function (req, res) {
-    // TODO BW Refactor, replace whole function with simply the 'save' as called in the function body.
-    return sc.save(req, res);
-});
-app.get("/api/seller/", sc.getAll);
-
-// All routes which are directly accessible (i.e. not only from within the Angular SPA).
-// All open index.html, where Angular handles further routing to the right controller/ view.
-// All remaining routes - not matched by previous server-side routes are matched with this wildcard handler and forwarded to Angular.
-app.get("*", indexRoute.index);
-
-/*********************** HTTP server setup ********************/
-var httpsOptions;
-
-try {
-    console.log("Trying custom certificate.");
-
-    httpsOptions = {
-        key: fs.readFileSync('key.pem'),
-        cert: fs.readFileSync('cert.pem')
-    };
-
-    console.log("Using custom certificate.");
-
-    try {
-        console.log("Trying to read intermediate certificate.");
-        var chainLines = fs.readFileSync('intermediate.pem', 'utf-8').split("\n");
-        var cert = [];
-        var ca = [];
-        chainLines.forEach(function (line) {
-            cert.push(line);
-            if (line.match(/-END CERTIFICATE-/)) {
-                ca.push(cert.join("\n"));
-                cert = [];
-            }
-        });
-        httpsOptions.ca = ca;
-        console.log("Using intermediate certificate.");
-    }
-    catch (e) {
-        console.log("Intermediate certificate could not be read.");
-    }
-}
-catch (e) {
-    console.log("Falling back to default self-signed certificate.");
-    httpsOptions = {
-        key: fs.readFileSync('key.default.pem'),
-        cert: fs.readFileSync('cert.default.pem')
-    };
-}
->>>>>>> #1 Added seller form and some more. But build error.
 
         // Proposals
         var pc = new proposalController.ProposalController();
         app.get("/api/proposal", pc.getAll);
         app.get("/api/proposal/:id", pc.getOne);
         app.post("/api/proposal/:id/back", pc.back);
+        app.get("/api/proposal/:id/backers", pc.getBackers);
         app.post("/api/proposal", pc.create);
 
         // Migrations
@@ -287,5 +210,12 @@ catch (e) {
 
         console.log('http server started on port ' + this.HTTP_PORT);
         console.log('https server started on port ' + this.HTTPS_PORT);
+    }
+
+    /**
+     * Stop running the application and close the database connection.
+     */
+    stop() {
+        this.db.disconnect();
     }
 }

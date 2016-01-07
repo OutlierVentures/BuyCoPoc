@@ -8,7 +8,7 @@
             "suppressTaskName": true,
             "isBuildCommand": true,
             "showOutput": "silent",
-            "args": ["client/js/controllers.ts"]
+            "args": []
         }
     ]
 }

@@ -53,11 +53,6 @@ export interface IUser extends mongoose.Document {
     accessToken: string;
 
     email: string;
-
-    /**
-     * Circles this user is a member of.
-     */
-    circleMemberships: [CircleMembership];
 }
 
 /**

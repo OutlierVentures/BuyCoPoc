@@ -1,52 +1,116 @@
-﻿import Sellerservice = require("/client/js/sellers/seller.service");
-
-interface ISellerSignUpScope extends ng.IScope {
-    signupResponse: any;
+﻿// import Seller = buyCo.Domain.Seller;
+interface ISellerSignUp {
+    seller: buyCo.Domain.Seller;
+    signUp(): void;
 }
 
-angular.module("buyCoApp").controller("SellerSignupController", SellerSignupController);
+enum MessageType {  // Bootstrap classes.
+    Success = 0,
+    Info = 1,
+    Warning = 2,
+    Danger = 3
+};
 
-class SellerSignupController {
+/**
+ * Return message type as bootstrap class. 
+ * @param type Enum MessageType, for instance Succes.
+ * @returns bootstrap class as string, for instance 'alert-success'.
+ */
+var messageTypeAsBsClass: (type: MessageType) => string = (type) => {
+    return `alert-${MessageType[type]}`;
+};
+
+class SellerSignupController implements ISellerSignUp {
+    seller: buyCo.Domain.Seller;
+    message: string;
+    messageType: MessageType;
+    private sellerResource: buyCo.Common.ISellerResourceClass;
+
     static $inject = [
-        "$scope",
         "$rootScope",
         "$http",
         "$location",
-        "$window",
         "$route",
         "identityService",
-        "sellerService"
+        "dataAccessService"
     ];
 
     constructor(
-        private $scope: ISellerSignUpScope,
         private $rootScope: BuyCoRootScope,
         private $http: ng.IHttpService,
         private $location: ng.ILocationService,
         private $route: ng.route.IRouteService,
         private identityService: IdentityService,
-        private sellerService: Sellerservice.SellerService) {
-        // private ngMessages: Function) {
-        // $scope.vm = this;
-
-        // this.signup();
+        private dataAccessService: buyCo.Common.IDataAccessService
+    ) {
+        this.message = "test";
+        this.messageType = MessageType.Success;
+        this.getSeller();
+        this.sellerResource = this.dataAccessService.getSellerResource(this.$rootScope.userInfo.accessToken);
+        this.$rootScope.$on("loggedOn", function(event, data) {
+        });
     }
 
-    signup() {
+    getSeller() {
+        if (this.$rootScope.userInfo) {
+            this.sellerResource.get(
+                { externalId: this.$rootScope.userInfo.externalId },
+                (data: buyCo.Domain.Seller) => {
+                    if (data) {
+                        alert(`seller has Mongo data: ${data}`);
+                        this.seller = data;
+                    } else {
+                        // User doesn't exist yet, initialize seller object with on user info
+                        // Set isActive to true, as the user will sign up as active seller if he saves the form.
+                        this.seller = new buyCo.Domain.Seller(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
+                    }
+                },
+                (httpResponse: any) => {
+                    console.log(httpResponse);
+                    alert(`error getting seller: ${httpResponse}`);
+                }
+            );
+        }
+    }
+
+    messageClass() {
+        return messageTypeAsBsClass(this.messageType);
+    };
+
+    signUp() {
         var t = this;
-        alert('signing up');
+        t.sellerResource.save(
+            this.seller,
+            (data) => {
+                alert(`success: ${data}`);
+                this.message = 'You signed up as seller';
+                this.messageType = MessageType.Success;
+            },
+            (httpResponse) => {
+                alert(`fail: ${httpResponse}`);
+                this.message = httpResponse.message;
+                this.messageType = MessageType.Danger;
+            });
+        // alert("signing up");
+        /*
         this.$http({
             method: "POST",
             url: apiUrl + "/seller/signup",
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-        }).success(function (resultData: any) {
-            t.$scope.signupResponse = resultData;
-        }).error(function (error) {                
+        }).success((resultData: any) => {
+            this.statusMessage = "Signed up as seller.";
+            this.seller = resultData;
+        }).error((error) => {                
             // Handle error.
             console.log("Error signing up:");
             console.log(error);
 
             // TODO: show notification
+            this.statusMessage = error;
         });
+        */
     }
 }
+
+angular.module("buyCoApp")
+.controller("SellerSignupController", SellerSignupController);

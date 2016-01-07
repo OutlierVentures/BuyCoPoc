@@ -1,7 +1,6 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
-module BuyCo {
-    "use strict";
-    angular.module("buyCoApp").config(AppRoutes);
+import Controllers = require("./controllers");
+import LoginController = Controllers.LoginController;
 
     function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
         $routeProvider
