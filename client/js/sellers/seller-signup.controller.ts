@@ -1,6 +1,5 @@
-﻿// import Seller = buyCo.Domain.Seller;
-interface ISellerSignUp {
-    seller: buyCo.Domain.Seller;
+﻿interface ISellerSignUp {
+    seller: Seller;
     signUp(): void;
 }
 
@@ -21,10 +20,10 @@ var messageTypeAsBsClass: (type: MessageType) => string = (type) => {
 };
 
 class SellerSignupController implements ISellerSignUp {
-    seller: buyCo.Domain.Seller;
+    seller: Seller;
     message: string;
     messageType: MessageType;
-    private sellerResource: buyCo.Common.ISellerResourceClass;
+    private sellerResource: ISellerResourceClass;
 
     static $inject = [
         "$rootScope",
@@ -41,13 +40,13 @@ class SellerSignupController implements ISellerSignUp {
         private $location: ng.ILocationService,
         private $route: ng.route.IRouteService,
         private identityService: IdentityService,
-        private dataAccessService: buyCo.Common.IDataAccessService
+        private dataAccessService: IDataAccessService
     ) {
         this.message = "test";
         this.messageType = MessageType.Success;
         this.getSeller();
         this.sellerResource = this.dataAccessService.getSellerResource(this.$rootScope.userInfo.accessToken);
-        this.$rootScope.$on("loggedOn", function(event, data) {
+        this.$rootScope.$on("loggedOn", (event: any, data: any) => {
         });
     }
 
@@ -55,14 +54,14 @@ class SellerSignupController implements ISellerSignUp {
         if (this.$rootScope.userInfo) {
             this.sellerResource.get(
                 { externalId: this.$rootScope.userInfo.externalId },
-                (data: buyCo.Domain.Seller) => {
+                (data: Seller) => {
                     if (data) {
                         alert(`seller has Mongo data: ${data}`);
                         this.seller = data;
                     } else {
                         // User doesn't exist yet, initialize seller object with on user info
                         // Set isActive to true, as the user will sign up as active seller if he saves the form.
-                        this.seller = new buyCo.Domain.Seller(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
+                        this.seller = new Seller(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
                     }
                 },
                 (httpResponse: any) => {
@@ -81,7 +80,7 @@ class SellerSignupController implements ISellerSignUp {
         var t = this;
         t.sellerResource.save(
             this.seller,
-            (data) => {
+            (data: any) => {
                 alert(`success: ${data}`);
                 this.message = 'You signed up as seller';
                 this.messageType = MessageType.Success;

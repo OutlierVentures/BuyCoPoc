@@ -6,7 +6,7 @@ mockResource.run(mockRun);
 
 mockRun.$inject = ["$httpBackend", "$http", "_"];
 function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: any) : void {
-    var sellers: buyCo.Domain.Seller[];
+    var sellers: Seller[];
     $http.get("client/data/sellers.json").then((result: any) => {
         sellers = result.data;
     });
@@ -19,8 +19,8 @@ function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _
         if (!externalIdFromUrl) {
             return [500, `no seller id in url`, {}];
         }
-        // var seller: buyCo.Domain.Seller = _.find(sellers, (seller: buyCo.Domain.Seller) => { return seller.userExternalId === externalIdFromUrl; };
-        const seller: buyCo.Domain.Seller = _.find(sellers, (seller: buyCo.Domain.Seller) => { return seller.userExternalId === externalIdFromUrl; });
+        // var seller: Seller = _.find(sellers, (seller: Seller) => { return seller.userExternalId === externalIdFromUrl; };
+        const seller: Seller = _.find(sellers, (seller: Seller) => { return seller.userExternalId === externalIdFromUrl; });
         return seller ? [200, seller, {}] : [500, `no seller with name ${externalIdFromUrl}`, {}];
     });
 
