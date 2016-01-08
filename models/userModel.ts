@@ -82,6 +82,22 @@ export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
 }
 
 /**
+ * Get a user by their externalId.
+ */
+export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
+    User.findOne({ externalId: token }, (err, user) => {
+        // TODO: use promise to wait for creating new user.
+        if (!user) {
+            // No user with this token.
+            cb("Not found", null);
+        }
+
+        cb(null, user);
+    });
+}
+
+
+/**
  * Gets the users who are in a certain circle.
  */
 export var getUsersInCircle = (circleId: string, cb: any) => {

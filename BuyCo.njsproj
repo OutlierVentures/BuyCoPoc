@@ -366,7 +366,6 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="services\configurationService.ts" />
-    <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />

@@ -11,7 +11,6 @@ class SellerListController {
         private $rootScope: BuyCoRootScope) {
             // Do some stuff.
     }
-
 }
 
 angular.module("buyCoApp").controller("SellerListController", SellerListController);

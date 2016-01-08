@@ -1,5 +1,4 @@
 ﻿var assert = require("assert");
-var chai = require("chai");
 var mongoose = require("mongoose");
 var mochaMongoose = require("mocha-mongoose");
 
@@ -8,7 +7,6 @@ import userModel = require("../../models/userModel");
 import sellerModel = require("../../models/sellerModel");
 import configurationService = require("../../services/configurationService");
 
-var should = chai.should();
 var config = new configurationService.ConfigurationService().getConfiguration();
 
 // Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
@@ -16,7 +14,7 @@ const dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB
 
 var clearDb = mochaMongoose(dbUri);
 
-describe("Seller persistance", () => {    
+describe("Seller persistance", () => {
     const testUsers = require("../../client/data/users.json");
     const testSellers = require("../../client/data/sellers.json");
     const testUser1 = <userModel.IUser>testUsers[0].user;
@@ -35,43 +33,28 @@ describe("Seller persistance", () => {
         assert.equal(1, 1);
         done();
     });
-    // TODO For some reason I don't see this user in the database, while the test does succeed.
+    
     it("should be able to create a user in the database", (done) => {
-        // console.log(testUser);
-        userModel.User.create(testUser1, function (err: any, result: any) {
+        userModel.User.create(testUser1, (err: any, result: userModel.IUser) => {
             if (err) { done(err) }
-            assert.equal((<userModel.IUser>testUser1).externalId, (<userModel.IUser>result).externalId);
-            console.log(`Saved user to ${dbUri}`);
+            assert.equal((testUser1).externalId, (result).externalId);
             done();
         });
     });
-    it("should be able to create a seller (e.g. upgrade a plain user to a 'seller user')", (done) => {
-        // Get test user data (shared with front-end).
-        const users = require("../../client/data/users.json");
-        const user  = <userModel.IUser> users[0].user;
-        // TODO get from sellers.json
-        var seller: sellerModel.SellerModel = {
-            "userExternalId": user.externalId,
-            "isActive": true,
-            "email": user.email,
-            "dateCreated": new Date("2015-01-06T09:34:00+00:00"),
-            "dateUpdated": new Date("2015-01-06T09:34:30+00:00"),
-            "company": "IT Off the Wall",
-            "addressLine1": "Nepveulaan 18",
-            "addressline2": "",
-            "postalCode": "3705LD",
-            "city": "Zeist",
-            "country": "The Netherlands",
-            "telephone": "+31646102065",
-            "region": "Utrecht"
-        };
+
+    it("should be able to create a seller (e.g. upgrade user to 'seller user')", (done) => {
+        userModel.User.create(testUser1, (err: any, result: userModel.IUser) => {
+            if (err) { done(err) }
+        });
         // Sign that user up as a seller.
-        sellerModel.Seller.create(testSeller1, (err: any, result: any) => {
+        sellerModel.Seller.create(testSeller1, (err: any, result: sellerModel.ISeller) => {
+            if (err) done(err);
             assert.equal(err, null);
-            assert.equal((<sellerModel.ISeller>result).userExternalId, seller.userExternalId);
+            assert.equal(result.userExternalId, testSeller1.userExternalId);
             done();
         });
     });
+    
     it("should be able to list multiple sellers", (done) => {
         // Add another user
         userModel.User.create(testUser1, (err: any) => {
@@ -95,41 +78,76 @@ describe("Seller persistance", () => {
             done();
         });
     });
-    it("should be able to retrieve that seller by externalID", (done) => {
-        sellerModel.getSellerByUserExternalId(testSeller2.userExternalId, (err: any, result: sellerModel.ISeller) => {
-            if (err) { done(err) }
-            const externalId = testSeller2.userExternalId;
-            assert.equal((result).userExternalId, externalId);
-            done();
+
+    describe("After creating a seller", () => {
+        var existingSeller: sellerModel.ISeller,
+            externalId: string;
+        
+        beforeEach(done => {
+            existingSeller = testSeller1;
+            externalId = existingSeller.userExternalId;
+            sellerModel.create(existingSeller, (err: any, result: sellerModel.ISeller) => {
+                console.log(err);
+                // console.log(existingSeller);
+                if (err) return done(err);
+                existingSeller = result;
+            });
         });
-    });
-    it("should return Not found error and empty result for non existing externalID");
-    sellerModel.getSellerByUserExternalId(testSeller2.userExternalId, (err: any, result: sellerModel.ISeller) => {
-        if (err) { done(err) }
-        const externalId = testSeller2.userExternalId;
-        assert.equal((result).userExternalId, externalId);
-        done();
-    });
-    it("should be able to update that seller");
-    it("should be able to remove a seller (e.g. sign off user that was seller back to seller-less status)", (done) => {
-        sellerModel.Seller.findOneAndRemove(testSeller2, (err: any, result: sellerModel.ISeller) => {
-            if (err) { done(err) }
-            const externalId = testSeller2.userExternalId;
-            assert.equal((result).userExternalId, externalId);
-            done();
+
+        it.skip("should be able to retrieve the previously stored seller by externalID", (done) => {
+            sellerModel.getSellerByUserExternalId(externalId, (err: any, result: sellerModel.ISeller) => {
+                if (err) { done(err) }
+                assert.equal((result).userExternalId, externalId);
+                assert.equal(err, undefined);
+                done();
+            });
         });
-    });
-    it("can clear the DB on demand", (done) => {
-        // And also sign that user up as seller.
-        sellerModel.Seller.create(testSeller1, (err: any) => {
-            if (err) { done(err) }
+
+        it("should return a Not found error and empty result when using non existing externalID", (done) => {
+            sellerModel.getSellerByUserExternalId("thisisaninvalidexternalid", (err: any, result: sellerModel.ISeller) => {
+                assert.equal(result, null);
+                assert.equal(err, new Error("Not found"));
+                done();
+            });
         });
-        sellerModel.Seller.create(testSeller2, (err: any) => {
-            if (err) { done(err) }
+
+        it("should be able to update that seller", (done) => {
+            var newEmail = "henk@vandentillaert.nl";
+            sellerModel.Seller.update({ userExternalId: externalId }, { email: newEmail  }, (err, result: sellerModel.ISeller, nrOfAffected: number) => {
+                if (err) done(err);
+                assert.equal(result.email, newEmail);
+                assert.equal(nrOfAffected, 1);
+            });
         });
-        clearDb((err) => {
-            if (err) return done(err);
-            sellerModel.Seller.find({}, (err, sellers) => {
+
+        it("should be able to remove that seller (e.g. sign off user that was seller back to seller-less status)", (done) => {
+            sellerModel.getSellerByUserExternalId(externalId, (err: any, result: sellerModel.ISeller) => {
+                if (err) { done(err) }
+                done();
+            });
+            sellerModel.deleteByExternalId(externalId, (err: any, result: sellerModel.ISeller) => {
+                if (err) { done(err) }
+                assert.equal((result).userExternalId, externalId);
+                // Check that seller is indeed removed.
+                sellerModel.getSellerByUserExternalId(externalId, (err: any, result: sellerModel.ISeller) => {
+                    assert.equal(result, null);
+                    assert.equal(err, new Error("Not found"));
+                    done();
+                });
+            });
+        });
+
+        it("should clear the DB", (done) => {
+            // And also sign that user up as seller.
+            sellerModel.Seller.create(testSeller1, (err: any) => {
+                if (err) { done(err) }
+            });
+            sellerModel.Seller.create(testSeller2, (err: any) => {
+                if (err) { done(err) }
+            });
+            clearDb((err) => {
+                if (err) return done(err);
+                sellerModel.Seller.find({}, (err, sellers) => {
                     if (err) return done(err);
                     assert.equal(sellers.length, 0);
                     done();

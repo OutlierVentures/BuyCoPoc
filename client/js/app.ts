@@ -1,9 +1,4 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
-/// <reference path="../typings/tsd.d.ts" />
-import Controllers = require("./controllers");
-import UserAccountController = Controllers.UserAccountController;
-import LoginController = Controllers.LoginController;
-import NavigationController = Controllers.NavigationController;
 "use strict";
 
 /**
@@ -20,7 +15,7 @@ interface BuyCoRootScope extends ng.IRootScopeService {
     isProcessingLogin: boolean;
     loginErrorMessage: string;
     isPublicPage(locationService: ng.ILocationService): boolean;
-    userInfo: buyCo.Models.IUser;
+    userInfo: IUser;
 }
 
 // angular.module("buyCoApp", ["ngResource", "ngRoute", "ngSanitize", "mgcrea.ngStrap"]);
@@ -46,8 +41,6 @@ angular.module("buyCoApp").run(['$rootScope', function ($rootScope: BuyCoRootSco
 // Note: the string name provided to angular has to match the parameter names as used in the controllers,
 // case-sensitive.
 angular.module("buyCoApp").service("identityService", IdentityService);
-
-
 
 /**
  * Shorthand method for getting an Angular service from the debug console.
