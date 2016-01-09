@@ -41,45 +41,17 @@ describe("ProposalRegistry", () => {
             testRegistryName);
     });
 
-    it("should have the properties set at construction", function (done) {
-        this.timeout(10000);
-
-        assert.equal(registryContract.name(), testRegistryName);
-        done();
-    });
-
-
-    it("should have a correct creation time", function (done) {
-        this.timeout(10000);
-
-        // Get the creation time of the Circle from the blockchain through block.timestamp,
-        // and verify that it is correct.
-
-        // To facilitate this for calling code, a convenience function getCreationTime() could
-        // be created in web3plus.enhanceContract().
-
-        web3.eth.getTransaction(registryContract.transactionHash, function processTransactionInfo(err, tx) {
-            web3.eth.getBlock(tx.blockNumber, function processBlockInfo(err, block) {
-                // Allow a margin of some seconds between the time measurement in the test code
-                // and the block time on the blockchain node.
-                var margin = 10;
-
-                // block.timestamp is specified in seconds, Date.now() in milliseconds.
-                assert.ok((block.timestamp + margin) * 1000 >= timeBeforeDeployment, "Block timestamp is after timeBeforeDeployment");
-                assert.ok(block.timestamp * 1000 <= timeAfterDeployment, "Block timestamp is before timeBeforeDeployment");
-                done();
-            });
-        });
-
-    });
-
-    it("should add a proposal and then return it", function (done) {
+    it("should add backers for a proposal", function (done) {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
+
         var name1 = "Ethiopia Adado Coop";
         var price1 = 10299;
-        var name2 = "FTO Guatemala Huehuetenango";
-        var price2 = 2990000;
+        var amount1 = 15;
+
+        // Currently all transactions are sent from a single address. Hence the "backer" is
+        // also that address.
+        var backerAddress1 = web3.eth.coinbase;
 
         var proposalContract;
 
@@ -93,16 +65,44 @@ describe("ProposalRegistry", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                return registryContract.addProposal(name2, "Another exceptional product", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
+                return proposalContract.back(amount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
-            .then(function testGetMember(tx) {
-                var newProposalAddress = registryContract.proposals(2);
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                assert.equal(newBacker[0], backerAddress1);
+                assert.equal(newBacker[1].toNumber(), amount1);
 
-                assert.equal(proposalContract.productName(), name2);
-                assert.equal(proposalContract.maxPrice().toNumber(), price2);
+                // Add more "backers". This should update the amount, not add more backers, as we're backing
+                // from the same address.
+                proposalContract.back(1, { gas: 2500000 });
+                proposalContract.back(2, { gas: 2500000 });
+                proposalContract.back(3, { gas: 2500000 });
+                proposalContract.back(4, { gas: 2500000 });
+                proposalContract.back(5, { gas: 2500000 });
+                proposalContract.back(6, { gas: 2500000 });
+                proposalContract.back(7, { gas: 2500000 });
+                return proposalContract.back(8, { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                var backerIndex = proposalContract.backerIndex().toNumber();
+
+                assert.equal(backerIndex, 1);
+
+                // Backer address should be unchanged.
+                assert.equal(newBacker[0], backerAddress1);
+
+                var newAmount = newBacker[1].toNumber();
+
+                // Because there is no guarantee for the sequence in which transaction are processed,
+                // we don't know for sure what the current amount should be. We do however now that it 
+                // should be between 1 and 8. Usually it will be 8.
+                assert.ok(newAmount <= 8);
+                assert.ok(newAmount >= 1);
 
                 done();
             })

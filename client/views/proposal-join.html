@@ -1,0 +1,45 @@
+﻿﻿<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>Join a BuyCo</h2>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>
+                                Do you want to join in to buy <strong>{{proposal.productName}}</strong>?
+                            </p>
+                            <form role="form" name="proposalForm" novalidate>
+                                <fieldset ng-disabled="processMessage || successMessage">
+                                    <button name="saveButton" ng-click="vm.joinConfirm()" ng-disabled="proposalForm.$invalid" class="btn btn-primary">
+                                        Join this proposal
+                                    </button>
+                                </fieldset>
+                            </form>
+                            <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
+                                <div class="panel-heading">Processing</div>
+                                <div class="panel-body">{{processMessage}}</div>
+                            </div>
+                            <div class="panel panel-danger" style="margin-top:1em;" ng-show="errorMessage">
+                                <div class="panel-heading">There was an error processing your request.</div>
+                                <div class="panel-body">{{errorMessage}}</div>
+                            </div>
+                            <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
+                                <div class="panel-heading">Success</div>
+                                <div class="panel-body">{{successMessage}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-lg-8 (nested) -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+</div>

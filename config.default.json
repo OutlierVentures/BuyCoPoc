@@ -10,18 +10,22 @@
     },
     "uphold": {
         "app": {
-            "clientID": "46f9da061028333040829045a01314ab73531cfc",
-            "clientSecret": "1cb1b7c7bd45c67447c265034fd05e69856b1b2a"
+            "clientID": "1bd20ca53ee644ef2e768a744efb9586c263b77a",
+            "clientSecret": "68e582bfefd3b11cb5ec01c43bdd48fa52d1ca22"
         },
         "vaultAccount": {
-            "__comment": "The main account that stores funds of Circles.",
+            "__comment": "The main account that stores funds of buying cooperatives.",
             "userName": "AronVanAmmers",
-            "cardBitcoinAddress": "1EXgEzs3qGbMooHt89xmrmwXbbKxTNqVjh",
-            "cardId": "fdbe3f64-93db-4666-872b-68ffbc11db4a"
+            "cardBitcoinAddress": "1BnN8uD7yo63ZCQevqRLsBFeEiMZjfTTPp",
+            "cardId": "ead96fff-5370-4322-b83c-508315c1c455"
         }
     },
     "ethereum": {
-        "jsonRpcUrl": "http://buyco-poc-dev.projects.blockstars.io:8001",
-        "nodeUrl": "buyco-poc-dev.projects.blockstars.io:30301"
+        "__comment" : "This configuration uses the development Ethereum node on blockstars.io.",
+        "jsonRpcUrl": "http://blockstars.io:9001",
+        "nodeUrl": "blockstars.io:30301",
+        "contracts": {
+            "proposalRegistry": "0x0b97c62080f2654bcf7204c242769d1062c31065"
+        }
     }
 }

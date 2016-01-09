@@ -1,5 +1,6 @@
 {
-  "name": "assetchain-app",
+    "directory": "vendors",
+    "name": "buyco-client",
   "dependencies": {
     "jquery": "~2.0.2",
     "underscore": "~1.7.0",

@@ -1,0 +1,37 @@
+﻿
+<div class="container">
+    <div class="panel panel-danger" ng-show="errorMessage">
+        <div class="panel-heading">There was an error processing your request.</div>
+        <div class="panel-body">{{errorMessage}}</div>
+    </div>
+    <div class="jumbotron">
+        <h2>{{proposal.productName}}</h2>
+        <p class="text-muted">{{proposal.productDescription}}</p>
+        <span class="small">
+            Maximum price: <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span>
+        </span><br><br>
+        <span class="small">
+            End date: <span class="text-muted">{{proposal.endDate}}</span>
+        </span><br><br>
+        <span class="small">
+            Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate}}</span>
+        </span><br><br>
+        <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.id}}</span></span>
+        <form role="form" name="proposalForm" novalidate>
+            <a href="/proposal/{{proposal.id}}/join" class="btn btn-primary">
+                Join this BuyCo
+            </a>
+        </form>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Backers
+        </div>
+        <div class="panel-body" ng-hide="backers">
+            Loading the list of prospective buyers...
+        </div>
+        <div class="list-group" ng-show="backers">
+            
+        </div>
+    </div>
+</div>

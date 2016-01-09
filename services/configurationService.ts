@@ -1,15 +1,21 @@
 ﻿import fs = require('fs');
 import configModel = require('../models/configModel');
 
+/**
+ * Globally cached configuration. No way to invalidate it yet; config changes require restarting, 
+ * and there's only one instance of the configuration.
+ */
 var cachedConfig: configModel.IApplicationConfig;
 
 export class ConfigurationService {
+    basePath = "./";
+
     getConfiguration = () => {
         if (cachedConfig)
             return cachedConfig;
 
         /*************** Configuration ********************/
-        var CONFIG_FILE = './config.json';
+        var CONFIG_FILE = this.basePath + 'config.json';
         var config: configModel.IApplicationConfig;
         var configString: string;
 
@@ -20,7 +26,7 @@ export class ConfigurationService {
         }
         catch (e) {
             try {
-                CONFIG_FILE = './config.default.json';
+                CONFIG_FILE = this.basePath + 'config.default.json';
                 configString = fs.readFileSync(CONFIG_FILE, 'utf8');
             }
             catch (e2) {

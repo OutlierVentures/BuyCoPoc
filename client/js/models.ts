@@ -74,3 +74,13 @@ interface IApplicationInfo {
         genesisBlock: any
     }
 }
+
+
+interface IProposal {
+    id: string;
+    productName: string;
+    productDescription: string;
+    maxPrice: number;
+    endDate: Date;
+    ultimateDeliveryDate: Date;
+}

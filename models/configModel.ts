@@ -21,6 +21,10 @@
     },
     "ethereum": {
         "jsonRpcUrl": string,
-        "nodeUrl": string
-    }
+        "nodeUrl": string,
+        "contracts": {
+            "proposalRegistry": string
+        }
+    },
+    
 }
