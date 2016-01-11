@@ -9,6 +9,10 @@ interface IBigNumber {
     toNumber(): number
 }
 
+/**
+ * Service for dealing with buying proposals on the blockchain. All functions
+ * return promises.
+ */
 export class ProposalService {
     config = new configurationService.ConfigurationService().getConfiguration();
     registryContract;
@@ -17,6 +21,9 @@ export class ProposalService {
     constructor() {
     }
 
+    /**
+     * Initialize the service by loading the registry contract.
+     */
     initialize(): Q.Promise<void> {
         var defer = Q.defer<void>();
         var t = this;
@@ -37,6 +44,13 @@ export class ProposalService {
         return defer.promise;
     }
 
+    /**
+     * Build a function to return an IProposal from a proposal contract address.
+     * Gets the details of the proposal asynchronously.
+     * To be used as a callback function from web3.js functions that return a 
+     * proposal address.
+     * @param d A Deferred that is resolved with the new IProposal when it's complete.
+     */
     buildGetProposalCallback(d: Q.Deferred<proposalModel.IProposal>) {
         var t = this;
         return function (proposalErr, proposalAddress) {
@@ -109,9 +123,7 @@ export class ProposalService {
     }
 
     /**
-    * Get all proposals.
-    * TODO: include filters by category, amount etc. Should be done at
-    * contract side to prevent many JSON RPC calls at scale.
+    * Get a single proposal by its contract address.
     */
     getOne(proposalId: string): Q.Promise<proposalModel.IProposal> {
         var deferred = Q.defer<proposalModel.IProposal>();
@@ -139,6 +151,11 @@ export class ProposalService {
         return deferred.promise;
     }
 
+    /**
+     * Create a new proposal in the blockchain.
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
     create(p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
         var t = this;
 
