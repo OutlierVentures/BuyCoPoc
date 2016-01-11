@@ -19,10 +19,7 @@ export class SellerController {
 
         // TODO Try to get seller 
         // userModel.
-        sellerModel.getSellerByUserExternalId(userExternalId, (sellerErr: any, sellerResult: ISeller) => {
-            if (sellerErr) {
-                return;
-            }
+        sellerModel.getSellerByUserExternalId(userExternalId).then((sellerResult: ISeller) => {
             var doesSellerExist = !!sellerResult;
 
             // Make SellerDocument from data from posted request/form.

@@ -1,5 +1,6 @@
 ﻿{
     "__comment": "This is the default configuration file. If you want custom configuration, copy this file to 'config.json' and adapt.",
+    "useStubs": false,
     "server": {
         "httpPort": 4123,
         "httpsPort": 4124,

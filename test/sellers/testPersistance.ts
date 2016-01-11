@@ -1,15 +1,15 @@
-﻿import testHelper = require("../testHelper");
+﻿import assert = require("assert");
+import mongoose = require("mongoose");
+import testHelper = require("../testHelper");
+var mochaMongoose = require("mocha-mongoose");
 import configurationService = require("../../services/configurationService");
 var config = new configurationService.ConfigurationService().getConfiguration();
 
 // Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
 const dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
 
-var should = require('chai').should(),
-    mongoose = require('mongoose'),
-    Dummy = mongoose.model('Dummy',
-    new mongoose.Schema({ a: Number })),
-    clearDb = require('mocha-mongoose')(dbUri);
+var Dummy = mongoose.model('Dummy', new mongoose.Schema({ a: Number })),
+    clearDb = require("mocha-mongoose")(dbUri);
     
 describe("Example spec for a model", () => {
     beforeEach(done => {
@@ -22,7 +22,7 @@ describe("Example spec for a model", () => {
     it("can be saved", done => {
         new Dummy({ a: 1 }).save(done);
     });
-    it("can be listed", function (done) {
+    it("can be listed", function(done) {
         new Dummy({ a: 1 }).save((err, model) => {
             if (err)
                 return done(err);
@@ -32,7 +32,7 @@ describe("Example spec for a model", () => {
                 Dummy.find({}, function (err, docs) {
                     if (err)
                         return done(err);
-                    docs.length.should.equal(2);
+                    assert.equal(docs.length, 2);
                     done();
                 });
             });
@@ -48,7 +48,7 @@ describe("Example spec for a model", () => {
                 Dummy.find({}, (err, docs) => {
                     if (err)
                         return done(err);
-                    docs.length.should.equal(0);
+                    assert.equal(docs.length, 0);
                     done();
                 });
             });
