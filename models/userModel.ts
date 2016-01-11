@@ -1,4 +1,5 @@
 ﻿import mongoose = require("mongoose");
+import q = require("q");
 
 /**
  * Membership token of the user for a specific circle.
@@ -68,7 +69,7 @@ interface IUserCallback {
  * Get a user by their access token.
  */
 export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
-    User.findOne({ accessToken: token }, function (err, user) {
+    User.findOne({ accessToken: token }, (err, user) => {
         // TODO: use promise to wait for creating new user.
         if (!user) {
             // No user with this token.
@@ -76,32 +77,70 @@ export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
         }
 
         // TODO: check for validity of the token.
-
         cb(null, user);
     });
 }
 
 /**
- * Get a user by their externalId.
+ * Get a user by their externalId. 
+ * For now just a simple one to one mapping with mongoose findOne function, but 'Promisied'.
  */
-export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
-    User.findOne({ externalId: token }, (err, user) => {
-        // TODO: use promise to wait for creating new user.
-        if (!user) {
-            // No user with this token.
-            cb("Not found", null);
-        }
-
-        cb(null, user);
+export var getUserByExternalId: (externalId: string) => q.Promise<IUser> = (externalId: string): q.Promise<IUser> => {
+    var result = q.Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+        User.findOne({ externalId: externalId }, (err: any, resultUser: IUser) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(resultUser);
+        });
     });
-}
-
+    return result;
+};
 
 /**
  * Gets the users who are in a certain circle.
+ * // TODO BW Delete!
  */
 export var getUsersInCircle = (circleId: string, cb: any) => {
     User.find({})
         .where("circleMemberships.circleId").equals(circleId)
         .exec(cb);
 }
+
+/**
+ * Create a user.
+ * For now just a simple one to one mapping with mongoose create function, but 'Promisied'.
+ * @param user
+ * @param cb
+ */
+export var create: (newUser: IUser) => q.Promise<IUser> = 
+(newUser: IUser): q.Promise<IUser> => {
+    var result = q.Promise<IUser>(
+    (resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+        User.create(newUser, (err: any, resultUser: IUser) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(resultUser);
+        });
+    });
+    return result;
+};
+
+
+/**
+ * Find one or more users give some criteria (in an JS Object format).
+ * For now just a simple one to one mapping with the mongoose find function, but 'Promisied'.
+ */
+export var find: (cond: Object) => q.Promise<IUser[]> = (cond: Object) => {
+    var result = q.Promise<IUser[]>(
+    (resolve: (users: IUser[]) => void, reject: (error: any) => void) => {
+        User.find(cond, (err: any, users: IUser[]) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(users);
+        });
+    });
+    return result;
+};
