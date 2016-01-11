@@ -65,7 +65,8 @@ describe("ProposalRegistry", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                return proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                return backPromise;
             })
             .then(web3plus.promiseCommital)
             .then(function testGetBacker(tx) {
@@ -83,7 +84,8 @@ describe("ProposalRegistry", () => {
                 proposalContract.back(5, { gas: 2500000 });
                 proposalContract.back(6, { gas: 2500000 });
                 proposalContract.back(7, { gas: 2500000 });
-                return proposalContract.back(8, { gas: 2500000 });
+                var lastBacker = proposalContract.back(8, { gas: 2500000 });
+                return lastBacker;
             })
             .then(web3plus.promiseCommital)
             .then(function testGetBacker(tx) {
@@ -99,7 +101,7 @@ describe("ProposalRegistry", () => {
                 var newAmount = newBacker[1].toNumber();
 
                 // Because there is no guarantee for the sequence in which transaction are processed,
-                // we don't know for sure what the current amount should be. We do however now that it 
+                // we don't know for sure what the current amount should be. We do however know that it 
                 // should be between 1 and 8. Usually it will be 8.
                 assert.ok(newAmount <= 8);
                 assert.ok(newAmount >= 1);

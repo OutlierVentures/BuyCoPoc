@@ -190,4 +190,28 @@ export class ProposalService {
         return defer.promise;
     }
 
+    /**
+     * Back an existing proposal in the blockchain.
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser): Q.Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        var proposalContract = this.proposalContractDefinition.at(p.id);
+
+        var backPromise = proposalContract.back(amount, { gas: 2500000 });
+
+        backPromise.then(web3plus.promiseCommital)
+            .then(function (res) {
+                defer.resolve(res);
+            }, function (err) {
+                defer.reject(err);
+            });
+
+        return defer.promise;
+    }
+
 }

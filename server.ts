@@ -128,7 +128,7 @@ export class Server {
 
         app.get('/proposal/list', indexRoute.index);
         app.get('/proposal/:id', indexRoute.index);
-        app.get('/proposal/:id/join', indexRoute.index);
+        app.get('/proposal/:id/back', indexRoute.index);
         app.get('/proposal/new', indexRoute.index);
 
         app.get('/not-found', indexRoute.index);
@@ -146,6 +146,7 @@ export class Server {
         var pc = new proposalController.ProposalController();
         app.get("/api/proposal", pc.getAll);
         app.get("/api/proposal/:id", pc.getOne);
+        app.post("/api/proposal/:id/back", pc.back);
         app.post("/api/proposal", pc.create);
 
         // Migrations

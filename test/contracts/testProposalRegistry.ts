@@ -93,7 +93,8 @@ describe("ProposalRegistry", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                return registryContract.addProposal(name2, "Another exceptional product", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
+                var addProposalPromise = registryContract.addProposal(name2, "Another exceptional product", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
+                return addProposalPromise;
             })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {

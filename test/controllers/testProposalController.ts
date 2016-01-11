@@ -102,4 +102,47 @@ describe("ProposalController", () => {
             });
     });
 
+    it("should back a proposal on POST /api/proposal/:id/back", function (done) {
+        this.timeout(100000);
+
+        var proposal: proposalModel.IProposal;
+
+        // Get the proposal list to obtain a valid ID
+        request(theApp)
+            .get('/api/proposal')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var list = <Array<proposalModel.IProposal>>res.body;
+                proposal = list[0];
+            })
+            .end(function (err, res) {
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.id + '/back')
+                    .send({
+                        proposal: proposal,
+                        amount: 31
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        //var proposal = <proposalModel.IProposal>res.body;
+                
+                        // TODO: Check whether the result has been achieved. The result itself
+                        // doesn't contain any data. However we can call /api/proposal/:id/backers to
+                        // see if our backing was registered.
+
+
+                        //assert.equal(proposal.id, proposalId, "Returned proposal has correct ID");
+                        //assert.equal(proposal.productName, productName, "Returned product has correct name");
+                    })
+                    .end(function (err, res) {
+                        done(err);
+                    });
+
+            });
+
+    });
+
 });

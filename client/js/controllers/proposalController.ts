@@ -1,5 +1,6 @@
 ﻿interface IProposalScope extends ng.IScope {
     proposal: IProposal;
+    amount: number;
     vm: ProposalController;
     processMessage: string;
     errorMessage: string;
@@ -39,8 +40,8 @@ class ProposalController {
 
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
-        if (this.$route.current.name === "join") {
-            this.join(proposalId);
+        if (this.$route.current.name === "back") {
+            this.back(proposalId);
         } else if (this.$route.current.name === "details") {
             this.view(proposalId);
         }
@@ -104,14 +105,51 @@ class ProposalController {
     }
 
     /**
-     * Show screen to join a proposal.
+     * Show screen to back a proposal.
      */
-    join(proposalId: string) {
+    back(proposalId: string) {
         var t = this;
 
         t.getProposalData(proposalId, function (err, res) {
         });
     }
+
+    backConfirm() {
+        var t = this;
+
+        // Confirm backing the currently loaded proposal.
+        t.$scope.processMessage = "Backing prooposal...";
+        t.$scope.errorMessage = undefined;
+        t.$scope.successMessage = undefined;
+
+        this.$http({
+            method: 'POST',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/back',
+            data: { proposal: t.$scope.proposal, amount: t.$scope.amount },
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: any) {
+            t.$scope.processMessage = undefined;
+            t.$scope.successMessage = "You successfully backed this proposal for " + t.$scope.amount +
+                " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
+            t.$timeout(() => {
+            }, 5000).then((promiseValue) => {
+                t.$scope.successMessage = undefined;
+
+                // Redirect to the proposal view
+                t.$location.path("/proposal/" + t.$scope.proposal.id)
+            });
+        }).error(function (error) {
+            t.$scope.processMessage = undefined;
+
+            // Handle error
+            console.log("Error confirming backing:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error;
+        });
+    }
+
 
     create() {
         // TODO: check for validity
