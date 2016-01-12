@@ -17,7 +17,7 @@
             "isBuildCommand": false,
             "isTestCommand": true,
             "showOutput": "always",
-            "args": ["mocha-typescript"]
+            "args": []
         }
     ]
 }

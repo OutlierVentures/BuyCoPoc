@@ -1,6 +1,0 @@
-﻿{
-  "ui": "tdd",
-  "timeout": 2000,
-  "reporter": "tap",
-  "reporter_": "xunit"
-}

@@ -1,15 +1,34 @@
 ﻿import express = require("express");
-import userModel = require("../models/userModel");
-import sellerModel = require("../models/sellerModel");
+import { IUser, User, UserRepository } from "../models/userModel";
+import { ISeller, SellerRepository } from "../models/sellerModel";
+
+var userRepo = new UserRepository();
+var sellerRepo = new SellerRepository();
 
 /**
  * Controller for Sellers.
  */
 // TODO BW dd. 2015-01-08: Perhaps all sellerModel stuff should only be called from separate sellerService, and this controller should only do the mapping of that service from and to request, resp. response.
-export class SellerController {
+export default class SellerController {
     getAll = (req: express.Request, res: express.Response) => {
-        userModel.User.find({}, (err, result) => {
+        User.find({}, (err, result) => {
             res.json(result);
+        });
+    };
+    get = (req: express.Request, res: express.Response) => {
+        var accessToken = req.headers["accessToken"];
+        // Throw unauthorized error when there is no accessToken.
+        if (!accessToken) {
+            res.statusMessage="User not authenticated.";
+            return res.status(403);
+        }
+        userRepo.getUserByAccessToken(accessToken, (err, user: IUser) => {
+            sellerRepo.getSellerByUserExternalId(user.externalId)
+            .then((seller: ISeller) => {
+                return res.json(seller);
+            }).catch((err) => {
+                return res.status(403).json(err);
+            })
         });
     };
     save = (req: express.Request, res: express.Response) => {
@@ -17,19 +36,17 @@ export class SellerController {
 
         var userExternalId = req.body.userExternalId;
 
-        // TODO Try to get seller 
-        // userModel.
-        sellerModel.getSellerByUserExternalId(userExternalId).then((sellerResult: ISeller) => {
-            var doesSellerExist = !!sellerResult;
+        // Check if there's already a seller for the current user.
+        sellerRepo.getSellerByUserExternalId(userExternalId)
+        .then((sellerResult: ISeller) => {
+            var doesSellerExist: Boolean = !!sellerResult;
 
             // Make SellerDocument from data from posted request/form.
             // Note: using 'object literal' instead of constructor+ set props, because it refactors more easily).
-            var input = new sellerModel.Seller({
+            var input = {
                 userExternalId: userExternalId,
                 isActive: true,
                 email: req.body.email,
-                dateCreated: now,
-                dateUpdated: now,
                 company: req.body.company,
                 addressLine1: req.body.addressLine1,
                 addressline2: req.body.addressLine2,
@@ -38,40 +55,38 @@ export class SellerController {
                 country: req.body.country,
                 telephone: req.body.telephone,
                 region: req.body.region
-            });
+            };
             // If already exists and no error then save, update otherwise.
             if (doesSellerExist) {
-                sellerModel.Seller.update({ userExternalId: userExternalId }, input, (sellerErr: any, seller: ISeller, nrOfAffected: number) => {
-                    if (!sellerErr) {
-                        // Handle result.             
-                        res.json({
-                            "status": "Ok",
-                            "seller": seller
-                        });
-                        // TODO Handle if error.
-                    } else {
-                        res.json({
-                            "status": "Error",
-                            "msg": sellerErr
-                        });
-                    }
+                sellerRepo.update(input as ISeller)
+                .then((seller: ISeller) => {
+                    // Handle result.             
+                    res.json({
+                        "status": "Ok",
+                        "seller": seller
+                    });
+                }).catch((err: any) => {
+                    // Handle error on updating seller. 
+                    res.json({
+                        "status": "Error",
+                        "msg": err
+                    });
                 });
             } else {
                 // Seller doesn't exist yet.
-                sellerModel.Seller.create(input, (sellerErr, sellerRes) => {
-                    if (!sellerErr) {
-                        // Handle result.             
-                        res.json({
-                            "status": "Ok",
-                            "seller": sellerRes
-                        });
-                        // TODO Handle if error.
-                    } else {
-                        res.json({
-                            "status": "Error",
-                            "msg": sellerErr
-                        });
-                    }
+                sellerRepo.create(input as ISeller)
+                .then((sellerRes: ISeller) => {
+                    // Handle result.             
+                    res.json({
+                        "status": "Ok",
+                        "seller": sellerRes
+                    });
+                    // Handle if error.
+                }).catch((err: any) => {
+                    res.json({
+                        "status": "Error",
+                        "msg": err
+                    });
                 });
             }
         });

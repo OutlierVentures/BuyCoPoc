@@ -66,7 +66,6 @@ if (config.useStubs) {
     // Create a stub controller from the real controller.
     var stubController = new stubOauthController.StubOAuthController(upholdOauthController);
 
-
     // Replace the handlers of the real controller by the stubs.
     upholdOauthController.auth = stubController.auth;
     upholdOauthController.callback = stubController.callback;
@@ -108,11 +107,11 @@ var apiRouter = express.Router();
 import upholdController = require('./controllers/upholdController');
 import proposalController = require('./controllers/proposalController');
 import migrationController = require('./controllers/migrationController');
-import sellerController = require('./controllers/sellerController');
+import SellerController from "./controllers/sellerController";
 var uc = new upholdController.UpholdController();
 var pc = new proposalController.ProposalController();
 var mc = new migrationController.MigrationController();
-var sc = new sellerController.SellerController();
+var sc = new SellerController();
 
 // Uphold API wrapper
 apiRouter.route("/uphold/me/cards")
@@ -137,7 +136,7 @@ apiRouter.route("/seller/signup")
         return sc.save(req, res);
     });
 apiRouter.route("/seller")
-    .get(sc.getAll);
+    .get(sc.get);
 
 // Catch not existing api calls.
 apiRouter.route("*")

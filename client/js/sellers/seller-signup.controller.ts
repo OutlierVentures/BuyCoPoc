@@ -44,8 +44,8 @@ class SellerSignupController implements ISellerSignUp {
     ) {
         this.message = "test";
         this.messageType = MessageType.Success;
-        this.getSeller();
         this.sellerResource = this.dataAccessService.getSellerResource(this.$rootScope.userInfo.accessToken);
+        this.getSeller();
         this.$rootScope.$on("loggedOn", (event: any, data: any) => {
         });
     }
