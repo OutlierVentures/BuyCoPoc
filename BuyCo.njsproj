@@ -35,7 +35,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="test\mocha.json" />
     <Content Include="test\spec-runner.html" />
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
@@ -56,9 +55,9 @@
     <TypeScriptCompile Include="client\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="client\typings\cryptojs\cryptojs.d.ts" />
+    <TypeScriptCompile Include="client\typings\gulp-mocha\gulp-mocha.d.ts" />
     <TypeScriptCompile Include="client\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
-    <TypeScriptCompile Include="client\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="controllers\sellerController.ts" />
@@ -489,13 +488,8 @@
     <TypeScriptCompile Include="test\sellers\testPersistance.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\sellers\testUserPersistance.ts">
-      <TestFramework>Mocha</TestFramework>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="test\sellers\UnitTest1.ts">
-      <SubType>Code</SubType>
-      <TestFramework>Mocha</TestFramework>
-    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\sellers\testSellerRepository.ts" />
+    <TypeScriptCompile Include="test\sellers\testUserRepository.ts" />
     <TypeScriptCompile Include="test\testHelper.ts" />
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\chai\chai.d.ts" />
@@ -524,7 +518,9 @@
     <Folder Include="client\typings\" />
     <Folder Include="client\typings\angularjs\" />
     <Folder Include="client\typings\cryptojs\" />
+    <Folder Include="client\typings\gulp-mocha\" />
     <Folder Include="client\typings\jquery\" />
+    <Folder Include="client\typings\lodash\" />
     <Folder Include="client\typings\underscore\" />
     <Folder Include="client\vendors\" />
     <Folder Include="client\vendors\bootstrap\" />

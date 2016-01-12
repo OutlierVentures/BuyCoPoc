@@ -20,14 +20,23 @@
     "cryptojs/cryptojs.d.ts": {
       "commit": "c5a2f44bab06cf9f2bcc14530171daac1cebff6c"
     },
-    "underscore/underscore.d.ts": {
-      "commit": "f11e49cfb77f99678657ddfe5d43017849675c64"
-    },
     "angularjs/angular-resource.d.ts": {
       "commit": "81b951f1ac437d1eb5ff5171a0bfa6c467634b13"
     },
     "angularjs/angular-mocks.d.ts": {
       "commit": "bdaf2f0eb19edee26248c80bab4947e9b70e4217"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
+    },
+    "gulp-mocha/gulp-mocha.d.ts": {
+      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
+    },
+    "node/node.d.ts": {
+      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
     }
   }
 }
