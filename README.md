@@ -11,10 +11,9 @@ To get a version working you can mess around with on the local machine, you can 
 ### The GIT bit
     Note BW dd. 2015-12-23: Work in progress, please update based on continued use.
 
-*Developers typically - only - have read-only access to OutlierVentures' GitHub. You can't clone or branch in the Outlier Ventures ('you're already looking at it).
+Developers typically have read-only access to OutlierVentures' GitHub. You can't clone or branch in the Outlier Ventures.
 So you'll have to have at least a GitHub Micro subscription, to clone the repo to your own private repo. Because ofcourse we DON't want the repo set public.
-
-Deployments are done from the 'original', getting code their from your own fork is done through pull requests.
+All deployments to productions are done from the original 'OutlierVentures' branch, to get developed from your own fork there is done through pull requests.
 
 Some links to [help.github.com](https://help.github.com) for more info:
 - [Pushing to a remote](https://help.github.com/articles/pushing-to-a-remote/)
@@ -24,7 +23,7 @@ Some links to [help.github.com](https://help.github.com) for more info:
 ![gitoriginandupstream](https://cloud.githubusercontent.com/assets/3029472/11975316/bf86b836-a96c-11e5-8402-fe64067a2bdc.png)
 
 ####Check out private fork
-Fork the repo to your own private repo*. Then check out your own fork from your own `Code` or `dev` folder, or whatever
+Fork the repo to your own private repo*. Then check out your own fork to your own `Code` or `dev` folder, for example:
 
     git clone https://github.com/bartvanderwal/BuyCo.git
 
@@ -49,9 +48,10 @@ Typically you'll ONLY work on your `development` branch. Possibly you'll use sep
 #### Sync changes back
 Before doing a pull request, you want to resync your local folder based on the fork with the original you forked from:
 
-    git status                         -- There should be no changes, otherwise push them to own remote first!
+    git status                         -- There should be no changes, if so push them to own remote first!
     git rebase upstream/development
-    git pull                           -- Then sync back the changes from your own remote, manually merge any changes (and after use 'git rebase --continue' et al).
+    git pull                           -- Then sync back the changes from your own remote.
+                                       -- If there are conflicts manually merge them (and after use 'git rebase --continue' et al)
     git push                           -- And then sync the changes from the fork.
 
 To get the commits nice it's best to rebase. And you have to manually merge any changes from the upstream, and push them to your own remote repo.
