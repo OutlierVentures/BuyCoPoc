@@ -30,8 +30,13 @@
         <div class="panel-body" ng-hide="backers">
             Loading the list of prospective buyers...
         </div>
-        <div class="list-group" ng-show="backers">
-            <a href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code>: <span class="pull-right text-muted">{{backer.amount}} unit(s)</span></a>
+        <div class="panel-body" ng-show="backers.length == 0">
+            <p>You can be the first to back this proposal!</p>
+        </div>
+        <div class="panel-body" ng-show="backers.length > 0">
+            <div class="list-group">
+                <a href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code>: <span class="pull-right text-muted">{{backer.amount}} unit(s)</span></a>
+            </div>
         </div>
     </div>
 </div>
