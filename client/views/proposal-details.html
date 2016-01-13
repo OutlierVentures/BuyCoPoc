@@ -31,7 +31,7 @@
             Loading the list of prospective buyers...
         </div>
         <div class="list-group" ng-show="backers">
-            
+            <a href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code>: <span class="pull-right text-muted">{{backer.amount}} unit(s)</span></a>
         </div>
     </div>
 </div>

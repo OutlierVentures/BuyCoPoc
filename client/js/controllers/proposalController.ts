@@ -1,5 +1,6 @@
 ﻿interface IProposalScope extends ng.IScope {
     proposal: IProposal;
+    backers: Array<IProposalBacker>;
     amount: number;
     vm: ProposalController;
     processMessage: string;
@@ -72,29 +73,29 @@ class ProposalController {
         });
     }
 
-    //private getProposalStatistics(proposalId: string, cb: any) {
-    //    var t = this;
+    private getProposalBackers(proposalId: string, cb: any) {
+        var t = this;
 
-    //    // Get statistics
-    //    this.$http({
-    //        method: 'GET',
-    //        url: apiUrl + '/proposal/' + proposalId + '/statistics',
-    //        headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-    //    }).success(function (resultData: IProposalStatistics) {
-    //        t.$scope.statistics = resultData;
-    //        cb(null, resultData);
-    //    }).error(function (error) {
-    //        // Handle error
-    //        console.log("Error loading proposal statistics:");
-    //        console.log(error);
+        // Get statistics
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/proposal/' + proposalId + '/backers',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: Array<IProposalBacker>) {
+            t.$scope.backers = resultData;
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            console.log("Error loading proposal backers:");
+            console.log(error);
 
-    //        // Show notification
-    //        t.$scope.errorMessage = error.error;
+            // Show notification
+            t.$scope.errorMessage = error.error;
 
-    //        cb("Error getting proposal data", null);
-    //    });
+            cb("Error getting backers data", null);
+        });
 
-    //}
+    }
 
     view(proposalId: string) {
         var t = this;
@@ -102,6 +103,11 @@ class ProposalController {
         t.getProposalData(proposalId, function (err, res) {
             // The getter already sets scope variables. Nothing to do here.
         });
+
+        t.getProposalBackers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
     }
 
     /**
