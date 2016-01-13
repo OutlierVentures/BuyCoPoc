@@ -34,6 +34,7 @@ export class Server {
     config: configModel.IApplicationConfig;
     HTTP_PORT: number;
     HTTPS_PORT: number;
+    db: mongoose.Mongoose;
 
     /**
      * Create the Express application.
@@ -112,7 +113,7 @@ export class Server {
         // disconnect for some reason.
         // TODO: make this more stable, in a way that doesn't require a specific call to Mongoose
         // before every request (because that will be forgotten).
-        var db = mongoose.connect(this.config.database.url);
+        this.db = mongoose.connect(this.config.database.url);
 
         // Client folder containing the Angular SPA, serve as static assets
         var clientDir = path.join(__dirname, 'client')
@@ -208,5 +209,12 @@ export class Server {
 
         console.log('http server started on port ' + this.HTTP_PORT);
         console.log('https server started on port ' + this.HTTPS_PORT);
+    }
+
+    /**
+     * Stop running the application and close the database connection.
+     */
+    stop() {
+        this.db.disconnect();
     }
 }

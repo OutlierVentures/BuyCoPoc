@@ -142,7 +142,7 @@ export class ProposalController {
                 .then(
                 function (tx) {
                     // Empty response, no need to communicate anything.
-                    res.send(200);
+                    res.sendStatus(200);
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,

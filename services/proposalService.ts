@@ -152,6 +152,56 @@ export class ProposalService {
     }
 
     /**
+     * Get a single proposal by its contract address.
+     */
+    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacker>> {
+        var deferred = Q.defer<Array<proposalModel.IProposalBacker>>();
+
+        var t = this;
+
+        // Get the proposal contract
+
+        var proposalContract;
+        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacker>>();
+
+        t.proposalContractDefinition.at(proposalId)
+            .then(function (proposal) {
+                var numBackers = proposalContract.backerIndex().toNumber();
+
+                for (var i = 1; i <= numBackers; i++) {
+                    var defer = Q.defer<proposalModel.IProposalBacker>();
+
+                    getBackerDetailsPromises.push(defer.promise);
+                    proposal.backers(i, function (backerErr, backer) {
+                        if (backerErr) {
+                            defer.reject(backerErr);
+                            return;
+                        }
+                        var backerAddress = backer[0];
+                        var amount = backer[1].toNumber();
+                        defer.resolve({
+                            address: backerAddress,
+                            amount: amount,
+                            userId: "unknown", // TODO: get this
+                        });
+                    });
+                }
+
+                return Q.all(getBackerDetailsPromises);
+            },
+            function (proposalErr) {
+                deferred.reject(proposalErr);
+            })
+            .then(function (allBackers) {
+                deferred.resolve(allBackers);
+            }, function (allBackersErr) {
+                deferred.reject(allBackersErr);
+            });
+           
+        return deferred.promise;
+    }
+
+    /**
      * Create a new proposal in the blockchain.
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.

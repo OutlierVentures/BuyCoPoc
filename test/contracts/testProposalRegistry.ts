@@ -60,13 +60,29 @@ describe("ProposalRegistry", () => {
 
         web3.eth.getTransaction(registryContract.transactionHash, function processTransactionInfo(err, tx) {
             web3.eth.getBlock(tx.blockNumber, function processBlockInfo(err, block) {
+                if (err) {
+                    done(err);
+                    return;
+                }
+
                 // Allow a margin of some seconds between the time measurement in the test code
-                // and the block time on the blockchain node.
+                // and the block time on the blockchain node. It happens regularly that the time
+                // is a few seconds off.
                 var margin = 10;
 
                 // block.timestamp is specified in seconds, Date.now() in milliseconds.
-                assert.ok((block.timestamp + margin) * 1000 >= timeBeforeDeployment, "Block timestamp is after timeBeforeDeployment");
-                assert.ok(block.timestamp * 1000 <= timeAfterDeployment, "Block timestamp is before timeBeforeDeployment");
+                var millisecondsWithMargin = (block.timestamp + margin) * 1000;
+                console.log("before with margin", millisecondsWithMargin);
+                var difference = millisecondsWithMargin - timeBeforeDeployment;
+                console.log("difference", difference);
+                assert.ok(difference > 0, "Block timestamp is after timeBeforeDeployment");
+
+                console.log("timeAfterDeployment", timeAfterDeployment);
+
+                // Also apply margin the other way around
+                difference = timeAfterDeployment - (block.timestamp - margin) * 1000;
+                console.log("difference", difference);
+                assert.ok(difference > 0, "Block timestamp is before timeAfterDeployment");
                 done();
             });
         });

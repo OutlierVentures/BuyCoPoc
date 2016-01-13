@@ -25,6 +25,11 @@ describe("ProposalController", () => {
         done();
     });
 
+    after(function (done) {
+        theServer.stop();
+        done();
+    });
+
     it("should return a list of proposals on GET /api/proposal", function (done) {
         this.timeout(10000);
 
@@ -124,7 +129,7 @@ describe("ProposalController", () => {
                         proposal: proposal,
                         amount: 31
                     })
-                    .expect('Content-Type', /json/)
+                    //.expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
                         //var proposal = <proposalModel.IProposal>res.body;
