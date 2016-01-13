@@ -27,7 +27,7 @@ export class MigrationController {
         catch (ex) {
         }
 
-        if (registryCode == "0x") {
+        if (!registryCode || registryCode == "0x") {
             var deferDeployRegistry = Q.defer<any>();
 
             web3plus.deployContractFromFile("ProposalRegistry.sol", "ProposalRegistry", true, function (deployErr, deployRes) {
@@ -40,19 +40,28 @@ export class MigrationController {
                 // COULD DO: write config file here, or provide result values in a
                 // format that can be easily incorporated in the config file.
                 // ... or use a/the namereg contract...
-                deferDeployRegistry.resolve({ "registryContractAddress": deployRes });
+                console.log("MigrationController.update", "ProposalRegistry deployed at " + deployRes.address);
+                deferDeployRegistry.resolve({ "registryContract": deployRes });
             });
 
             promises.push(deferDeployRegistry.promise);
-        }
+        } else {
+            var deferShowRegistry = Q.defer<any>();
+            promises.push(deferShowRegistry.promise);
 
+            setTimeout(() => {
+                deferShowRegistry.resolve({
+                    "address": this.config.ethereum.contracts.proposalRegistry
+                })
+            }, 0);
+        }
 
         Q.all(promises)
             .then(function (results) {
                 res.status(200).json({
                     "status": "Ok",
                     "message": "Everything is up to date",
-                    "results": results,
+                    "results": results[0],
                 });
             })
             .catch(function (err) {

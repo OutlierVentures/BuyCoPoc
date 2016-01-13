@@ -70,7 +70,14 @@ contract Proposal {
     string public ultimateDeliveryDate;
 
     struct Backing {
+        /**
+         * Blockchain address of the buyer
+         */
         address buyerAddress;
+
+        /**
+         * Amount of products the buyer has committed to buy.s
+         */
         uint amount;
     }
 

@@ -1,41 +1,25 @@
 ﻿import mongoose = require("mongoose");
 
 /**
- * Membership token of the user for a specific circle.
+ * Backing token of the user for a specific BuyCo.
  */
-// Circle membership is stored in the user document itself, not in a separate collection. To be able
-// to work with this in a productive, typesafe manner we define it as a class. That way a circle
-// membership can be created like so:
-//  var cm = new CircleMembership();
-//  cm.circleId = "12345";
-//  myUser.circleMemberships.push(cm);
-export class CircleMembership {
+// Backing of a BuyCo is stored in the user document itself, not in a separate collection. To be able
+// to work with this in a productive, typesafe manner we define it as a class. 
+// The only function of this class is to link the user data to the smart contract.
+// Details like the amount and payments are stored in the contract.
+export class Backing {
     /**
-     * The ID of the corresponding Circle.
+     * The ID of the backed proposal.
      */
-    circleId: string;
-    /**
-     * Join date
-     */
-    startDate: Date;
-
-    /**
-     * Date the user left the circle.
-     */
-    endDate: Date;
+    proposalAddress: string;
 }
 
 export var userSchema = new mongoose.Schema({
     name: String,
     externalId: String,
     accessToken: String,
-    // In the schema we use the shorthand syntax for schema, as we don't need access to the Schema object itself.
-    // The Schema is only a necessity to let Mongoose do its magic.
-    // http://stackoverflow.com/a/16493881/81949
-    circleMemberships: [{
-        circleId: mongoose.Schema.Types.ObjectId,
-        startDate: Date,
-        endDate: Date
+    backings: [{
+        proposalAddress: String
     }]
 });
 
@@ -55,9 +39,9 @@ export interface IUser extends mongoose.Document {
     email: string;
 
     /**
-     * Circles this user is a member of.
+     * BuyCos this user has backed
      */
-    circleMemberships: [CircleMembership];
+    backings: [Backing];
 }
 
 /**
@@ -84,13 +68,4 @@ export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
 
         cb(null, user);
     });
-}
-
-/**
- * Gets the users who are in a certain circle.
- */
-export var getUsersInCircle = (circleId: string, cb: any) => {
-    User.find({})
-        .where("circleMemberships.circleId").equals(circleId)
-        .exec(cb);
 }

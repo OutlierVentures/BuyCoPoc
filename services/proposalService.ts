@@ -251,7 +251,20 @@ export class ProposalService {
 
         backPromise.then(web3plus.promiseCommital)
             .then(function (res) {
-                defer.resolve(res);
+                // Save link to the backing in our database. Just save the address. In the contract itself
+                // we don't store user data (yet) for privacy reasons.
+                backingUser.backings.push({
+                    proposalAddress: p.id
+                });
+                backingUser.save(
+                    function (userErr, userRes) {
+                        if (userErr) {
+                            defer.reject(userErr);
+                            return;
+                        }
+                        defer.resolve(res);
+                    });
+                
             }, function (err) {
                 defer.reject(err);
             });
