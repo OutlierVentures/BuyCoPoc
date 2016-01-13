@@ -160,44 +160,39 @@ export class ProposalService {
         var t = this;
 
         // Get the proposal contract
-
         var proposalContract;
         var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacker>>();
 
-        t.proposalContractDefinition.at(proposalId)
-            .then(function (proposal) {
-                var numBackers = proposalContract.backerIndex().toNumber();
+        proposalContract = t.proposalContractDefinition.at(proposalId);
 
-                for (var i = 1; i <= numBackers; i++) {
-                    var defer = Q.defer<proposalModel.IProposalBacker>();
+        var numBackers = proposalContract.backerIndex().toNumber();
 
-                    getBackerDetailsPromises.push(defer.promise);
-                    proposal.backers(i, function (backerErr, backer) {
-                        if (backerErr) {
-                            defer.reject(backerErr);
-                            return;
-                        }
-                        var backerAddress = backer[0];
-                        var amount = backer[1].toNumber();
-                        defer.resolve({
-                            address: backerAddress,
-                            amount: amount,
-                            userId: "unknown", // TODO: get this
-                        });
-                    });
+        for (var i = 1; i <= numBackers; i++) {
+            var defer = Q.defer<proposalModel.IProposalBacker>();
+
+            getBackerDetailsPromises.push(defer.promise);
+            proposalContract.backers(i, function (backerErr, backer) {
+                if (backerErr) {
+                    defer.reject(backerErr);
+                    return;
                 }
+                var backerAddress = backer[0];
+                var amount = backer[1].toNumber();
+                defer.resolve({
+                    address: backerAddress,
+                    amount: amount,
+                    userId: "unknown", // TODO: get this
+                });
+            });
+        }
 
-                return Q.all(getBackerDetailsPromises);
-            },
-            function (proposalErr) {
-                deferred.reject(proposalErr);
-            })
+        Q.all(getBackerDetailsPromises)
             .then(function (allBackers) {
                 deferred.resolve(allBackers);
             }, function (allBackersErr) {
                 deferred.reject(allBackersErr);
             });
-           
+
         return deferred.promise;
     }
 

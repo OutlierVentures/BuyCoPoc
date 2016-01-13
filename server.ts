@@ -148,6 +148,7 @@ export class Server {
         app.get("/api/proposal", pc.getAll);
         app.get("/api/proposal/:id", pc.getOne);
         app.post("/api/proposal/:id/back", pc.back);
+        app.get("/api/proposal/:id/backers", pc.getBackers);
         app.post("/api/proposal", pc.create);
 
         // Migrations

@@ -156,4 +156,31 @@ export class ProposalController {
 
     }
 
+    getBackers = (req: express.Request, res: express.Response) => {
+        //var token = req.header("AccessToken");
+
+        serviceFactory.createProposalService()
+            .then(
+            function (ps) {
+                return ps.getBackers(req.params.id);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing proposal service"
+                });
+                return null;
+            })
+            .then(
+            function (backers) {
+                res.json(backers);
+            }, function (backersErr) {
+                res.status(500).json({
+                    "error": backersErr,
+                    "error_location": "getting backers"
+                });
+                return null;
+            })
+    }
+
 }
