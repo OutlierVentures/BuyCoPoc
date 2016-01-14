@@ -123,6 +123,13 @@ export class ProposalController {
         // could live in the browser. Server side would then check whether the transfer had completed.
         // --> could we do this without holding the user's Uphold tokens entirely?
         userModel.getUserByAccessToken(token, function (userErr, user) {
+            if (userErr) {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+            }
+
             serviceFactory.createProposalService()
                 .then(
                 function (ps) {

@@ -8,6 +8,7 @@ import web3config = require('../contracts/web3config');
 import server = require('../../server');
 
 import proposalModel = require('../../models/proposalModel');
+import userModel = require('../../models/userModel');
 import _ = require('underscore');
 
 var web3plus = web3config.web3plus;
@@ -151,49 +152,62 @@ describe("ProposalController", () => {
         // single address.
         var sourceAddress = web3.eth.coinbase;
 
-        // Get the proposal list to obtain a valid ID
-        request(theApp)
-            .get('/api/proposal')
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .expect(function (res) {
-                var list = <Array<proposalModel.IProposal>>res.body;
-                proposal = list[0];
-            })
-            .end(function (err, res) {
-
-                request(theApp)
-                    .post('/api/proposal/' + proposal.id + '/back')
-                    .send({
-                        proposal: proposal,
-                        amount: amount
-                    })
+        // Find a valid user token to simulate the originating user
+        userModel.User.findOne().exec()
+            .then(function (user) {
+                // Get the proposal list to obtain a valid ID
+                var rq = request(theApp)
+                    .get('/api/proposal')
+                    .set({ AccessToken: user.accessToken })
+                    .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        // Nothing to assert here; POST ../back gives no content.
+                        var list = <Array<proposalModel.IProposal>>res.body;
+                        proposal = list[0];
                     })
                     .end(function (err, res) {
-                        // We check the result by doing another request, to see if the list of backers
-                        // contains our address and amount.
+                        if (err) done(err);
+
                         request(theApp)
-                            .get('/api/proposal/' + proposal.id + '/backers')
-                            .expect('Content-Type', /json/)
+                            .post('/api/proposal/' + proposal.id + '/back')
+                            .set("AccessToken", user.accessToken)
+                            .send({
+                                proposal: proposal,
+                                amount: amount
+                            })
                             .expect(200)
                             .expect(function (res) {
-                                var backers = <Array<proposalModel.IProposalBacker>>res.body;
-
-                                var backerAddress = sourceAddress;
-
-                                assert(_(backers).any((backer) => { return backer.amount == amount && backer.address == backerAddress; }),
-                                    "Backers contain address " + backerAddress + " for amount " + amount);
+                                // Nothing to assert here; POST ../back gives no content.
                             })
                             .end(function (err, res) {
-                                done(err);
+                                if (err) done(err);
+
+                                // We check the result by doing another request, to see if the list of backers
+                                // contains our address and amount.
+                                request(theApp)
+                                    .get('/api/proposal/' + proposal.id + '/backers')
+                                    .expect('Content-Type', /json/)
+                                    .expect(200)
+                                    .expect(function (res) {
+                                        var backers = <Array<proposalModel.IProposalBacker>>res.body;
+
+                                        var backerAddress = sourceAddress;
+
+                                        assert(_(backers).any((backer) => { return backer.amount == amount && backer.address == backerAddress; }),
+                                            "Backers contain address " + backerAddress + " for amount " + amount);
+                                    })
+                                    .end(function (err, res) {
+                                        done(err);
+                                    });
+
                             });
 
                     });
-
+            },
+            function (userErr) {
+                done(userErr);
             });
+
 
     });
 

@@ -393,6 +393,8 @@
     <TypeScriptCompile Include="typings\q\Q.d.ts" />
     <TypeScriptCompile Include="typings\request\request.d.ts" />
     <TypeScriptCompile Include="typings\serve-static\serve-static.d.ts" />
+    <TypeScriptCompile Include="typings\superagent\superagent.d.ts" />
+    <TypeScriptCompile Include="typings\supertest\supertest.d.ts" />
     <TypeScriptCompile Include="typings\tsd.d.ts" />
     <TypeScriptCompile Include="typings\underscore\underscore.d.ts" />
   </ItemGroup>
@@ -483,6 +485,8 @@
     <Folder Include="typings\q\" />
     <Folder Include="typings\request\" />
     <Folder Include="typings\serve-static\" />
+    <Folder Include="typings\superagent\" />
+    <Folder Include="typings\supertest\" />
     <Folder Include="typings\underscore\" />
   </ItemGroup>
   <ItemGroup>

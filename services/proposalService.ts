@@ -1,6 +1,7 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
+import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import configurationService = require('./configurationService');
 import Q = require('q');
@@ -262,9 +263,20 @@ export class ProposalService {
                             defer.reject(userErr);
                             return;
                         }
+
+                        // Do payment and store it
+                        var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
+
+                        // TODO: Get card from request
+
+                        // Create transaction
+                        //upholdService.createTransaction(
+
+                        // TODO: store  transaction with backing after it's finished
+
                         defer.resolve(res);
                     });
-                
+
             }, function (err) {
                 defer.reject(err);
             });
