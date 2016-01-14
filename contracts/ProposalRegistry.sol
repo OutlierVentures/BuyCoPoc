@@ -79,6 +79,26 @@ contract Proposal {
          * Amount of products the buyer has committed to buy.s
          */
         uint amount;
+
+        /**
+         * Transaction ID of the initial payment (at moment of backing).
+         */
+        string startPaymentTransactionID;
+
+        /**
+         * Amount of initial payment.
+         */
+        uint startPaymentAmount;
+
+        /**
+         * Transaction ID of the final payment (after deliery).
+         */
+        string endPaymentTransactionID;
+
+        /**
+         * Amount of the final payment.
+         */
+        uint endPaymentAmount;
     }
 
     /**
@@ -141,6 +161,36 @@ contract Proposal {
         backerIndexByAddress[tx.origin] = backerIndex;
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
+    }
+
+    /**
+     * Register a payment for a backer.
+     * @param backerAddress the backer that paid
+     * @param paymentType 1=start, 2=end
+     * @param transactionID the external transaction ID of the payment
+     * @param amount the payment amount
+     */
+    function setPaid(address backerAddress, uint paymentType, string transactionID, uint amount) {
+        // TODO: check whether tx.origin is proposal creator? Or admin?
+        // TODO: check whether the amount is correct according to payment
+        // schedule
+
+        // Validate this is an existing backer.
+        if(backerIndexByAddress[backerAddress] == 0)
+            return;
+
+        Backing b = backers[backerIndexByAddress[backerAddress]];
+        if (paymentType == 1) {
+            // Start payment
+            b.startPaymentTransactionID = transactionID;
+            b.startPaymentAmount = amount;
+        }
+        else if (paymentType == 2) {
+            // End payment
+            // TODO: validate that start payment has been registered
+            b.endPaymentTransactionID = transactionID;
+            b.endPaymentAmount = amount;
+        }
     }
 
     /**

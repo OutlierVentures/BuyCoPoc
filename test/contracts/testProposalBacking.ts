@@ -113,4 +113,61 @@ describe("ProposalRegistry", () => {
             });
     });
 
+    it("should register a payment for a backer", function (done) {
+        // It can take quite a while til transactions are processed.
+        this.timeout(180000);
+
+        var name1 = "Ethiopia Adado Coop";
+        var price1 = 10293;
+        var amount1 = 13;
+
+        var txID1 = "tx" + Math.random() * 1000000;
+
+        // Amount: 40% up front
+        var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
+
+        // Currently all transactions are sent from a single address. Hence the "backer" is
+        // also that address.
+        var backerAddress1 = web3.eth.coinbase;
+
+        var proposalContract;
+
+        registryContract.addProposal(name1, "A very special product", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+            .then(web3plus.promiseCommital)
+            .then(function testGetMember(tx) {
+                var newProposalAddress = registryContract.proposals(1);
+
+                proposalContract = proposalContractDefinition.at(newProposalAddress);
+
+                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                return backPromise;
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                assert.equal(newBacker[0], backerAddress1);
+                assert.equal(newBacker[1].toNumber(), amount1);
+
+                // Register a payment for this backer
+                return proposalContract.setPaid(backerAddress1, 1, txID1, paymentAmount1);
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                // Backer address should be unchanged.
+                assert.equal(newBacker[0], backerAddress1, "Backer address is unchanged");
+
+                assert.equal(newBacker[2], txID1, "Transaction ID is registered correctly");
+                var registeredAmount = newBacker[3].toNumber();
+                assert.equal(registeredAmount, paymentAmount1, "Amount is registered correctly");
+
+                done();
+            })
+            .catch((reason) => {
+                done(reason);
+            });
+    });
+
 });
