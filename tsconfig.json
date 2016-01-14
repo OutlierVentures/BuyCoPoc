@@ -5,12 +5,12 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
-        "target": "es5",
-        "watch": true
+        "target": "es5"
     },
-    "exclude": [
-        "node_modules",
-        "bower_components",
-        "typings"
-    ]
+  "exclude": [
+    "bower_components",
+    "typings",
+    "typings/mocha",
+    "client/typings/mocha"
+  ]
 }

@@ -8,9 +8,9 @@ var config = new configurationService.ConfigurationService().getConfiguration();
 // Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
 const dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
 
-var Dummy = mongoose.model('Dummy', new mongoose.Schema({ a: Number })),
-    clearDb = require("mocha-mongoose")(dbUri);
-    
+var Dummy = mongoose.model('Dummy', new mongoose.Schema({ a: Number }));
+var clearDb = require("mocha-mongoose")(dbUri);
+ 
 describe("Example spec for a model", () => {
     beforeEach(done => {
         if (mongoose.connection.db) {

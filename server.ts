@@ -87,10 +87,6 @@ export class Server {
         if (this.config.useStubs) {
             // Create a stub controller from the real controller.
             var stubController = new stubOauthController.StubOAuthController(upholdOauthController);
-    // Replace the handlers of the real controller by the stubs.
-    upholdOauthController.auth = stubController.auth;
-    upholdOauthController.callback = stubController.callback;
-}
 
 
             // Replace the handlers of the real controller by the stubs.
@@ -199,79 +195,6 @@ export class Server {
             }
             catch (e) {
                 console.log("Intermediate certificate could not be read.");
-=======
-import upholdController = require('./controllers/upholdController');
-import proposalController = require('./controllers/proposalController');
-import migrationController = require('./controllers/migrationController');
-import SellerController from "./controllers/sellerController";
-var uc = new upholdController.UpholdController();
-var pc = new proposalController.ProposalController();
-var mc = new migrationController.MigrationController();
-var sc = new SellerController();
-
-// Uphold API wrapper
-apiRouter.route("/uphold/me/cards")
-    .get(uc.getCards);
-apiRouter.route("/uphold/me/cards/withBalance")
-    .get(uc.getCardsWithBalance);
-
-// Proposals
-apiRouter.route("/proposal")
-    .get(pc.getAll);
-
-// Migrations
-apiRouter.route("/migration/update")
-    .post(mc.update);
-apiRouter.route("/migration/test/seed")
-    .post(mc.seedTestData);
-
-// Sellers
-apiRouter.route("/seller/signup")
-    .post(function (req, res) {
-    // TODO BW Refactor, replace function with 'save' as now called in the function body.
-        return sc.save(req, res);
-    });
-apiRouter.route("/seller")
-    .get(sc.get);
-
-// Catch not existing api calls.
-apiRouter.route("*")
-    .all(function(req, res) {
-        res.status(404).send(`no API method at '${req.url}'`);
-    });
-
-app.use('/api', apiRouter);
-// BW END TODO
-
-// All routes which are directly accessible (i.e. not only from within the Angular SPA).
-// All open index.html, where Angular handles further routing to the right controller/ view.
-// All remaining routes - not matched by previous server-side routes are matched with this wildcard handler and forwarded to Angular.
-app.get("*", indexRoute.index);
-
-/*********************** HTTP server setup ********************/
-var httpsOptions;
-
-try {
-    console.log("Trying custom certificate.");
-
-    httpsOptions = {
-        key: fs.readFileSync('key.pem'),
-        cert: fs.readFileSync('cert.pem')
-    };
-
-    console.log("Using custom certificate.");
-
-    try {
-        console.log("Trying to read intermediate certificate.");
-        var chainLines = fs.readFileSync('intermediate.pem', 'utf-8').split("\n");
-        var cert = [];
-        var ca = [];
-        chainLines.forEach(function (line) {
-            cert.push(line);
-            if (line.match(/-END CERTIFICATE-/)) {
-                ca.push(cert.join("\n"));
-                cert = [];
->>>>>>> Added unit tests, refactored to repo's. Gulp TS task.
             }
         }
         catch (e) {

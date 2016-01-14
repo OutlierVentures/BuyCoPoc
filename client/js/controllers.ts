@@ -4,7 +4,7 @@ interface ILoginScope extends ng.IScope {
     //credentials: Credentials;
     isAuthenticated(): boolean;
     login(): any;
-    userInfo: buyCo.Models.IUser;
+    userInfo: IUser;
     isGlobalAdmin: boolean;
 }
 
@@ -15,7 +15,7 @@ interface IOVWindowService extends ng.IWindowService {
 /**
  * Controller for the logon box.
  */
-export class LoginController {
+class LoginController {
     public static $inject = [
         "$scope",
         "$rootScope",
@@ -50,7 +50,7 @@ export class LoginController {
             // Don't authenticate when already authenticated.
             && !this.$scope.isAuthenticated()) {
             // Restore from session
-            var userDataFromSession = <buyCo.Models.IUser>JSON.parse(userStringFromSession);
+            var userDataFromSession = <IUser>JSON.parse(userStringFromSession);
             var brip = new UpholdIdentityProvider();
             brip.setToken(tokenFromSession, null);
             brip.setUserInfo(userDataFromSession, null);
@@ -129,14 +129,14 @@ export class LoginController {
 }
 
 interface IDashboardScope extends ng.IScope {
-    userInfo: buyCo.Models.IUser;
+    userInfo: IUser;
     allCards: any;
     cardsToShow: any;
     favoriteCardsOnly: boolean;
 }
 
 
-export class DashboardController {
+class DashboardController {
     public static $inject = [
         "$scope",
         "$rootScope",
@@ -226,7 +226,7 @@ export class DashboardController {
     }
 }
 
-export class NavigationController {
+class NavigationController {
     public static $inject = [
         "$scope",
         "$location"];
@@ -243,7 +243,7 @@ interface IUserAccountScope extends ng.IScope {
     userInfo: IUser;
 }
 
-export class UserAccountController {
+class UserAccountController {
     public static $inject = [
         "$scope",
         "$rootScope",

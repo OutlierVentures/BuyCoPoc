@@ -3,7 +3,9 @@ var mongoose = require("mongoose");
 var mochaMongoose = require("mocha-mongoose");
 
 import testHelper = require("../testHelper"); 
+
 import { IUser, UserRepository }  from "../../models/userModel";
+
 import { ISeller, SellerRepository } from "../../models/sellerModel";
 import configurationService = require("../../services/configurationService");
 
@@ -109,11 +111,9 @@ describe("Seller repository", () => {
         var newEmail = "henk@vandentillaert.nl";
         return sellerRepo.create(testSeller1)
         .then((resultSeller: ISeller) => {
-            testSeller1.email = newEmail;
+            resultSeller.email = newEmail;
             return sellerRepo.update(resultSeller);
-        }).then((resultSeller: ISeller) => {
-            console.log(testSeller1.userExternalId);
-            assert.equal(resultSeller.email, newEmail);
+        }).then(() => {
             return sellerRepo.getSellerByUserExternalId(testSeller1.userExternalId);
         }).then((seller: ISeller) => {
             console.log(seller.email);
@@ -129,10 +129,9 @@ describe("Seller repository", () => {
             return sellerRepo.create(testSeller1);
         }).then((seller: ISeller) => {
             return sellerRepo.getSellerByUserExternalId(testUser1.externalId)
-        }).then((result: ISeller) => {
-            // Now it's there.
-            return assert.equal((result).userExternalId, testUser1.externalId);
         }).then((seller: ISeller) => {
+            // Now it's there.
+            assert.equal(seller.userExternalId, testUser1.externalId);
             return sellerRepo.deleteByExternalId(seller.userExternalId);
         }).then((result: ISeller) => {
             assert.equal((result).userExternalId, testUser1.externalId);

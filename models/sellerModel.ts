@@ -107,7 +107,7 @@ export class SellerRepository {
     public update(updatedSeller: ISeller): q.Promise<ISeller> {
         var result = q.Promise<ISeller>(
             (resolve: (resultSeller: ISeller) => void, reject: (error: any) => void) => {
-                Seller.update({ userExternalId: updatedSeller.userExternalId }, updatedSeller, (err: any, affectedRows: number, resultSeller: ISeller) => {
+                Seller.update({ userExternalId: updatedSeller.userExternalId }, { $set: updatedSeller}, (err: any, affectedRows: number, resultSeller: ISeller) => {
                     if (err) {
                         reject(err);
                     }

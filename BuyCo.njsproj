@@ -283,7 +283,6 @@
     <Content Include="client\index.html" />
     <Content Include="client\js\sellers\seller-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
-    <Content Include="client\tsconfig.json" />
     <Content Include="client\tsd.json" />
     <Content Include="client\vendors\bootstrap\less\.csscomb.json" />
     <Content Include="client\vendors\bootstrap\less\.csslintrc" />
@@ -484,7 +483,6 @@
     <TypeScriptCompile Include="test\controllers\testProposalController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\sellers\testSellerPersistance.ts" />
     <TypeScriptCompile Include="test\sellers\testPersistance.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
@@ -526,6 +524,15 @@
     <Folder Include="client\vendors\bootstrap\" />
     <Folder Include="client\vendors\bootstrap\less\" />
     <Folder Include="client\vendors\bootstrap\less\mixins\" />
+    <Folder Include="client\vendors\bootstrap\nuget\" />
+    <Folder Include="client\vendors\font-awesome\" />
+    <Folder Include="client\vendors\font-awesome\css\" />
+    <Folder Include="client\vendors\font-awesome\fonts\" />
+    <Folder Include="client\vendors\font-awesome\less\" />
+    <Folder Include="client\vendors\font-awesome\scss\" />
+    <Folder Include="client\vendors\jquery\" />
+    <Folder Include="client\vendors\jquery\speed\" />
+    <Folder Include="client\vendors\underscore\" />
     <Folder Include="client\views\" />
     <Folder Include="controllers\" />
     <Folder Include="lib\" />

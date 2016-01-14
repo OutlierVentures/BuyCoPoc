@@ -1,9 +1,4 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
-/// <reference path="../typings/tsd.d.ts" />
-import Controllers = require("./controllers");
-import UserAccountController = Controllers.UserAccountController;
-import LoginController = Controllers.LoginController;
-import NavigationController = Controllers.NavigationController;
 "use strict";
 
 /**
@@ -20,7 +15,7 @@ interface BuyCoRootScope extends ng.IRootScopeService {
     isProcessingLogin: boolean;
     loginErrorMessage: string;
     isPublicPage(locationService: ng.ILocationService): boolean;
-    userInfo: buyCo.Models.IUser;
+    userInfo: IUser;
 }
 
 // angular.module("buyCoApp", ["ngResource", "ngRoute", "ngSanitize", "mgcrea.ngStrap"]);
