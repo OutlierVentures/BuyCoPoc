@@ -3,6 +3,7 @@ import path = require('path');
 import fs = require('fs');
 import request = require('supertest');
 import express = require('express');
+import Q = require('q');
 
 import web3config = require('../contracts/web3config');
 import server = require('../../server');
@@ -143,6 +144,23 @@ describe("ProposalController", () => {
 
     });
 
+    /**
+     * Get a token of any user in the database. Returns a promise that resolves
+     * with the token.
+     */
+    function getTestUserToken(): Q.Promise<string> {
+        var defer = Q.defer<string>();
+        userModel.User.findOne().exec()
+            .then(function (user) {
+                defer.resolve(user.accessToken);
+            },
+            function (userErr) {
+                defer.reject(userErr);
+            });
+
+        return defer.promise;
+    }
+
     it("should back a proposal on POST /api/proposal/:id/back", function (done) {
         this.timeout(100000);
 
@@ -153,12 +171,12 @@ describe("ProposalController", () => {
         var sourceAddress = web3.eth.coinbase;
 
         // Find a valid user token to simulate the originating user
-        userModel.User.findOne().exec()
-            .then(function (user) {
+        getTestUserToken()
+            .then(function (testUserToken) {
                 // Get the proposal list to obtain a valid ID
-                var rq = request(theApp)
+                request(theApp)
                     .get('/api/proposal')
-                    .set({ AccessToken: user.accessToken })
+                    .set({ AccessToken: testUserToken})
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
@@ -170,7 +188,7 @@ describe("ProposalController", () => {
 
                         request(theApp)
                             .post('/api/proposal/' + proposal.id + '/back')
-                            .set("AccessToken", user.accessToken)
+                            .set("AccessToken", testUserToken)
                             .send({
                                 proposal: proposal,
                                 amount: amount
