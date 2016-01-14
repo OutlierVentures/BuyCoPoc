@@ -3,9 +3,7 @@ var mongoose = require("mongoose");
 var mochaMongoose = require("mocha-mongoose");
 
 import testHelper = require("../testHelper"); 
-
 import { IUser, UserRepository }  from "../../models/userModel";
-
 import { ISeller, SellerRepository } from "../../models/sellerModel";
 import configurationService = require("../../services/configurationService");
 
@@ -116,8 +114,6 @@ describe("Seller repository", () => {
         }).then(() => {
             return sellerRepo.getSellerByUserExternalId(testSeller1.userExternalId);
         }).then((seller: ISeller) => {
-            console.log(seller.email);
-            console.log(newEmail);
             assert.equal(seller.email, newEmail);
             done();
         }).catch((err: any) => done(err));

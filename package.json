@@ -36,6 +36,7 @@
     "grunt-concurrent": "^2.0.3",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-injector": "^0.6.1",
     "grunt-newer": "^1.1.1",
     "grunt-nodemon": "^0.4.0",
     "grunt-ts": "^4.2.0",
@@ -45,7 +46,6 @@
     "gulp-typescript": "^2.10.0",
     "mocha": "^2.3.3",
     "supertest": "^1.1.0",
-    "grunt-injector": "^0.6.1",
     "mocha-mongoose": "^1.1.1",
     "should": "^8.0.2",
     "tslint": "^3.2.1"

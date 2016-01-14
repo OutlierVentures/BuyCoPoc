@@ -1,4 +1,8 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
+
+"use strict";
+angular.module("buyCoApp").config(AppRoutes);
+
 function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
     $routeProvider
         .when('/', { controller: DashboardController, templateUrl: 'views/dashboard.html' })
@@ -13,4 +17,3 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');
 }
-

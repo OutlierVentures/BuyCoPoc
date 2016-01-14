@@ -283,6 +283,10 @@
     <Content Include="client\index.html" />
     <Content Include="client\js\sellers\seller-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
+<<<<<<< HEAD
+=======
+    <Content Include="client\tsconfig.json" />
+>>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     <Content Include="client\tsd.json" />
     <Content Include="client\vendors\bootstrap\less\.csscomb.json" />
     <Content Include="client\vendors\bootstrap\less\.csslintrc" />
@@ -357,6 +361,7 @@
     <Content Include="client\vendors\bootstrap\less\utilities.less" />
     <Content Include="client\vendors\bootstrap\less\variables.less" />
     <Content Include="client\vendors\bootstrap\less\wells.less" />
+<<<<<<< HEAD
     <Content Include="client\vendors\bootstrap\LICENSE" />
     <Content Include="client\vendors\bootstrap\nuget\bootstrap.less.nuspec" />
     <Content Include="client\vendors\bootstrap\nuget\bootstrap.nuspec" />
@@ -439,6 +444,8 @@
     <Content Include="client\views\proposal-details.html" />
     <Content Include="client\views\proposal-back.html" />
     <Content Include="client\views\proposal-form.html" />
+=======
+>>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     <Content Include="client\views\proposal-list.html" />
     <Content Include="client\views\dashboard.html" />
     <Content Include="client\views\login-finished.html" />
