@@ -54,6 +54,23 @@ contract Proposal {
     string public productDescription;
 
     /**
+     * The SKU (unique identification number) of the product.
+     */
+    string public productSku;
+
+    /**
+     * The product category in plain text. Future vevrsions might contain a more
+     * advanced taxonomy of categories.
+     */
+    string public mainCategory;
+
+    /**
+     * The product category in plain text. Future vevrsions might contain a more
+     * advanced taxonomy of categories.
+     */
+    string public subCategory;
+
+    /**
      *
      */
     uint public maxPrice;
@@ -133,9 +150,14 @@ contract Proposal {
      */
     Offer public acceptedOffer;
 
-    function Proposal(string pn, string pd, uint mp, string ed, string udd) {
+    function Proposal(string pn, string pd,
+        //string ps,
+        string mc, string sc, uint mp, string ed, string udd) {
         productName = pn;
         productDescription = pd;
+        //productSku = ps;
+        mainCategory = mc;
+        subCategory = sc;
         maxPrice = mp;
         endDate = ed;
         ultimateDeliveryDate = udd;
@@ -294,13 +316,18 @@ contract ProposalRegistry {
     mapping (uint=>Proposal) public proposals;
     uint public proposalIndex;
 
-    function addProposal(string productName, string description, uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
+    function addProposal(string productName, string description,
+        //string productSku,
+        string productCategory, string productSubCategory,
+        uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
         proposalIndex++;
 
-        p = new Proposal(productName, description, maxPrice, endDate, ultimateDeliveryDate);
+        p = new Proposal(productName, description,
+            //productSku,
+            productCategory, productSubCategory,
+            maxPrice, endDate, ultimateDeliveryDate);
         proposals[proposalIndex] = p;
 
         return p;
-
     }
 }

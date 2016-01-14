@@ -72,8 +72,17 @@ export class ProposalService {
                 // reasonable performance. See testProposalList.ts for more info.
                         
                 p.id = proposalAddress;
+
+                // These could be written more compactly as both the property of proposal and of
+                // p are named identical.
+                // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
+                // The calls would then be: addPropertyGetter(getProperties, proposal, p, "productName")
+                // Drawback: properties of IProposal wouldn't be typesafe any more.
                 getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                 getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
+                //getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
+                getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
+                getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
                 getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber(); }));
                 getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
                 getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
@@ -215,7 +224,8 @@ export class ProposalService {
             anyP.ultimateDeliveryDate = "";
 
         this.registryContract.addProposal(p.productName,
-            p.productDescription, p.maxPrice,
+            p.productDescription, p.mainCategory, p.subCategory,
+            p.maxPrice,
             p.endDate, p.ultimateDeliveryDate, { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {

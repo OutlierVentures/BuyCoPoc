@@ -80,11 +80,13 @@ interface IProposal {
     id: string;
     productName: string;
     productDescription: string;
+    //productSku: string;
+    mainCategory: string;
+    subCategory: string;
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
 }
-
 
 /**
  * A backer of a proposal, i.e. a buyer.

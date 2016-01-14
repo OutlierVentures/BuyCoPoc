@@ -52,7 +52,7 @@ describe("ProposalRegistry", () => {
                 var name3 = "Peru Ciriaco Quispe";
                 var price3 = 189456;
 
-                registryContract.addProposal(name1, "A very special product", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
                 registryContract.addProposal(name2, "A very special product", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
                 registryContract.addProposal(name3, "A very special product", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
@@ -274,6 +274,9 @@ describe("ProposalRegistry", () => {
                             id: proposalAddress,
                             productName: proposal.productName(),
                             productDescription: proposal.productDescription(),
+                            //productSku: proposal.productSku(),
+                            mainCategory: proposal.mainCategory(),
+                            subCategory: proposal.subCategory(),
                             maxPrice: proposal.maxPrice().toNumber(),
                             endDate: proposal.endDate(),
                             ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
@@ -352,6 +355,9 @@ describe("ProposalRegistry", () => {
                 id: proposalAddress,
                 productName: proposal.productName(),
                 productDescription: proposal.productDescription(),
+                //productSku: proposal.productSku(),
+                mainCategory: proposal.mainCategory(),
+                subCategory: proposal.subCategory(),
                 maxPrice: proposal.maxPrice().toNumber(),
                 endDate: proposal.endDate(),
                 ultimateDeliveryDate: proposal.ultimateDeliveryDate(),

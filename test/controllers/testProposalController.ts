@@ -95,7 +95,11 @@ describe("ProposalController", () => {
 
         request(theApp)
             .post('/api/proposal')
-            .send({ "productName": "A testing product", "productDescription": "From the unit tests" })
+            .send({
+                "productName": "A testing product", "productDescription": "From the unit tests",
+                //"productSku": "SKU123",
+                "category" : "Electronics - Camera"
+            })
             .expect('Content-Type', /json/)
             .expect(200)
             .expect(function (res) {
@@ -104,6 +108,9 @@ describe("ProposalController", () => {
                 // Assert stuff on the result
                 assert.notEqual(newProposal.id, "0x", "New proposal has an ID");
                 assert.equal(newProposal.endDate, "", "New proposal has an empty string as end date");
+                //assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
+                assert.equal(newProposal.mainCategory, "Electronics", "New proposal has correct main category");
+                assert.equal(newProposal.subCategory, "Camera", "New proposal has correct sub category");
             })
             .end(function (err, res) {
                 done(err);

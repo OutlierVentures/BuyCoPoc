@@ -6,7 +6,9 @@
     </div>
     <div class="jumbotron">
         <h2>{{proposal.productName}}</h2>
+        <p class="text-muted" ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
         <p class="text-muted">{{proposal.productDescription}}</p>
+        <p class="text-muted" ng-show="proposal.productSku">{{proposal.productSku}}</p>
         <span class="small">
             Maximum price: <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span>
         </span><br><br>

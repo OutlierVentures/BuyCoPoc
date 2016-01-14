@@ -27,7 +27,18 @@
                                     </p>
                                     <input class="form-control" type="text" ng-model="amount" required min="1">
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Card to pay from</label>
+                                    <p class="help-block">
+                                        The initial payment of 50% of the total amount will be made immediately into the BuyCo escrow. If the sale doesn't
+                                        close, your money will be returned on the proposal end date of {{proposal.endDate}}.
+                                        <br /> Which Uphold card do you want to pay from?
+                                    </p>
+                                    <select class="form-control" ng-model="payment.fromCard" required>
+                                        <option ng-hide="cards.length > 0">Loading your cards...</option>
+                                        <option ng-repeat="card in cards track by card.id" value="{{card.id}}">{{card.label}} ({{card.currency}} {{card.available}})</option>
+                                    </select>
+                                </div>
                                 <fieldset ng-disabled="processMessage || successMessage">
                                     <button name="saveButton" ng-click="vm.backConfirm()" ng-disabled="backForm.$invalid" class="btn btn-primary">
                                         Back this proposal

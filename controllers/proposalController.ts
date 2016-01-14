@@ -79,6 +79,18 @@ export class ProposalController {
         //var token = req.header("AccessToken");
         var proposalData = <proposalModel.IProposal>req.body;
 
+        // The category arrives as a string: [main] - [sub]
+        // Example: "Electronics - Camera"
+        var categoryString: string = req.body.category;
+
+        if (categoryString && categoryString.indexOf(" - ")) {
+            var parts = categoryString.split(" - ")
+            if (parts.length == 2) {
+                proposalData.mainCategory = parts[0];
+                proposalData.subCategory = parts[1];
+            }
+        }
+
         serviceFactory.createProposalService()
             .then(
             function (ps) {

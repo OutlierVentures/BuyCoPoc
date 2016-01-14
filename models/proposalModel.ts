@@ -2,6 +2,9 @@
     id: string;
     productName: string;
     productDescription: string;
+    //productSku: string;
+    mainCategory: string;
+    subCategory: string;
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
