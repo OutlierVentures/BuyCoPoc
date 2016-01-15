@@ -26,6 +26,7 @@ export class SellerController {
             return res.status(403);
         }
         // TODO BW Check accesstoken (e.g. get user by externalId instead and then check accesstoken matches).
+
         userRepo.getUserByAccessToken(accessToken, (err, user: IUser) => {
             sellerRepo.getSellerByUserExternalId(user.externalId)
             .then((seller: ISeller) => {

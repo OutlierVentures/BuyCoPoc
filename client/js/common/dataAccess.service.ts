@@ -10,12 +10,6 @@ interface ISellerResourceClass extends
     ng.resource.IResourceClass<ISellerResource> {
 }
 
-interface ICredentials {
-    externalId: string
-    accessToken: string
-}
-
-
 class DataAccessService implements IDataAccessService {
     static $inject = ["$resource"];
     constructor(private $resource: ng.resource.IResourceService) {

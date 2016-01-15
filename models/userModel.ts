@@ -1,5 +1,5 @@
 ﻿import mongoose = require("mongoose");
-import q = require("q");
+import { Promise } from "q";
 
 /**
  * Backing token of the user for a specific BuyCo.
@@ -23,6 +23,11 @@ export var userSchema = new mongoose.Schema({
         proposalAddress: String
     }]
 });
+
+export interface ICredentials {
+    externalId: string
+    accessToken: string
+}
 
 export interface IUser extends mongoose.Document {
     name: string;
@@ -76,8 +81,8 @@ export class UserRepository {
     /**
     * Get a promise by their accessToken - promise version. 
     */
-    public getUserByAccessToken2 (accessToken: string): q.Promise<IUser> {
-        var result = q.Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+    public getUserByAccessToken2 (accessToken: string): Promise<IUser> {
+        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
             User.findOne({ accessToken: accessToken }, (err: any, resultUser: IUser) => {
                 if (err) {
                     reject(err);
@@ -91,8 +96,8 @@ export class UserRepository {
     /**
     * Get a user by their externalId. 
     */
-    public getUserByExternalId(externalId: string): q.Promise<IUser> {
-        var result = q.Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+    public getUserByExternalId(externalId: string): Promise<IUser> {
+        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
             User.findOne({ externalId: externalId }, (err: any, resultUser: IUser) => {
                 if (err) {
                     reject(err);
@@ -109,8 +114,8 @@ export class UserRepository {
      * @param user
      * @param cb
      */
-    public create(newUser: IUser): q.Promise<IUser> { 
-        var result = q.Promise<IUser>(
+    public create(newUser: IUser): Promise<IUser> { 
+        var result = Promise<IUser>(
         (resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
             User.create(newUser, (err: any, resultUser: IUser) => {
                 if (err) {
@@ -127,8 +132,8 @@ export class UserRepository {
      * Find one or more users give some criteria (in an JS Object format).
      * For now just a simple one to one mapping with the mongoose find function, but 'Promisied'.
      */
-    public find(cond: Object): q.Promise<IUser[]> {
-        var result = q.Promise<IUser[]>(
+    public find(cond: Object): Promise<IUser[]> {
+        var result = Promise<IUser[]>(
         (resolve: (users: IUser[]) => void, reject: (error: any) => void) => {
             User.find(cond, (err: any, users: IUser[]) => {
                 if (err) {
@@ -139,4 +144,21 @@ export class UserRepository {
         });
         return result;
     };
+
+    /**
+     * Check if them credentials are credible :).
+     */
+    public checkCredentials(cred: ICredentials): Promise<Boolean> {
+        var result = Promise<Boolean>(
+        (resolve: (checksOut: Boolean) => void, reject: (error: any) => void) => {
+            this.getUserByExternalId(cred.externalId).then((user: IUser) => {
+                let credsValid = user.accessToken===cred.accessToken;
+                resolve(credsValid);
+            }).catch((err: any) => {
+                reject(err);
+            });
+        })
+        
+        return result;
+    }
 }

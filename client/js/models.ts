@@ -20,7 +20,12 @@ interface IUser extends IDocument {
     email: string;
     accessToken: string;
 }
-    
+
+interface ICredentials {
+    externalId: string
+    accessToken: string
+}
+
 // TODO BW dd. 2015-12-7 Come up with decent name for this type. 
 interface IUpholdTransactionNode {
     "CardId": string,
