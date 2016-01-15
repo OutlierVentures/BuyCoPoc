@@ -25,9 +25,6 @@
     },
     "angularjs/angular-mocks.d.ts": {
       "commit": "bdaf2f0eb19edee26248c80bab4947e9b70e4217"
-    },
-    "underscore/underscore.d.ts": {
-      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
     }
   }
 }

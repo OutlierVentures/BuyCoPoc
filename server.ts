@@ -21,7 +21,7 @@ import oauthController = require('./controllers/oauthController');
 import upholdController = require('./controllers/upholdController');
 import migrationController = require('./controllers/migrationController');
 import proposalController = require('./controllers/proposalController');
-import sellerController = require("./controllers/sellerController");
+import sellerController = require('./controllers/sellerController');
 
 import bitReserveService = require('./services/upholdService');
 import serviceFactory = require('./services/serviceFactory');
@@ -120,49 +120,47 @@ export class Server {
         var clientDir = path.join(__dirname, 'client')
         app.use(express.static(clientDir));
 
+        // All routes which are directly accessible (i.e. not only from within the Angular SPA).
+        // All open index.html, where Angular handles further routing to the right controller/ view.
+        // Ideally all routes not matched by server-side routes are forwarded to Angular.
+        // TODO: introduce an "other" wildcard handler for this.
+        app.get('/', indexRoute.index);
+        app.get('/user/profile', indexRoute.index);
+        app.get('/user/login', indexRoute.index);
+
+        app.get('/proposal/list', indexRoute.index);
+        app.get('/proposal/:id', indexRoute.index);
+        app.get('/proposal/:id/back', indexRoute.index);
+        app.get('/proposal/new', indexRoute.index);
+        app.get('/seller/signup', indexRoute.index);
+
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
         app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
-        
-        // Uphold API wrapper
-        // BW TODO Refactor apiRouter to separate file.
-        let apiRouter = express.Router();
-        app.use('/api', apiRouter);
-
         // Uphold API wrapper
         var uc = new upholdController.UpholdController();
-        apiRouter.route("/uphold/me/cards").get(uc.getCards);
-        apiRouter.route("/uphold/me/cards/withBalance").get(uc.getCardsWithBalance);
+        app.get("/api/uphold/me/cards", uc.getCards);
+        app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
 
         // Proposals
         var pc = new proposalController.ProposalController();
-        apiRouter.route("/proposal").get(pc.getAll);
-        apiRouter.route("/proposal/:id").get(pc.getOne);
-        apiRouter.route("/proposal/:id/back").post(pc.back);
-        apiRouter.route("/api/proposal/:id/backers").get(pc.getBackers);
-        apiRouter.route("/api/proposal").get(pc.create);
+        app.get("/api/proposal", pc.getAll);
+        app.get("/api/proposal/:id", pc.getOne);
+        app.post("/api/proposal/:id/back", pc.back);
+        app.get("/api/proposal/:id/backers", pc.getBackers);
+        app.post("/api/proposal", pc.create);
+
+        var sc = new sellerController.SellerController();
+        app.get("/api/seller", sc.get);
+        app.post("/api/seller", sc.save);
 
         // Migrations
         var mc = new migrationController.MigrationController();
-        apiRouter.route("/migration/update").post(mc.update);
-        apiRouter.route("/migration/test/seed").post(mc.seedTestData);
+        app.post("/api/migration/update", mc.update);
+        app.post("/api/migration/test/seed", mc.seedTestData);
 
-        // Sellers
-        var sc = new sellerController.SellerController();
-        apiRouter.route("/seller/signup").post(sc.save);
-        apiRouter.route("/seller").get(sc.get);
-
-        // Catch not existing api calls.
-        apiRouter.route("*").all(function (req, res) {
-            res.status(404).send(`no API method at '${req.url}'`);
-        });
-        // BW END TODO
-
-        // All routes which are directly accessible (i.e. not only from within the Angular SPA).
-        // All open index.html, where Angular handles further routing to the right controller/ view.
-        // All remaining routes - not matched by previous server-side routes are matched with this wildcard handler and forwarded to Angular.
-        // app.get("*", indexRoute.index);
+        app.get("*", indexRoute.index);
 
         return app;
     }
@@ -227,3 +225,5 @@ export class Server {
         this.db.disconnect();
     }
 }
+
+        

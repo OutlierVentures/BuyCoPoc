@@ -16,12 +16,16 @@ export class SellerController {
         });
     };
     get = (req: express.Request, res: express.Response) => {
-        var accessToken = req.headers["accessToken"];
+        let externalId = req.headers["externalid"];
+        let accessToken = req.headers["accesstoken"];
+        console.log(req.headers["accesstoken"]);
+        console.log(accessToken);
         // Throw unauthorized error when there is no accessToken.
         if (!accessToken) {
             res.statusMessage="User not authenticated.";
             return res.status(403);
         }
+        // TODO BW Check accesstoken (e.g. get user by externalId instead and then check accesstoken matches).
         userRepo.getUserByAccessToken(accessToken, (err, user: IUser) => {
             sellerRepo.getSellerByUserExternalId(user.externalId)
             .then((seller: ISeller) => {

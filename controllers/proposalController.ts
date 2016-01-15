@@ -21,7 +21,7 @@ export class ProposalController {
     }
 
     getAll = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
+        var token = req.headers.accesstoken;
 
         serviceFactory.createProposalService()
             .then(

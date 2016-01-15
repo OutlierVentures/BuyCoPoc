@@ -1,5 +1,5 @@
 ﻿interface IDataAccessService {
-    getSellerResource(accessToken: string): ng.resource.IResourceClass<ISellerResource>;
+    getSellerResource(creds: ICredentials): ng.resource.IResourceClass<ISellerResource>;
 }
 
 interface ISellerResource
@@ -10,17 +10,27 @@ interface ISellerResourceClass extends
     ng.resource.IResourceClass<ISellerResource> {
 }
 
+interface ICredentials {
+    externalId: string
+    accessToken: string
+}
+
+
 class DataAccessService implements IDataAccessService {
     static $inject = ["$resource"];
     constructor(private $resource: ng.resource.IResourceService) {
     }
 
-    getSellerResource(accessToken: string): ng.resource.IResourceClass<ISellerResource> {
-        const result = this.$resource("/api/seller/:sellerId");
-        const result2 = this.$resource("/api/seller/:sellerId", {
+    getSellerResource(creds: ICredentials): ng.resource.IResourceClass<ISellerResource> {
+        // const result2 = this.$resource("/api/seller/:sellerId");
+        const result = this.$resource("/api/seller", { }, {
+            get: {
+                method: "GET",
+                headers: creds
+            },
             post: {
                 method: "POST",
-                headers: { "AccessToken": accessToken }
+                headers: creds
             }
         });
         return result;

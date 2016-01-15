@@ -44,7 +44,8 @@ class SellerSignupController implements ISellerSignUp {
     ) {
         this.message = "test";
         this.messageType = MessageType.Success;
-        this.sellerResource = this.dataAccessService.getSellerResource(this.$rootScope.userInfo.accessToken);
+        let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId }
+        this.sellerResource = this.dataAccessService.getSellerResource(creds);
         this.getSeller();
         this.$rootScope.$on("loggedOn", (event: any, data: any) => {
         });
@@ -53,7 +54,7 @@ class SellerSignupController implements ISellerSignUp {
     getSeller() {
         if (this.$rootScope.userInfo) {
             this.sellerResource.get(
-                { externalId: this.$rootScope.userInfo.externalId },
+                { },
                 (data: Seller) => {
                     if (data) {
                         alert(`seller has Mongo data: ${data}`);
