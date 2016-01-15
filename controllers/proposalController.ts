@@ -1,5 +1,6 @@
 ﻿import express = require("express");
-import { UserRepository }  from "../models/userModel";
+import { UserRepository } from "../models/userModel";
+
 import configModel = require('../models/configModel');
 import serviceFactory = require('../services/serviceFactory');
 import proposalService = require('../services/proposalService');
@@ -144,7 +145,7 @@ export class ProposalController {
                 .then(
                 function (tx) {
                     // Empty response, no need to communicate anything.
-                    res.send(200);
+                    res.sendStatus(200);
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,
@@ -156,6 +157,33 @@ export class ProposalController {
         });
 
 
+    }
+
+    getBackers = (req: express.Request, res: express.Response) => {
+        //var token = req.header("AccessToken");
+
+        serviceFactory.createProposalService()
+            .then(
+            function (ps) {
+                return ps.getBackers(req.params.id);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing proposal service"
+                });
+                return null;
+            })
+            .then(
+            function (backers) {
+                res.json(backers);
+            }, function (backersErr) {
+                res.status(500).json({
+                    "error": backersErr,
+                    "error_location": "getting backers"
+                });
+                return null;
+            })
     }
 
 }

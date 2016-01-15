@@ -1,10 +1,27 @@
 ﻿import mongoose = require("mongoose");
 import q = require("q");
 
+/**
+ * Backing token of the user for a specific BuyCo.
+ */
+// Backing of a BuyCo is stored in the user document itself, not in a separate collection. To be able
+// to work with this in a productive, typesafe manner we define it as a class. 
+// The only function of this class is to link the user data to the smart contract.
+// Details like the amount and payments are stored in the contract.
+export class Backing {
+    /**
+     * The ID of the backed proposal.
+     */
+    proposalAddress: string;
+}
+
 export var userSchema = new mongoose.Schema({
     name: String,
     externalId: String,
-    accessToken: String
+    accessToken: String,
+    backings: [{
+        proposalAddress: String
+    }]
 });
 
 export interface IUser extends mongoose.Document {
@@ -21,6 +38,11 @@ export interface IUser extends mongoose.Document {
     accessToken: string;
 
     email: string;
+    
+    /**
+     * BuyCos this user has backed
+     */
+    backings: [Backing];
 }
 
 /**
@@ -38,7 +60,7 @@ export class UserRepository {
     * Get a user by their access token.
     * TODO BW dd. 2015-01-11: Replace all calls with Promise-based variant and then remove this one.
     */
-    getUserByAccessToken(token: string, cb: IUserCallback): void {
+    public getUserByAccessToken(token: string, cb: IUserCallback): void {
         User.findOne({ accessToken: token }, (err, user) => {
             // TODO: use promise to wait for creating new user.
             if (!user) {

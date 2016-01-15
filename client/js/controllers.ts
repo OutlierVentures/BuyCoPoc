@@ -208,29 +208,17 @@ class DashboardController {
             // TODO: further handling
         });
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     private determineCardsToShow() {
         var t = this;
         t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
             // When favoriteCardsOnly then show only cards with settings.starred = true.
-<<<<<<< HEAD
-            t.$scope.allCards : t._.filter(t.$scope.allCards, function (card: IUpholdCard) {
-=======
             t.$scope.allCards : t._.filter(t.$scope.allCards, function(card: IUpholdCard) {
->>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
                 return card.settings.starred;
             });
         ;
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     private starredCards() {
         var t = this;
         var result = t._.filter(t.$scope.allCards, { starred: true });
@@ -251,11 +239,7 @@ class NavigationController {
 
 interface IUserAccountScope extends ng.IScope {
     //credentials: Credentials;
-<<<<<<< HEAD
-    isAuthenticated(): Boolean;
-=======
     isAuthenticated() : Boolean;
->>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     userInfo: IUser;
 }
 

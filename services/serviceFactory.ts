@@ -17,7 +17,7 @@ export interface IUpholdService {
         recipient: string,
         callback: upholdService.IUpholdTransactionCallback) => void;
 
-    commitTransaction: (transaction: IUpholdTransaction, callback: upholdService.IUpholdTransactionCallback) => void
+    commitTransaction: (transaction: upholdService.IUpholdTransaction, callback: upholdService.IUpholdTransactionCallback) => void
     getCardTransactions: (cardiId: string, callback: upholdService.IUpholdTransactionsCallback) => void;
 }
 

@@ -9,7 +9,7 @@ var sellerRepo = new SellerRepository();
  * Controller for Sellers.
  */
 // TODO BW dd. 2015-01-08: Perhaps all sellerModel stuff should only be called from separate sellerService, and this controller should only do the mapping of that service from and to request, resp. response.
-export default class SellerController {
+export class SellerController {
     getAll = (req: express.Request, res: express.Response) => {
         User.find({}, (err, result) => {
             res.json(result);

@@ -28,15 +28,6 @@
     },
     "underscore/underscore.d.ts": {
       "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
-    },
-    "mocha/mocha.d.ts": {
-      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
-    },
-    "gulp-mocha/gulp-mocha.d.ts": {
-      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
-    },
-    "node/node.d.ts": {
-      "commit": "627b6c158b73494c803f36fc2fe00ad75faa8fde"
     }
   }
 }
