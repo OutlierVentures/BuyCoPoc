@@ -1,11 +1,14 @@
 ﻿interface IProposalScope extends ng.IScope {
     proposal: IProposal;
-    backers: Array<IProposalBacker>;
+    backers: Array<IProposalBacking>;
     amount: number;
+    fromCard: string;
+    cards: Array<IUpholdCard>;
     vm: ProposalController;
     processMessage: string;
     errorMessage: string;
     successMessage: string;
+    transactionId: string;
 }
 
 interface IProposalRouteParameters extends ng.route.IRouteParamsService {
@@ -49,6 +52,31 @@ class ProposalController {
 
     }
 
+    private getCardsData(cb: any) {
+        var t = this;
+
+        // Get Uphold cards with >0 funds
+        // TODO: call in parallel; use promises for that.
+        t.$http({
+            method: 'GET',
+            url: apiUrl + '/uphold/me/cards/withBalance',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (cards: any) {
+            console.log("Success on Uphold call through our API. Result:");
+            console.log(cards);
+
+            // Store in scope to show in view
+            t.$scope.cards = cards;
+        }).error(function (error) {
+            // Handle error
+            console.log("Error on Uphold call through our API:");
+            console.log(error);
+
+            cb(error, null);
+        });
+
+    }
+
     private getProposalData(proposalId: string, cb: any) {
         var t = this;
 
@@ -81,7 +109,7 @@ class ProposalController {
             method: 'GET',
             url: apiUrl + '/proposal/' + proposalId + '/backers',
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-        }).success(function (resultData: Array<IProposalBacker>) {
+        }).success(function (resultData: Array<IProposalBacking>) {
             t.$scope.backers = resultData;
             cb(null, resultData);
         }).error(function (error) {
@@ -118,6 +146,8 @@ class ProposalController {
 
         t.getProposalData(proposalId, function (err, res) {
         });
+        t.getCardsData(function (err, res) {
+        });
     }
 
     backConfirm() {
@@ -131,10 +161,15 @@ class ProposalController {
         this.$http({
             method: 'POST',
             url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/back',
-            data: { proposal: t.$scope.proposal, amount: t.$scope.amount },
+            data: {
+                proposal: t.$scope.proposal,
+                amount: t.$scope.amount,
+                fromCard: t.$scope.fromCard
+            },
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: any) {
             t.$scope.processMessage = undefined;
+            t.$scope.transactionId = resultData.startPaymentTransactionId;
             t.$scope.successMessage = "You successfully backed this proposal for " + t.$scope.amount +
                 " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
             t.$timeout(() => {

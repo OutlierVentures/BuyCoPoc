@@ -126,6 +126,7 @@ export class ProposalController {
         var token = req.header("AccessToken");
         var proposalData = <proposalModel.IProposal>req.body.proposal;
         var amount = <number>req.body.amount;
+        var fromCard = <string>req.body.fromCard;
 
         var proposalService: proposalService.ProposalService;
 
@@ -147,7 +148,7 @@ export class ProposalController {
                 function (ps) {
                     proposalService = ps;
 
-                    return ps.back(proposalData, amount * 1, user);
+                    return ps.back(proposalData, amount * 1, user, fromCard);
                 },
                 function (initErr) {
                     res.status(500).json({
@@ -158,17 +159,17 @@ export class ProposalController {
                     // processed in this case?
                     return null;
                 })
-                .then(
-                function (tx) {
-                    // Empty response, no need to communicate anything.
-                    res.sendStatus(200);
+                .then(function (proposalBacking) {
+                    // Return the transaction ID
+                    res.status(200)
+                        .json(proposalBacking);
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,
                         "error_location": "backing proposal"
                     });
                     return null;
-                })
+                });
 
         });
 

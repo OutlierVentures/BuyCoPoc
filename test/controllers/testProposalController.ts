@@ -138,7 +138,7 @@ describe("ProposalController", () => {
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        var backers = <Array<proposalModel.IProposalBacker>>res.body;
+                        var backers = <Array<proposalModel.IProposalBacking>>res.body;
 
                         // We can't assert much here. The fact that we got here without error is the result of the test.
                        
@@ -214,7 +214,7 @@ describe("ProposalController", () => {
                                     .expect('Content-Type', /json/)
                                     .expect(200)
                                     .expect(function (res) {
-                                        var backers = <Array<proposalModel.IProposalBacker>>res.body;
+                                        var backers = <Array<proposalModel.IProposalBacking>>res.body;
 
                                         var backerAddress = sourceAddress;
 

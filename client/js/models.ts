@@ -67,6 +67,35 @@ interface IUpholdTransaction {
     }
 }
 
+interface IUpholdCard {
+    "address": {
+        "bitcoin": string
+    },
+    "available": number,
+    "balance": number,
+    "currency": string,
+    "id": string,
+    "label": string,
+    "lastTransactionAt": string,
+    "settings": {
+        "position": number,
+        "starred": boolean
+    },
+    "addresses": [
+        {
+            "id": string,
+            "network": string
+        }
+    ],
+    "normalized": [
+        {
+            "available": number,
+            "balance": number,
+            "currency": string
+        }
+    ]
+}
+
 interface IApplicationInfo {
     blockchain: {
         nodeUrl: string,
@@ -91,7 +120,7 @@ interface IProposal {
 /**
  * A backer of a proposal, i.e. a buyer.
  */
-interface IProposalBacker {
+interface IProposalBacking {
     /**
      * User ID from MongoDB.
      */
@@ -106,4 +135,24 @@ interface IProposalBacker {
      * The amount of products this buyer is willing to purchase.
      */
     amount: number;
+
+    /**
+     * Transaction ID of the initial payment (at moment of backing).
+     */
+    startPaymentTransactionId: string;
+
+    /**
+     * Amount of initial payment.
+     */
+    startPaymentAmount: number;
+
+    /**
+     * Transaction ID of the final payment (after deliery).
+     */
+    endPaymentTransactionId: string;
+
+    /**
+     * Amount of the final payment.
+     */
+    endPaymentAmount: number;
 }

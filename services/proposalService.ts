@@ -164,21 +164,21 @@ export class ProposalService {
     /**
      * Get a single proposal by its contract address.
      */
-    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacker>> {
-        var deferred = Q.defer<Array<proposalModel.IProposalBacker>>();
+    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacking>> {
+        var deferred = Q.defer<Array<proposalModel.IProposalBacking>>();
 
         var t = this;
 
         // Get the proposal contract
         var proposalContract;
-        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacker>>();
+        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacking>>();
 
         proposalContract = t.proposalContractDefinition.at(proposalId);
 
         var numBackers = proposalContract.backerIndex().toNumber();
 
         for (var i = 1; i <= numBackers; i++) {
-            var defer = Q.defer<proposalModel.IProposalBacker>();
+            var defer = Q.defer<proposalModel.IProposalBacking>();
 
             getBackerDetailsPromises.push(defer.promise);
             proposalContract.backers(i, function (backerErr, backer) {
@@ -188,10 +188,23 @@ export class ProposalService {
                 }
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
+
+                var startPaymentAmount: number;
+                if (backer[3])
+                    startPaymentAmount = backer[3].toNumber();
+
+                var endPaymentAmount: number;
+                if (backer[5])
+                    endPaymentAmount = backer[5].toNumber();
+
                 defer.resolve({
                     address: backerAddress,
                     amount: amount,
-                    userId: "unknown", // TODO: get this
+                    userId: "unknown", // TODO: get this from mongoDB by address
+                    startPaymentTransactionId: backer[2],
+                    startPaymentAmount: startPaymentAmount,
+                    endPaymentTransactionId: backer[4],
+                    endPaymentAmount: endPaymentAmount,
                 });
             });
         }
@@ -251,14 +264,17 @@ export class ProposalService {
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser): Q.Promise<proposalModel.IProposal> {
+    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalModel.IProposalBacking> {
         var t = this;
 
-        var defer = Q.defer<proposalModel.IProposal>();
+        var defer = Q.defer<proposalModel.IProposalBacking>();
 
         var proposalContract = this.proposalContractDefinition.at(p.id);
 
         var backPromise = proposalContract.back(amount, { gas: 2500000 });
+
+        // TODO: use different eth address for buyer once we support that.
+        var backingAddress = web3plus.web3.eth.coinbase;
 
         backPromise.then(web3plus.promiseCommital)
             .then(function (res) {
@@ -277,14 +293,47 @@ export class ProposalService {
                         // Do payment and store it
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
 
-                        // TODO: Get card from request
+                        // TODO: move percentage to contract payment terms
+                        var paymentPercentage = 0.5;
 
+                        // Amounts are specified in cents, hence / 100.
+                        var paymentAmount = Math.round(amount * proposalContract.maxPrice().toNumber() * paymentPercentage) / 100;
+                        
                         // Create transaction
-                        //upholdService.createTransaction(
+                        upholdService.createTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress,
+                            function (txErr, paymentTransaction) {
+                                if (txErr) {
+                                    defer.reject(txErr);
+                                    return;
+                                }
 
-                        // TODO: store  transaction with backing after it's finished
+                                upholdService.commitTransaction(paymentTransaction,
+                                    function (commitErr, committedTransaction) {
+                                        if (commitErr) {
+                                            defer.reject(txErr);
+                                            return;
+                                        }
 
-                        defer.resolve(res);
+                                        // Store transaction with backing after it's finished
+                                        // paymentType 1 = initial payment
+                                        proposalContract.setPaid(backingAddress, 1, committedTransaction.id, paymentAmount)
+                                            .then(web3plus.promiseCommital)
+                                            .then(function (setPaidResult) {
+                                                defer.resolve({
+                                                    address: backingAddress,
+                                                    amount: amount,
+                                                    userId: backingUser.id,
+                                                    startPaymentTransactionId: committedTransaction.id,
+                                                    startPaymentAmount: paymentAmount,
+                                                    endPaymentTransactionId: undefined,
+                                                    endPaymentAmount: undefined,
+                                                });
+                                            },
+                                            function (setPaidError) {
+                                                defer.reject(setPaidError);
+                                            });
+                                    });
+                            });
                     });
 
             }, function (err) {
