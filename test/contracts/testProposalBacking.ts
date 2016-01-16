@@ -121,9 +121,7 @@ describe("ProposalRegistry", () => {
         var price1 = 10293;
         var amount1 = 13;
 
-        var txID1 = "tx" + Math.random() * 1000000;
-        //var txID1 = "0dd6c60b-d1a1-486f-b867-cdb8804bc094".replace(/-/g, "");
-        //var txID1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF";
+        var txID1 = Math.round("tx" + Math.random() * 1000000);
 
         // Amount: 40% up front
         var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
