@@ -122,6 +122,8 @@ describe("ProposalRegistry", () => {
         var amount1 = 13;
 
         var txID1 = "tx" + Math.random() * 1000000;
+        //var txID1 = "0dd6c60b-d1a1-486f-b867-cdb8804bc094".replace(/-/g, "");
+        //var txID1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF";
 
         // Amount: 40% up front
         var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
@@ -162,6 +164,97 @@ describe("ProposalRegistry", () => {
                 assert.equal(newBacker[2], txID1, "Transaction ID is registered correctly");
                 var registeredAmount = newBacker[3].toNumber();
                 assert.equal(registeredAmount, paymentAmount1, "Amount is registered correctly");
+
+                done();
+            })
+            .catch((reason) => {
+                done(reason);
+            });
+    });
+
+    /**
+     * The Backings in the contract are a struct. The transaction IDs are
+     * of type `string`. Hence we would expect them to have arbitrary length.
+     * However when a transaction ID of longer than 32 characters is sent,
+     * the call to setPaid() fails (silently!).
+     * This test tracks that limitation.
+     * Of course ultimately we would want to store longer strings as tx IDs.
+     * That's another issue.
+     */
+    it("should not register a payment with a transaction ID longer than 32 characters because of Solidity limits", function (done) {
+        // It can take quite a while til transactions are processed.
+        this.timeout(180000);
+
+        var name1 = "Ethiopia Adado Coop";
+        var price1 = 10293;
+        var amount1 = 13;
+
+        // A string of 32 characters
+        var txID32 = "01234567890123456789012345678912";
+
+        // A string of 33 characters
+        var txID33 = "012345678901234567890123456789123";
+
+        // Amount: 40% up front
+        var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
+
+        // Currently all transactions are sent from a single address. Hence the "backer" is
+        // also that address.
+        var backerAddress1 = web3.eth.coinbase;
+
+        var proposalContract;
+
+        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+            .then(web3plus.promiseCommital)
+            .then(function testGetMember(tx) {
+                var newProposalAddress = registryContract.proposals(1);
+
+                proposalContract = proposalContractDefinition.at(newProposalAddress);
+
+                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                return backPromise;
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                assert.equal(newBacker[0], backerAddress1);
+                assert.equal(newBacker[1].toNumber(), amount1);
+
+                // Register a payment for this backer
+                return proposalContract.setPaid(backerAddress1, 1, txID32, paymentAmount1);
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                assert.equal(newBacker[2], txID32, "Transaction ID of 32 chars is registered correctly");
+                assert.equal(newBacker[3].toNumber(), paymentAmount1, "Amount for setPaid with transaction ID of 32 chars is registered correctly");
+
+                return registryContract.addProposal(name1, "A very special product, 2", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetMember(tx) {
+                var newProposalAddress = registryContract.proposals(2);
+
+                proposalContract = proposalContractDefinition.at(newProposalAddress);
+
+                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                return backPromise;
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                // Register a payment for this backer, now use string of length 33
+                return proposalContract.setPaid(backerAddress1, 1, txID33, paymentAmount1);
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                assert.equal(newBacker[2], "", "setPaid with Transaction ID of 33 chars is not registered correctly");
+                assert.equal(newBacker[3].toNumber(), 0, "amount for setPaid with Transaction ID of 33 chars is not registered correctly");
 
                 done();
             })

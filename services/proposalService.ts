@@ -316,7 +316,7 @@ export class ProposalService {
 
                                         // Store transaction with backing after it's finished
                                         // paymentType 1 = initial payment
-                                        proposalContract.setPaid(backingAddress, 1, committedTransaction.id, paymentAmount)
+                                        proposalContract.setPaid(backingAddress, 1, committedTransaction.id, paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
                                                 defer.resolve({
