@@ -84,7 +84,7 @@ export class ProposalService {
                 //getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
                 getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
                 getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
-                getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber(); }));
+                getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
                 getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
                 getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
 
@@ -238,6 +238,9 @@ export class ProposalService {
 
         var defer = Q.defer<proposalModel.IProposal>();
 
+        // Normalize amount for contract
+        p.maxPrice = p.maxPrice * 100;
+
         // Workaround for empty dates in current implementation
         var anyP = <any>p;
         if (!p.endDate)
@@ -260,6 +263,8 @@ export class ProposalService {
 
                 p.id = newProposalAddress;
 
+                // Normalize amount for display, again
+                p.maxPrice = p.maxPrice / 100;
                 defer.resolve(p);
             }, function getProposalErr(err) {
                 defer.reject(err);

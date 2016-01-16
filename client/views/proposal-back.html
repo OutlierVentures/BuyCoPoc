@@ -13,7 +13,7 @@
                                 Do you want to join in to buy <strong>{{proposal.productName}}</strong>?
                             </p>
                             <p>
-                                The maximum price is <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
+                                The maximum price is <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
                             </p>
                             <p>
                                 <label>Payment conditions</label>
