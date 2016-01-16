@@ -121,7 +121,7 @@ describe("ProposalRegistry", () => {
         var price1 = 10293;
         var amount1 = 13;
 
-        var txID1 = Math.round("tx" + Math.random() * 1000000);
+        var txID1 = "tx" + Math.round(Math.random() * 1000000);
 
         // Amount: 40% up front
         var paymentAmount1 = Math.round(price1 * amount1 * 0.4);

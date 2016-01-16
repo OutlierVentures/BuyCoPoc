@@ -37,7 +37,7 @@
         </div>
         <div class="panel-body" ng-show="backers.length > 0">
             <div class="list-group">
-                <p href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code><span ng-show="backer.startPaymentTransactionId">(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see initial payment</a>) </span>:
+                <p href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code><span ng-show="backer.startPaymentTransactionId"> (<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see initial payment</a>)</span>:
                  <span class="pull-right text-muted">{{backer.amount}} unit(s)</span></p>
             </div>
         </div>

@@ -154,7 +154,7 @@ class ProposalController {
         var t = this;
 
         // Confirm backing the currently loaded proposal.
-        t.$scope.processMessage = "Backing prooposal...";
+        t.$scope.processMessage = "Backing proposal...";
         t.$scope.errorMessage = undefined;
         t.$scope.successMessage = undefined;
 

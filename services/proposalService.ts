@@ -3,6 +3,7 @@ import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
+import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import Q = require('q');
 
@@ -189,9 +190,17 @@ export class ProposalService {
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
+                var startTx: string;
+                if (backer[2] && backer[2].length == 32)
+                    startTx = tools.guidAddDashes(backer[2])
+
                 var startPaymentAmount: number;
                 if (backer[3])
                     startPaymentAmount = backer[3].toNumber();
+
+                var endTx: string;
+                if (backer[4] && backer[4].length == 32)
+                    endTx = tools.guidAddDashes(backer[4])
 
                 var endPaymentAmount: number;
                 if (backer[5])
@@ -201,9 +210,9 @@ export class ProposalService {
                     address: backerAddress,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
-                    startPaymentTransactionId: backer[2],
+                    startPaymentTransactionId: startTx,
                     startPaymentAmount: startPaymentAmount,
-                    endPaymentTransactionId: backer[4],
+                    endPaymentTransactionId: endTx,
                     endPaymentAmount: endPaymentAmount,
                 });
             });
@@ -316,9 +325,17 @@ export class ProposalService {
 
                                         // Store transaction with backing after it's finished
                                         // paymentType 1 = initial payment
-                                        proposalContract.setPaid(backingAddress, 1, committedTransaction.id, paymentAmount * 100)
+                                        proposalContract.setPaid(backingAddress, 1, tools.guidRemoveDashes(committedTransaction.id),
+                                            paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
+                                                // Test correct storage
+                                                var backing = proposalContract.backers(proposalContract.backerIndexByAddress(backingAddress));
+                                                if (!backing[2]) {
+                                                    defer.reject("Error saving transaction ID");
+                                                    return;
+                                                }
+
                                                 defer.resolve({
                                                     address: backingAddress,
                                                     amount: amount,

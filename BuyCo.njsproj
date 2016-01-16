@@ -52,6 +52,7 @@
     <TypeScriptCompile Include="controllers\proposalController.ts" />
     <TypeScriptCompile Include="controllers\stubOauthController.ts" />
     <TypeScriptCompile Include="controllers\upholdController.ts" />
+    <TypeScriptCompile Include="lib\tools.ts" />
     <TypeScriptCompile Include="lib\web3config.ts" />
     <TypeScriptCompile Include="models\configModel.ts" />
     <TypeScriptCompile Include="models\proposalModel.ts" />
