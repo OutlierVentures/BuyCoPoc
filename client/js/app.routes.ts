@@ -12,7 +12,7 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
         .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
         .when('/proposal/:id', { controller: ProposalController, templateUrl: 'views/proposal-details.html', name: 'details' })
         .when('/proposal/:id/back', { controller: ProposalController, templateUrl: 'views/proposal-back.html', name: 'back' })
-        .when('/seller/signup', { controller: SellerSignupController, templateUrl: 'js/sellers/signup.html' })
+        .when('/seller/signup', { controller: SellerSignupController, controllerAs: "vm", templateUrl: 'js/sellers/seller-signup.html' })
         .otherwise({ templateUrl: 'views/not-found.html' });
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');

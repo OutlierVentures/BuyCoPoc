@@ -46,7 +46,6 @@
     <TypeScriptCompile Include="client\js\LoginController.spec.ts" />
     <TypeScriptCompile Include="client\js\models.ts" />
     <TypeScriptCompile Include="client\js\sellers\sellerResourceMock.ts" />
-    <TypeScriptCompile Include="client\js\sellers\seller-list.controller.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-signup.controller.ts" />
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />

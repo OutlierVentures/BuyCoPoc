@@ -4,7 +4,11 @@
         <h3 class="panel-title">Sign up as a seller</h3>
     </div>
     <div class="panel-body">
-        <div class="alert" role="alert" ng-hide="!vm.statusMessage" ng-class="vm.messageClass()">{{ vm.message }}</div>
+        <!-- <h3>test: {{vm.seller | json }}</h3> -->
+        <div class="alert" role="alert" ng-hide="!vm.message" ng-class="vm.messageClass">
+            <strong>{{ vm.message }}</strong>
+            <button type="button" ng-click="vm.resetMessage()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
         <form id="seller-signup" class="form-horizontal" ng-submit="vm.signUp()">
             <div class="row">
                 <div class="col-md-6 col-sm-10">
@@ -35,33 +39,43 @@
                     <div class="form-group">
                         <label for="postalcode" class="col-sm-2 control-label">Postalcode</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="postalcode">
+                            <input type="text" class="form-control" id="postalcode" ng-model="vm.seller.postalcode">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="city" class="col-sm-2 control-label">City</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="city">
+                            <input type="text" class="form-control" id="city" ng-model="vm.seller.city">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="country" class="col-sm-2 control-label">Country</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="country">
+                            <select class="form-control" id="country" ng-model="vm.currentCountryCode">
+                                <option value="">Select..</option>
+                                <option ng-repeat="country in vm.countries" value="{{ country.code }}">{{ country.name }}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="telephone" class="col-sm-2 control-label">Telephone number</label>
                         <div class="col-sm-10">
-                            <input type="tel" class="form-control" id="telephone">
+                            <input type="tel" class="form-control" id="telephone" ng-model="vm.seller.telephone">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="region" class="col-sm-2 control-label">Region</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="region">
+                            <select class="form-control" id="region" ng-options="region as region.name for region in vm.regions track by region.code" ng-model="vm.currentRegionCode">
+                                <!-- <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option> -->
+                            </select>
                         </div>
                     </div>
+                    <pre>vm.currentCountry: {{ vm.currentCountry | json }}</pre>
+                    <pre>vm.currentCountryCode: {{ vm.currentCountryCode | json }}</pre>
+                    <pre>vm.seller.country: {{ vm.seller.country | json }}</pre>
+                    <pre>vm.currentRegionCode: {{ vm.currentRegionCode | json }}</pre>
+                    <pre>vm.seller.region: {{ vm.seller.region | json }}</pre>
                     <div class="form-group">
                         <div class="col-sm-2 control-label"></div>
                         <div class="col-sm-10">

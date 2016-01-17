@@ -172,7 +172,7 @@ class DashboardController {
         t.$scope.favoriteCardsOnly = false;
         t.determineCardsToShow();
 
-        t.$scope.$watch('favoriteCardsOnly', (newValue, oldValue) => {
+        t.$scope.$watch("favoriteCardsOnly", (newValue, oldValue) => {
             if (newValue !== oldValue) {
                 t.determineCardsToShow();
             }

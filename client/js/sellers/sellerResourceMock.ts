@@ -1,35 +1,33 @@
-var mockResource = angular
-    .module("sellerResourceMock",
-        ["ngMockE2E"]);
-
-mockResource.run(mockRun);
-
 mockRun.$inject = ["$httpBackend", "$http", "_"];
-function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: any) : void {
-    var sellers: Seller[];
-    $http.get("client/data/sellers.json").then((result: any) => {
-        sellers = result.data;
-    });
-    const sellerUrl = "/api/sellers";
-    $httpBackend.whenGET(sellerUrl).respond(sellers);
 
-    const editingRegex = new RegExp(sellerUrl + "/w+/i", '');
+function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, underscoreService: UnderscoreStatic) : void {
+    var sellers: Seller[];
+    const sellerUrl = "/api/seller";
+    const editingRegex = new RegExp(sellerUrl + "/w*", 'i');
+    
+    // Catch all for testing purposes
+    $httpBackend.whenGET(sellerUrl).respond(function(method, url, data) {
+        return [200, sellers, {}];
+    });
+    
     $httpBackend.whenGET(editingRegex).respond(function (method, url, data) {
         const externalIdFromUrl = url.split('/').pop();
         if (!externalIdFromUrl) {
-            return [500, `no seller id in url`, {}];
+            return [500, `No seller id in url`, {}];
         }
         // var seller: Seller = _.find(sellers, (seller: Seller) => { return seller.userExternalId === externalIdFromUrl; };
-        const seller: Seller = _.find(sellers, (seller: Seller) => { return seller.userExternalId === externalIdFromUrl; });
-        return seller ? [200, seller, {}] : [500, `no seller with name ${externalIdFromUrl}`, {}];
-    });
-
-    // Catch all for testing purposes
-    $httpBackend.whenGET(/api\/sellers/).respond(function(method, url, data) {
-        return [200, sellers, {}];
+        var _ = underscoreService
+        const seller: ISeller = _.find(sellers, (seller: ISeller) => { return seller.userExternalId === externalIdFromUrl; });
+        return seller ? [200, seller, {}] : [500, `No seller with name ${externalIdFromUrl}`, {}];
     });
                 
-    // Pass through any requests for application files
-    $httpBackend.whenGET(/app/).passThrough();
+    // Pass through any requests for application files, so these are still allowed.
+    // $httpBackend.whenGET("client/data/sellers.json").passThrough();
+    $httpBackend.whenGET(/.*/).passThrough();
+    
+    $http.get("data/sellers.json").then((result: any) => {
+        sellers = result.data;
+    });
 }
 
+angular.module("buyCoApp.services").run(mockRun);

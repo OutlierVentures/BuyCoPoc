@@ -1,23 +1,24 @@
 ﻿interface IDataAccessService {
-    getSellerResource(creds: ICredentials): ng.resource.IResourceClass<ISellerResource>;
+    getSellerResource(creds: ICredentials): ISellerResourceClass;
+    getCountryResource(): ICountryResourceClass;
+    getRegionResource(filename: string): IRegionResourceClass;
 }
 
-interface ISellerResource
-    extends ng.resource.IResource<ISeller> {
-}
+interface ISellerResource extends ng.resource.IResource<ISeller> {}
+interface ICountryResource extends ng.resource.IResource<ICountry> {}
+interface IRegionResource extends ng.resource.IResource<IRegion> {}
 
-interface ISellerResourceClass extends
-    ng.resource.IResourceClass<ISellerResource> {
-}
+interface ISellerResourceClass extends ng.resource.IResourceClass<ISellerResource> {}
+interface ICountryResourceClass extends ng.resource.IResourceClass<ICountryResource> {}
+interface IRegionResourceClass extends ng.resource.IResourceClass<IRegionResource> {}
 
 class DataAccessService implements IDataAccessService {
     static $inject = ["$resource"];
-    constructor(private $resource: ng.resource.IResourceService) {
+    constructor(public $resource: ng.resource.IResourceService) {
     }
 
-    getSellerResource(creds: ICredentials): ng.resource.IResourceClass<ISellerResource> {
-        // const result2 = this.$resource("/api/seller/:sellerId");
-        const result = this.$resource("/api/seller", { }, {
+    getSellerResource(creds: ICredentials): ISellerResourceClass {
+        const result = this.$resource(`/api/seller/${creds.externalId}`, { }, {
             get: {
                 method: "GET",
                 headers: creds
@@ -29,8 +30,16 @@ class DataAccessService implements IDataAccessService {
         });
         return result;
     };
+    
+    getCountryResource(): ICountryResourceClass {
+        return this.$resource("data/countries-regions.json");
+    };
+    
+    getRegionResource(filename: string): IRegionResourceClass {
+        return this.$resource(`data/countries/${filename}.json`);
+    };
 }
 
 angular
-    .module("buyCoApp")
+    .module("buyCoApp.services")
     .service("dataAccessService", DataAccessService);

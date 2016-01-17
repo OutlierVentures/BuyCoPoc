@@ -8,7 +8,7 @@
             "taskName": "tsc",
             "suppressTaskName": true,
             "isBuildCommand": true,
-            "showOutput": "silent",
+            "showOutput": "always",
             "args": []
         },
         {
