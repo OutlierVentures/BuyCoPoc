@@ -22,6 +22,7 @@ import upholdController = require('./controllers/upholdController');
 import migrationController = require('./controllers/migrationController');
 import proposalController = require('./controllers/proposalController');
 import sellerController = require('./controllers/sellerController');
+import configController = require('./controllers/configurationController');
 
 import bitReserveService = require('./services/upholdService');
 import serviceFactory = require('./services/serviceFactory');
@@ -151,16 +152,22 @@ export class Server {
         app.get("/api/proposal/:id/backers", pc.getBackers);
         app.post("/api/proposal", pc.create);
 
+        // Sellers
         var sc = new sellerController.SellerController();
-        app.get("/api/seller", sc.get);
-        app.post("/api/seller", sc.save);
+        app.get("/api/seller/:id", sc.get);
+        app.post("/api/seller/:id", sc.save);
 
+        // Config
+        var cc = new configController.ConfigurationController();
+        app.get("/api/config/useStubs", cc.useStubs);
+        app.get("/api/config/getversion", cc.getVersion);
+        
         // Migrations
         var mc = new migrationController.MigrationController();
         app.post("/api/migration/update", mc.update);
         app.post("/api/migration/test/seed", mc.seedTestData);
 
-        app.get("*", indexRoute.index);
+        // app.get("*", indexRoute.index);
 
         return app;
     }

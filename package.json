@@ -1,6 +1,6 @@
 {
   "name": "buyco-poc",
-  "version": "1.0.0",
+  "version": "1.0.0 Alfa 1",
   "description": "Buyco Proof of Concept implementation",
   "main": "server.js",
   "repository": {

@@ -10,7 +10,7 @@ var cachedConfig: configModel.IApplicationConfig;
 export class ConfigurationService {
     basePath = "./";
 
-    getConfiguration = () => {
+    getConfiguration() {
         if (cachedConfig)
             return cachedConfig;
 

@@ -16,26 +16,35 @@ export class SellerController {
         });
     };
     get = (req: express.Request, res: express.Response) => {
-        let externalId = req.headers["externalid"];
+        let externalId = req.url.split("/").pop();
+        let externalIdHeader = req.headers["externalid"];
+        var isSelf = externalId === externalIdHeader;
         let accessToken = req.headers["accesstoken"];
-        console.log(req.headers["accesstoken"]);
-        console.log(accessToken);
-        // Throw unauthorized error when there is no accessToken.
-        if (!accessToken) {
+        
+        // Throw unauthorized error when there is no accessToken, externalId in header, or user tries to access other url than self.
+        if (!accessToken || !externalIdHeader || !isSelf) {
             res.statusMessage="User not authenticated.";
-            return res.status(403);
+            res.status(401);
         }
+         
         // TODO BW Check accesstoken (e.g. get user by externalId instead and then check accesstoken matches).
-
-        userRepo.getUserByAccessToken(accessToken, (err, user: IUser) => {
-            sellerRepo.getSellerByUserExternalId(user.externalId)
-            .then((seller: ISeller) => {
-                return res.json(seller);
-            }).catch((err) => {
-                return res.status(403).json(err);
-            })
+        if (!userRepo.checkCredentials({ accessToken: accessToken, externalId: externalId})) {
+            res.statusMessage="User is not authenticated.";
+            return res.status(401);
+        };
+        userRepo.getUserByAccessToken2(accessToken).then((user: IUser) => {
+            return sellerRepo.getSellerByUserExternalId(user.externalId)
+        }).then((seller: ISeller) => {
+            if (seller) {
+                return res.send(seller);
+            } else {
+                res.send({});
+            }
+        }).catch((err) => {
+            res.status(403).json(err);
         });
     };
+    
     save = (req: express.Request, res: express.Response) => {
         var now = new Date();
 
@@ -58,8 +67,10 @@ export class SellerController {
                 postalCode: req.body.postalCode,
                 city: req.body.city,
                 country: req.body.country,
+                countryCode: req.body.countryCode,
                 telephone: req.body.telephone,
-                region: req.body.region
+                region: req.body.region,
+                regionCode: req.body.regionCode,
             };
             // If already exists and no error then save, update otherwise.
             if (doesSellerExist) {

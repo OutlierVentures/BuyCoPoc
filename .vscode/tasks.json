@@ -5,9 +5,16 @@
     "isShellCommand": true,
     "tasks": [
         {
-            "taskName": "tsc",
+            "taskName": "grunt serve",
             "suppressTaskName": true,
             "isBuildCommand": true,
+            "showOutput": "always",
+            "args": [ ]
+        },
+        {
+            "taskName": "tsc-old",
+            "suppressTaskName": true,
+            "isBuildCommand": false,
             "showOutput": "always",
             "args": []
         },

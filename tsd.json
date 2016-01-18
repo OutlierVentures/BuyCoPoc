@@ -41,15 +41,12 @@
     "mocha/mocha.d.ts": {
       "commit": "32029fcb4e1a3ef8968711b545d77b584435729d"
     },
-<<<<<<< HEAD
     "supertest/supertest.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
     },
     "superagent/superagent.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
     },
-=======
->>>>>>> bc96ca0feb1c808775e08d776a90dc9842a96bf9
     "assertion-error/assertion-error.d.ts": {
       "commit": "81b951f1ac437d1eb5ff5171a0bfa6c467634b13"
     },

@@ -130,9 +130,10 @@ class LoginController {
 
 interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
-    allCards: any;
+    allCards: IUpholdCard[];
     cardsToShow: any;
     favoriteCardsOnly: boolean;
+    version: string;
 }
 
 
@@ -142,7 +143,9 @@ class DashboardController {
         "$rootScope",
         "$location",
         "$http",
-        "$window"];
+        "$window",
+        "configurationService",
+        "_"];
 
     constructor(
         private $scope: IDashboardScope,
@@ -150,9 +153,14 @@ class DashboardController {
         private $location: ng.ILocationService,
         private $http: ng.IHttpService,
         private $window: IOVWindowService,
-        private _: any) {
+        private configurationService: IConfigurationService,
+        private _: UnderscoreStatic) {
 
         var t = this;
+        configurationService.getVersion()
+        .then((version) => {
+            t.$scope.version = version;
+        });
 
         // Reset any logon errors once we're logged in.
         $rootScope.loginErrorMessage = undefined;
@@ -167,7 +175,7 @@ class DashboardController {
         });
         
         // Get underscore from global (TODO: inject!)
-        t._ = t.$window._;
+        // t._ = t.$window._;
 
         t.$scope.favoriteCardsOnly = false;
         t.determineCardsToShow();
@@ -221,9 +229,13 @@ class DashboardController {
 
     private starredCards() {
         var t = this;
-        var result = t._.filter(t.$scope.allCards, { starred: true });
+        var result = t._.filter<IUpholdCard>(t.$scope.allCards, (card) => {
+            return card.settings.starred;
+        });
         return result;
     }
+    
+    
 }
 
 class NavigationController {

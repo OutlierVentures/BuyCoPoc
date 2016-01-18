@@ -35,6 +35,7 @@ class SellerSignupController implements ISellerSignUp {
     currentRegionCode: string;
     message: string;
     messageClass: string;
+    form: ng.IFormController;
     
     private messageType: MessageType;
     private sellerResource: ISellerResourceClass;
@@ -61,13 +62,6 @@ class SellerSignupController implements ISellerSignUp {
         let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
         this.sellerResource = this.dataAccessService.getSellerResource(creds);
         this.countryResource = this.dataAccessService.getCountryResource();
-        this.getCountries()
-        .then(this.getSeller)
-        .then(this.getRegions).
-        catch((err) => {
-            this.setError(err);
-        });
-        
         
         // Watch the currentCountryCode and then update current country if it is changed. 
         this.$scope.$watch(() => { return this.currentCountryCode; }, (newValue, oldValue) => {
@@ -94,48 +88,64 @@ class SellerSignupController implements ISellerSignUp {
             this.messageType = MessageType.Success;
             this.message=`Welcome ${this.$rootScope.userInfo.name}!`;
         });
-               
+           
+        this.getCountries()
+        .then(() => {
+            return this.getSeller();
+        }).catch((err) => {
+            return this.showMessage(err);
+        });
+            
         // Test the message box.
         // this.message = "Testing 1, 2, 3...";
         // this.messageType = MessageType.Success;
     }
     
-    /** Shows the given error message on screen (with style 'danger'.) */
-    setError(error: string) {
-        if (error) {
-            this.messageType = MessageType.Danger;
-            this.message=error;
+    /** 
+     * Shows the given message on screens
+     * (default is error with Bootstrap style 'danger' if isError=true then style 'success'.)
+     **/
+    showMessage(message: string, isError = true) {
+        let messageType = isError ? MessageType.Danger : MessageType.Success;
+        if (message) { 
+            this.messageType = messageType;
+            this.message=message;
         }
     }
     
     setCurrentCountry(countryCode: string) {
         if (countryCode && this.countries) {
-            this.currentCountryCode=countryCode;
             let oldCountryCode = this.currentCountry; 
             this.currentCountry = _.find(this.countries, (country: ICountry) => {
                 return country.code === countryCode;
             });
             if (!this.currentCountry) {
-                this.setError(`No country found with code ${countryCode}`);
+                this.showMessage(`No country found with code ${countryCode}`);
             }
             
             // Update the regions dropdown and reset the region value if the country changed.
-            this.getRegions();
             if (oldCountryCode !== this.currentCountry) {
-                this.currentRegion = null;
+                this.currentRegionCode = null;
+                // Note: this change triggers getRegions() method due to $watch, so not calling getRegions an extra time here.
+                // Except if the regions was empty, because then the $watch is not triggered. 
+                if (!this.regions) {
+                    this.getRegions();
+                }
             }
+            this.currentCountryCode=countryCode;
         }
     }
 
     setCurrentRegion(regionCode: string) {
-        if (regionCode && this.regions) {
-            this.currentRegionCode = regionCode;
-            this.currentRegion = _.find(this.regions, (region: IRegion) => {
-                return region.code === regionCode; 
-            });
-            if (!this.currentRegion) {
-                this.setError(`No region found with code ${regionCode}`);
+        if (this.regions) {
+            if (regionCode) {
+                this.currentRegion = _.find(this.regions, (region: IRegion) => {
+                    return region.code === regionCode; 
+                });
+            } else {
+                this.currentRegion = null;
             }
+            this.currentRegionCode = regionCode;
         }
     }
     
@@ -144,9 +154,9 @@ class SellerSignupController implements ISellerSignUp {
             if (this.$rootScope.userInfo) {
                 this.sellerResource.get(
                     { },
-                    (data: ISeller) => {
-                        if (data) {
-                            this.seller = data;
+                    (seller: ISeller) => {
+                        if (seller.userExternalId) {
+                            this.seller = seller;
                             this.loadCountryAndRegionDropdown();
                         } else {
                             // User doesn't exist yet, initialize seller object with on user info
@@ -155,16 +165,17 @@ class SellerSignupController implements ISellerSignUp {
                             this.seller.countryCode = SellerSignupController.defaultCountryCode;
                             this.loadCountryAndRegionDropdown();
                         }
-                        resolve();
+                        resolve(this.seller);
                     },
                     (httpResponse: any) => {
                         console.log(httpResponse);
                         let errorMessage = `Error getting seller: ${httpResponse}`;
+                        // throw new Error(errorMessage);
                         reject(errorMessage);
                     }
                 );
             }
-        });
+        }); 
     }
     
     getCountries() {
@@ -173,9 +184,6 @@ class SellerSignupController implements ISellerSignUp {
                 this.countryResource.query((result: ICountry[]) => {
                     this.countries = result;
                     resolve();
-                }, (err: any) => {
-                    this.messageType = MessageType.Danger;
-                    this.message = err;
                 });
             } catch (err) {
                 reject(err);
@@ -191,22 +199,27 @@ class SellerSignupController implements ISellerSignUp {
                     this.regionResource = this.dataAccessService.getRegionResource(this.currentCountry.filename);
                     this.regionResource.query((result: IRegion[]) => {
                         this.regions = result;
-                        resolve();
+                        resolve(result);
                     }, (err: any) => {
-                        // this.setError(err);
                         reject(err);
                     });
                 } catch (err) {
                     reject(err);
-                    // this.setError(err)
                 }
             }
         });
     }
 
     signUp() {
+        if(this.form.$invalid) {
+            angular.forEach(this.form.$error.required, function(field) {
+                field.$setTouched();
+            });
+            this.showMessage("Some missing or invalid fields.");
+            return;
+        };
         if (!this.seller) {
-            this.setError("Error on save.");
+            this.showMessage("Error on save.");
             return;
         }
         // Assign selected country and region from dropdown to string field.
@@ -215,14 +228,12 @@ class SellerSignupController implements ISellerSignUp {
         this.sellerResource.save(
             this.seller,
             (data: any) => {
-                alert(`success: ${data}`);
-                this.message = 'You signed up as seller';
-                this.messageType = MessageType.Success;
+                // alert(`success: ${data}`);
+                this.seller = data.seller;
+                this.showMessage('You signed up as seller', false);
             },
             (httpResponse) => {
-                alert(`fail: ${httpResponse}`);
-                this.message = httpResponse.message;
-                this.messageType = MessageType.Danger;
+                this.showMessage(httpResponse.message);
             });
     }
     
@@ -243,12 +254,20 @@ class SellerSignupController implements ISellerSignUp {
     
     private saveCountryAndRegionString() {
         this.seller.country = this.currentCountry.name;
-        this.seller.region = this.currentRegion.name;
+        this.seller.countryCode = this.currentCountry.code;
+        // Save region if filled in.
+        if (this.currentRegion) {
+            this.seller.region = this.currentRegion.name;
+            this.seller.regionCode = this.currentRegion.code;
+        }
     }
     
     private loadCountryAndRegionDropdown() {
         this.setCurrentCountry(this.seller.countryCode);
-        this.setCurrentRegion(this.seller.regionCode);
+        this.getRegions().
+        then((result) => {
+            this.setCurrentRegion(this.seller.regionCode);
+        });
     }
 }
 

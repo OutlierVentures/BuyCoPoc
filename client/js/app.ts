@@ -10,6 +10,7 @@ var apiUrl = "/api";
 interface BuyCoRootScope extends ng.IRootScopeService {
     isLoggedIn: boolean;
     isGlobalAdmin: boolean;
+    version: string;
     // The variables below belong in the login controller. Currently placed here as a workaround to be able to show error
     // message while logging in.
     isProcessingLogin: boolean;

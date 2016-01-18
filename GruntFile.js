@@ -3,13 +3,13 @@ module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg : grunt.file.readJSON('package.json'),
-
 		nodemon : {
 			dev : {
 				script : 'launcher.js'
 			},
 			options : {
 				ignore : ['node_modules/**', 'Gruntfile.js'],
+                nodeArgs: ['--debug'],
 				env : {
 					PORT : '4123'
 				}

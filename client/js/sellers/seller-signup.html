@@ -7,21 +7,30 @@
         <!-- <h3>test: {{vm.seller | json }}</h3> -->
         <div class="alert" role="alert" ng-hide="!vm.message" ng-class="vm.messageClass">
             <strong>{{ vm.message }}</strong>
+            <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
+                <div ng-message="required">Company name is required</div>
+            </div>
+            <div ng-messages="vm.form.email.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.email.$invalid && vm.form.email.$touched">
+                <div ng-message="required">Email name is invalid</div>
+            </div>
+            <div ng-messages="vm.form.country.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.country.$invalid && vm.form.country.$touched">
+                <div ng-message="required">Country is required</div>
+            </div>
             <button type="button" ng-click="vm.resetMessage()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
-        <form id="seller-signup" class="form-horizontal" ng-submit="vm.signUp()">
+        <form id="seller-signup" name="vm.form" class="form-horizontal" ng-submit="vm.signUp()" novalidate>
             <div class="row">
                 <div class="col-md-6 col-sm-10">
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error': vm.form.company.$invalid && vm.form.company.$touched}">
                         <label for="company" class="col-sm-2 control-label">Company</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="company" ng-model="vm.seller.company">
+                            <input type="text" class="form-control" id="company" name="company" ng-model="vm.seller.company" required="required">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error': vm.form.email.$invalid && vm.form.email.$touched}">
                         <label for="email" class="col-sm-2 control-label">Email</label>
                         <div class="col-sm-10">
-                            <input type="email" class="form-control" id="email" ng-model="vm.seller.email">
+                            <input type="email" class="form-control" id="email" name="email" ng-model="vm.seller.email">
                         </div>
                     </div>
                     <div class="form-group">
@@ -48,10 +57,10 @@
                             <input type="text" class="form-control" id="city" ng-model="vm.seller.city">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{ 'has-error': vm.form.country.$invalid && vm.form.country.$touched}">
                         <label for="country" class="col-sm-2 control-label">Country</label>
                         <div class="col-sm-10">
-                            <select class="form-control" id="country" ng-model="vm.currentCountryCode">
+                            <select class="form-control" id="country" name="country" ng-model="vm.currentCountryCode" required="required">
                                 <option value="">Select..</option>
                                 <option ng-repeat="country in vm.countries" value="{{ country.code }}">{{ country.name }}</option>
                             </select>
@@ -66,16 +75,13 @@
                     <div class="form-group">
                         <label for="region" class="col-sm-2 control-label">Region</label>
                         <div class="col-sm-10">
-                            <select class="form-control" id="region" ng-options="region as region.name for region in vm.regions track by region.code" ng-model="vm.currentRegionCode">
-                                <!-- <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option> -->
+                            <select class="form-control" id="region" name="region" ng-model="vm.currentRegionCode">
+                                <option value="" ng-if="vm.currentCountryCode">Select..</option>
+                                <option value="" ng-if="!vm.currentCountryCode">Pick country first..</option>
+                                <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option>
                             </select>
                         </div>
                     </div>
-                    <pre>vm.currentCountry: {{ vm.currentCountry | json }}</pre>
-                    <pre>vm.currentCountryCode: {{ vm.currentCountryCode | json }}</pre>
-                    <pre>vm.seller.country: {{ vm.seller.country | json }}</pre>
-                    <pre>vm.currentRegionCode: {{ vm.currentRegionCode | json }}</pre>
-                    <pre>vm.seller.region: {{ vm.seller.region | json }}</pre>
                     <div class="form-group">
                         <div class="col-sm-2 control-label"></div>
                         <div class="col-sm-10">
@@ -83,6 +89,11 @@
                             <input type="submit" class="btn btn-default" value="Submit" />
                         </div>
                     </div>
+                    <!-- <pre>vm.currentCountry: {{ vm.currentCountry | json }}</pre>
+                    <pre>vm.currentCountryCode: {{ vm.currentCountryCode | json }}</pre>
+                    <pre>vm.seller.country: {{ vm.seller.country | json }}</pre>
+                    <pre>vm.currentRegionCode: {{ vm.currentRegionCode | json }}</pre>
+                    <pre>vm.seller.region: {{ vm.seller.region | json }}</pre> -->
                 </div>
             </div>
         </form>

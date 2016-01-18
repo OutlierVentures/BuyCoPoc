@@ -37,6 +37,7 @@
                     </button>
                     <a class="navbar-brand" href="/" ng-show="isLoggedIn">
                         BuyCo
+                        
                         <!--<img src="images/logo-dot.png">-->
                         <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
                     </a>
@@ -57,7 +58,7 @@
                         <input type="text" class="form-control" placeholder="Search">
                     </form> -->
                     <ul class="nav navbar-nav navbar-right" ng-controller="UserAccountController" ng-show="isLoggedIn">
-                        <li data-match-route="/user/login"><a href="/user/login">{{userInfo.name}}</a></li>
+                        <li data-match-route="/user/login"><a href="/user/login">{{userInfo.name}}</a> <p style="font-size: 8px;">v{{version}}</p></li>
                     </ul>
                 </div>
             </div>
@@ -138,6 +139,7 @@
     <script src="js/common/underscore.service.js"></script>
     <script src="js/controllers/proposalController.js"></script>
     <script src="js/controllers/proposalListController.js"></script>
+    <script src="js/sellers/configuration.service.js"></script>
     <script src="js/sellers/seller.js"></script>
     <script src="js/sellers/seller.service.js"></script>
     <script src="js/sellers/sellerResourceMock.js"></script>

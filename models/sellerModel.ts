@@ -14,8 +14,10 @@ export var sellerSchema = new mongoose.Schema({
     postalCode: String,
     city: String,
     country: String,
+    countryCode: String,
     telephone: String,
-    region: String
+    region: String,
+    regionCode: String
 }, {
     timestamps: true
 });
@@ -31,8 +33,10 @@ export interface ISeller extends mongoose.Document { // , TODO inherit (extra) f
     postalCode: string;
     city: string;
     country: string;
+    countryCode: string;
     telephone: string;
     region: string;
+    regionCode: string;
 }
 
 /**
@@ -54,11 +58,11 @@ export class SellerRepository {
         var result = q.Promise<ISeller>(
             (resolve: (seller: ISeller) => void, reject: (error: any) => void) => {
                 Seller.findOne({ userExternalId: externalId }, (err, resultSeller: ISeller) => {
-                    // TODO: use promise to wait for creating new user.
                     if (err) {
-                        // No user with this token.
                         reject(err);
                     }
+                    console.log("getSellerByUserExternalId: resultSeller");
+                    console.log(resultSeller);
                     resolve(resultSeller);
                 });
             });
@@ -112,7 +116,7 @@ export class SellerRepository {
                     if (err) {
                         reject(err);
                     }
-                    resolve(resultSeller);
+                    resolve(updatedSeller);
                 });
             });
         return result;
