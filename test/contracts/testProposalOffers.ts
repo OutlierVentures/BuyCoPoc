@@ -57,7 +57,7 @@ describe("ProposalRegistry", () => {
 
         var proposalContract;
 
-        registryContract.addProposal(name1, "A very special product", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
                 var newProposalAddress = registryContract.proposals(1);

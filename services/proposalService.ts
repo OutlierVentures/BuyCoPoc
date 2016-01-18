@@ -1,7 +1,9 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
+import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
+import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import Q = require('q');
 
@@ -71,9 +73,18 @@ export class ProposalService {
                 // reasonable performance. See testProposalList.ts for more info.
                         
                 p.id = proposalAddress;
+
+                // These could be written more compactly as both the property of proposal and of
+                // p are named identical.
+                // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
+                // The calls would then be: addPropertyGetter(getProperties, proposal, p, "productName")
+                // Drawback: properties of IProposal wouldn't be typesafe any more.
                 getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                 getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
-                getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber(); }));
+                //getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
+                getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
+                getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
+                getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
                 getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
                 getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
 
@@ -154,21 +165,34 @@ export class ProposalService {
     /**
      * Get a single proposal by its contract address.
      */
+<<<<<<< HEAD
     getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacker>> {
         var deferred = Q.defer<Array<proposalModel.IProposalBacker>>();
+=======
+    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacking>> {
+        var deferred = Q.defer<Array<proposalModel.IProposalBacking>>();
+>>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
         var t = this;
 
         // Get the proposal contract
         var proposalContract;
+<<<<<<< HEAD
         var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacker>>();
+=======
+        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacking>>();
+>>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
         proposalContract = t.proposalContractDefinition.at(proposalId);
 
         var numBackers = proposalContract.backerIndex().toNumber();
 
         for (var i = 1; i <= numBackers; i++) {
+<<<<<<< HEAD
             var defer = Q.defer<proposalModel.IProposalBacker>();
+=======
+            var defer = Q.defer<proposalModel.IProposalBacking>();
+>>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
             getBackerDetailsPromises.push(defer.promise);
             proposalContract.backers(i, function (backerErr, backer) {
@@ -178,10 +202,38 @@ export class ProposalService {
                 }
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
+<<<<<<< HEAD
                 defer.resolve({
                     address: backerAddress,
                     amount: amount,
                     userId: "unknown", // TODO: get this
+=======
+
+                var startTx: string;
+                if (backer[2] && backer[2].length == 32)
+                    startTx = tools.guidAddDashes(backer[2])
+
+                var startPaymentAmount: number;
+                if (backer[3])
+                    startPaymentAmount = backer[3].toNumber();
+
+                var endTx: string;
+                if (backer[4] && backer[4].length == 32)
+                    endTx = tools.guidAddDashes(backer[4])
+
+                var endPaymentAmount: number;
+                if (backer[5])
+                    endPaymentAmount = backer[5].toNumber();
+
+                defer.resolve({
+                    address: backerAddress,
+                    amount: amount,
+                    userId: "unknown", // TODO: get this from mongoDB by address
+                    startPaymentTransactionId: startTx,
+                    startPaymentAmount: startPaymentAmount,
+                    endPaymentTransactionId: endTx,
+                    endPaymentAmount: endPaymentAmount,
+>>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
                 });
             });
         }
@@ -206,6 +258,9 @@ export class ProposalService {
 
         var defer = Q.defer<proposalModel.IProposal>();
 
+        // Normalize amount for contract
+        p.maxPrice = p.maxPrice * 100;
+
         // Workaround for empty dates in current implementation
         var anyP = <any>p;
         if (!p.endDate)
@@ -214,7 +269,8 @@ export class ProposalService {
             anyP.ultimateDeliveryDate = "";
 
         this.registryContract.addProposal(p.productName,
-            p.productDescription, p.maxPrice,
+            p.productDescription, p.mainCategory, p.subCategory,
+            p.maxPrice,
             p.endDate, p.ultimateDeliveryDate, { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {
@@ -227,6 +283,8 @@ export class ProposalService {
 
                 p.id = newProposalAddress;
 
+                // Normalize amount for display, again
+                p.maxPrice = p.maxPrice / 100;
                 defer.resolve(p);
             }, function getProposalErr(err) {
                 defer.reject(err);
@@ -240,14 +298,17 @@ export class ProposalService {
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser): Q.Promise<proposalModel.IProposal> {
+    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalModel.IProposalBacking> {
         var t = this;
 
-        var defer = Q.defer<proposalModel.IProposal>();
+        var defer = Q.defer<proposalModel.IProposalBacking>();
 
         var proposalContract = this.proposalContractDefinition.at(p.id);
 
         var backPromise = proposalContract.back(amount, { gas: 2500000 });
+
+        // TODO: use different eth address for buyer once we support that.
+        var backingAddress = web3plus.web3.eth.coinbase;
 
         backPromise.then(web3plus.promiseCommital)
             .then(function (res) {
@@ -262,9 +323,67 @@ export class ProposalService {
                             defer.reject(userErr);
                             return;
                         }
+<<<<<<< HEAD
                         defer.resolve(res);
                     });
                 
+=======
+
+                        // Do payment and store it
+                        var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
+
+                        // TODO: move percentage to contract payment terms
+                        var paymentPercentage = 0.5;
+
+                        // Amounts are specified in cents, hence / 100.
+                        var paymentAmount = Math.round(amount * proposalContract.maxPrice().toNumber() * paymentPercentage) / 100;
+                        
+                        // Create transaction
+                        upholdService.createTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress,
+                            function (txErr, paymentTransaction) {
+                                if (txErr) {
+                                    defer.reject(txErr);
+                                    return;
+                                }
+
+                                upholdService.commitTransaction(paymentTransaction,
+                                    function (commitErr, committedTransaction) {
+                                        if (commitErr) {
+                                            defer.reject(txErr);
+                                            return;
+                                        }
+
+                                        // Store transaction with backing after it's finished
+                                        // paymentType 1 = initial payment
+                                        proposalContract.setPaid(backingAddress, 1, tools.guidRemoveDashes(committedTransaction.id),
+                                            paymentAmount * 100)
+                                            .then(web3plus.promiseCommital)
+                                            .then(function (setPaidResult) {
+                                                // Test correct storage
+                                                var backing = proposalContract.backers(proposalContract.backerIndexByAddress(backingAddress));
+                                                if (!backing[2]) {
+                                                    defer.reject("Error saving transaction ID");
+                                                    return;
+                                                }
+
+                                                defer.resolve({
+                                                    address: backingAddress,
+                                                    amount: amount,
+                                                    userId: backingUser.id,
+                                                    startPaymentTransactionId: committedTransaction.id,
+                                                    startPaymentAmount: paymentAmount,
+                                                    endPaymentTransactionId: undefined,
+                                                    endPaymentAmount: undefined,
+                                                });
+                                            },
+                                            function (setPaidError) {
+                                                defer.reject(setPaidError);
+                                            });
+                                    });
+                            });
+                    });
+
+>>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
             }, function (err) {
                 defer.reject(err);
             });

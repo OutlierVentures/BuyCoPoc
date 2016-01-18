@@ -6,9 +6,11 @@
     </div>
     <div class="jumbotron">
         <h2>{{proposal.productName}}</h2>
+        <p class="text-muted" ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
         <p class="text-muted">{{proposal.productDescription}}</p>
+        <p class="text-muted" ng-show="proposal.productSku">{{proposal.productSku}}</p>
         <span class="small">
-            Maximum price: <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span>
+            Maximum price: <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}} GBP</span>
         </span><br><br>
         <span class="small">
             End date: <span class="text-muted">{{proposal.endDate}}</span>
@@ -30,8 +32,14 @@
         <div class="panel-body" ng-hide="backers">
             Loading the list of prospective buyers...
         </div>
-        <div class="list-group" ng-show="backers">
-            
+        <div class="panel-body" ng-show="backers.length == 0">
+            <p>You can be the first to back this proposal!</p>
+        </div>
+        <div class="panel-body" ng-show="backers.length > 0">
+            <div class="list-group">
+                <p href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">Address <code>{{backer.address}}</code><span ng-show="backer.startPaymentTransactionId"> (<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see initial payment</a>)</span>:
+                 <span class="pull-right text-muted">{{backer.amount}} unit(s)</span></p>
+            </div>
         </div>
     </div>
 </div>

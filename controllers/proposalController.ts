@@ -82,6 +82,18 @@ export class ProposalController {
         //var token = req.header("AccessToken");
         var proposalData = <proposalModel.IProposal>req.body;
 
+        // The category arrives as a string: [main] - [sub]
+        // Example: "Electronics - Camera"
+        var categoryString: string = req.body.category;
+
+        if (categoryString && categoryString.indexOf(" - ")) {
+            var parts = categoryString.split(" - ")
+            if (parts.length == 2) {
+                proposalData.mainCategory = parts[0];
+                proposalData.subCategory = parts[1];
+            }
+        }
+
         serviceFactory.createProposalService()
             .then(
             function (ps) {
@@ -117,6 +129,7 @@ export class ProposalController {
         var token = req.header("AccessToken");
         var proposalData = <proposalModel.IProposal>req.body.proposal;
         var amount = <number>req.body.amount;
+        var fromCard = <string>req.body.fromCard;
 
         var proposalService: proposalService.ProposalService;
 
@@ -126,12 +139,19 @@ export class ProposalController {
         // could live in the browser. Server side would then check whether the transfer had completed.
         // --> could we do this without holding the user's Uphold tokens entirely?
         userRepo.getUserByAccessToken(token, function (userErr, user) {
+            if (userErr) {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+            }
+
             serviceFactory.createProposalService()
                 .then(
                 function (ps) {
                     proposalService = ps;
 
-                    return ps.back(proposalData, amount * 1, user);
+                    return ps.back(proposalData, amount * 1, user, fromCard);
                 },
                 function (initErr) {
                     res.status(500).json({
@@ -142,21 +162,17 @@ export class ProposalController {
                     // processed in this case?
                     return null;
                 })
-                .then(
-                function (tx) {
-                    // Empty response, no need to communicate anything.
-                    res.sendStatus(200);
+                .then(function (proposalBacking) {
+                    // Return the transaction ID
+                    res.json(proposalBacking);
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,
                         "error_location": "backing proposal"
                     });
                     return null;
-                })
-
+                });
         });
-
-
     }
 
     getBackers = (req: express.Request, res: express.Response) => {
@@ -185,5 +201,4 @@ export class ProposalController {
                 return null;
             })
     }
-
 }

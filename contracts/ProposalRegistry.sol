@@ -54,6 +54,23 @@ contract Proposal {
     string public productDescription;
 
     /**
+     * The SKU (unique identification number) of the product.
+     */
+    string public productSku;
+
+    /**
+     * The product category in plain text. Future vevrsions might contain a more
+     * advanced taxonomy of categories.
+     */
+    string public mainCategory;
+
+    /**
+     * The product category in plain text. Future vevrsions might contain a more
+     * advanced taxonomy of categories.
+     */
+    string public subCategory;
+
+    /**
      *
      */
     uint public maxPrice;
@@ -70,8 +87,35 @@ contract Proposal {
     string public ultimateDeliveryDate;
 
     struct Backing {
+        /**
+         * Blockchain address of the buyer
+         */
         address buyerAddress;
+
+        /**
+         * Amount of products the buyer has committed to buy.s
+         */
         uint amount;
+
+        /**
+         * Transaction ID of the initial payment (at moment of backing).
+         */
+        string startPaymentTransactionID;
+
+        /**
+         * Amount of initial payment.
+         */
+        uint startPaymentAmount;
+
+        /**
+         * Transaction ID of the final payment (after deliery).
+         */
+        string endPaymentTransactionID;
+
+        /**
+         * Amount of the final payment.
+         */
+        uint endPaymentAmount;
     }
 
     /**
@@ -106,9 +150,14 @@ contract Proposal {
      */
     Offer public acceptedOffer;
 
-    function Proposal(string pn, string pd, uint mp, string ed, string udd) {
+    function Proposal(string pn, string pd,
+        //string ps,
+        string mc, string sc, uint mp, string ed, string udd) {
         productName = pn;
         productDescription = pd;
+        //productSku = ps;
+        mainCategory = mc;
+        subCategory = sc;
         maxPrice = mp;
         endDate = ed;
         ultimateDeliveryDate = udd;
@@ -134,6 +183,36 @@ contract Proposal {
         backerIndexByAddress[tx.origin] = backerIndex;
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
+    }
+
+    /**
+     * Register a payment for a backer.
+     * @param backerAddress the backer that paid
+     * @param paymentType 1=start, 2=end
+     * @param transactionID the external transaction ID of the payment
+     * @param amount the payment amount
+     */
+    function setPaid(address backerAddress, uint paymentType, string transactionID, uint amount) {
+        // TODO: check whether tx.origin is proposal creator? Or admin?
+        // TODO: check whether the amount is correct according to payment
+        // schedule
+
+        // Validate this is an existing backer.
+        if(backerIndexByAddress[backerAddress] == 0)
+            return;
+
+        Backing b = backers[backerIndexByAddress[backerAddress]];
+        if (paymentType == 1) {
+            // Start payment
+            b.startPaymentTransactionID = transactionID;
+            b.startPaymentAmount = amount;
+        }
+        else if (paymentType == 2) {
+            // End payment
+            // TODO: validate that start payment has been registered
+            b.endPaymentTransactionID = transactionID;
+            b.endPaymentAmount = amount;
+        }
     }
 
     /**
@@ -237,13 +316,18 @@ contract ProposalRegistry {
     mapping (uint=>Proposal) public proposals;
     uint public proposalIndex;
 
-    function addProposal(string productName, string description, uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
+    function addProposal(string productName, string description,
+        //string productSku,
+        string productCategory, string productSubCategory,
+        uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
         proposalIndex++;
 
-        p = new Proposal(productName, description, maxPrice, endDate, ultimateDeliveryDate);
+        p = new Proposal(productName, description,
+            //productSku,
+            productCategory, productSubCategory,
+            maxPrice, endDate, ultimateDeliveryDate);
         proposals[proposalIndex] = p;
 
         return p;
-
     }
 }

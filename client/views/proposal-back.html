@@ -13,7 +13,7 @@
                                 Do you want to join in to buy <strong>{{proposal.productName}}</strong>?
                             </p>
                             <p>
-                                The maximum price is <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
+                                The maximum price is <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
                             </p>
                             <p>
                                 <label>Payment conditions</label>
@@ -27,7 +27,18 @@
                                     </p>
                                     <input class="form-control" type="text" ng-model="amount" required min="1">
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Card to pay from</label>
+                                    <p class="help-block">
+                                        The initial payment of 50% of the total amount will be made immediately into the BuyCo escrow. If the sale doesn't
+                                        close, your money will be returned on the proposal end date of {{proposal.endDate}}.
+                                        <br /> Which Uphold card do you want to pay from?
+                                    </p>
+                                    <select class="form-control" ng-model="fromCard" required>
+                                        <option ng-hide="cards.length > 0">Loading your cards...</option>
+                                        <option ng-repeat="card in cards track by card.id" value="{{card.id}}">{{card.label}} ({{card.currency}} {{card.available}})</option>
+                                    </select>
+                                </div>
                                 <fieldset ng-disabled="processMessage || successMessage">
                                     <button name="saveButton" ng-click="vm.backConfirm()" ng-disabled="backForm.$invalid" class="btn btn-primary">
                                         Back this proposal
@@ -44,7 +55,10 @@
                             </div>
                             <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
                                 <div class="panel-heading">Success</div>
-                                <div class="panel-body">{{successMessage}}</div>
+                                <div class="panel-body">
+                                    <p>{{successMessage}}</p>
+                                    <p>Transaction ID: <strong>{{transactionId}}</strong>. See the <a href="https://uphold.com/reserve/transactions/{{transactionId}}" target="_blank">transaction details</a>.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

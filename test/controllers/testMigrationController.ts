@@ -23,6 +23,11 @@ describe("MigrationController", () => {
         done();
     });
 
+    after(function (done) {
+        theServer.stop();
+        done();
+    });
+
     it("should ensure the base contracts are in place on POST /api/migration/update", function (done) {
         this.timeout(100000);
 
