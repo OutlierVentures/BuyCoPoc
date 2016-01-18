@@ -133,7 +133,6 @@ interface IDashboardScope extends ng.IScope {
     allCards: IUpholdCard[];
     cardsToShow: any;
     favoriteCardsOnly: boolean;
-    version: string;
 }
 
 
@@ -144,7 +143,6 @@ class DashboardController {
         "$location",
         "$http",
         "$window",
-        "configurationService",
         "_"];
 
     constructor(
@@ -153,14 +151,9 @@ class DashboardController {
         private $location: ng.ILocationService,
         private $http: ng.IHttpService,
         private $window: IOVWindowService,
-        private configurationService: IConfigurationService,
         private _: UnderscoreStatic) {
 
         var t = this;
-        configurationService.getVersion()
-        .then((version) => {
-            t.$scope.version = version;
-        });
 
         // Reset any logon errors once we're logged in.
         $rootScope.loginErrorMessage = undefined;
@@ -253,21 +246,29 @@ interface IUserAccountScope extends ng.IScope {
     //credentials: Credentials;
     isAuthenticated() : Boolean;
     userInfo: IUser;
+    version: string;
 }
 
 class UserAccountController {
     public static $inject = [
         "$scope",
         "$rootScope",
-        "$location"];
+        "$location",
+        "configurationService"
+    ];
 
     constructor(
         private $scope: IUserAccountScope,
         private $rootScope: BuyCoRootScope,
-        private $location: ng.ILocationService) {
+        private $location: ng.ILocationService,
+        private configurationService: IConfigurationService) {
 
         this.$rootScope.$on('loggedOn', function (event, data) {
             $scope.userInfo = $rootScope.userInfo;
+            configurationService.getVersion()
+            .then((version) => {
+                $scope.version = version;
+            });
         });
     }
 }

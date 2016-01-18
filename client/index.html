@@ -36,8 +36,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" ng-show="isLoggedIn">
-                        BuyCo
-                        
+                        BuyCo                        
                         <!--<img src="images/logo-dot.png">-->
                         <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
                     </a>
@@ -46,7 +45,7 @@
                         <!-- <img class="logo" src="images/logo.png">-->
                     </a>
                 </div>
-                <div class="navbar-collapse collapse">
+                <div class="navbar-collapse collapse" ng-controller="UserAccountController" >
                     <ul class="nav navbar-nav" ng-show="!isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
                     </ul>
@@ -57,8 +56,11 @@
                     <!-- <form class="navbar-form navbar-left">
                         <input type="text" class="form-control" placeholder="Search">
                     </form> -->
-                    <ul class="nav navbar-nav navbar-right" ng-controller="UserAccountController" ng-show="isLoggedIn">
-                        <li data-match-route="/user/login"><a href="/user/login">{{userInfo.name}}</a> <p style="font-size: 8px;">v{{version}}</p></li>
+                    <ul class="nav navbar-nav navbar-right" ng-show="isLoggedIn">
+                        <li data-match-route="/user/login"><a href="/user/login">{{ userInfo.name }}</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li style="font-size: 10px; text-align: right;"><a>v{{ version }}</a></li>
                     </ul>
                 </div>
             </div>

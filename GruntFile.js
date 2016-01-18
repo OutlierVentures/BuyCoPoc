@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 			},
 			options : {
 				ignore : ['node_modules/**', 'Gruntfile.js'],
-                nodeArgs: ['--debug'],
+                nodeArgs: ['--debug=5860'],
 				env : {
 					PORT : '4123'
 				}
