@@ -21,6 +21,8 @@ import oauthController = require('./controllers/oauthController');
 import upholdController = require('./controllers/upholdController');
 import migrationController = require('./controllers/migrationController');
 import proposalController = require('./controllers/proposalController');
+import sellerController = require('./controllers/sellerController');
+import configController = require('./controllers/configurationController');
 
 import bitReserveService = require('./services/upholdService');
 import serviceFactory = require('./services/serviceFactory');
@@ -131,8 +133,7 @@ export class Server {
         app.get('/proposal/:id', indexRoute.index);
         app.get('/proposal/:id/back', indexRoute.index);
         app.get('/proposal/new', indexRoute.index);
-
-        app.get('/not-found', indexRoute.index);
+        app.get('/seller/signup', indexRoute.index);
 
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
@@ -151,10 +152,22 @@ export class Server {
         app.get("/api/proposal/:id/backers", pc.getBackers);
         app.post("/api/proposal", pc.create);
 
+        // Sellers
+        var sc = new sellerController.SellerController();
+        app.get("/api/seller/:id", sc.get);
+        app.post("/api/seller/:id", sc.save);
+
+        // Config
+        var cc = new configController.ConfigurationController();
+        app.get("/api/config/useStubs", cc.useStubs);
+        app.get("/api/config/getversion", cc.getVersion);
+        
         // Migrations
         var mc = new migrationController.MigrationController();
         app.post("/api/migration/update", mc.update);
         app.post("/api/migration/test/seed", mc.seedTestData);
+
+        // app.get("*", indexRoute.index);
 
         return app;
     }
@@ -219,3 +232,5 @@ export class Server {
         this.db.disconnect();
     }
 }
+
+        

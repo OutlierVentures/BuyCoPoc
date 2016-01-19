@@ -33,7 +33,7 @@ class ProposalListController {
         this.$http({
             method: 'GET',
             url: apiUrl + '/proposal',
-            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+            headers: { "AccessToken": t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: any) {
             t.$scope.proposals = resultData;
         }).error(function (error) {                

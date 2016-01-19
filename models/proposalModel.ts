@@ -14,6 +14,7 @@
  * A backer of a proposal, i.e. a buyer.
  */
 export interface IProposalBacking {
+
     /**
      * User ID from MongoDB.
      */

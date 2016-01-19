@@ -1,5 +1,6 @@
 ﻿import express = require("express");
-import userModel = require('../models/userModel');
+import { UserRepository } from "../models/userModel";
+
 import configModel = require('../models/configModel');
 import serviceFactory = require('../services/serviceFactory');
 import proposalService = require('../services/proposalService');
@@ -10,6 +11,8 @@ import proposalModel = require('../models/proposalModel');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
 
+var userRepo = new UserRepository();
+
 /**
  * Controller for Circle membership operations.
  */
@@ -18,7 +21,7 @@ export class ProposalController {
     }
 
     getAll = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
+        var token = req.headers["accesstoken"];
 
         serviceFactory.createProposalService()
             .then(
@@ -135,7 +138,7 @@ export class ProposalController {
         // For a more decentralized version this could be done client side. The Uphold token 
         // could live in the browser. Server side would then check whether the transfer had completed.
         // --> could we do this without holding the user's Uphold tokens entirely?
-        userModel.getUserByAccessToken(token, function (userErr, user) {
+        userRepo.getUserByAccessToken(token, function (userErr, user) {
             if (userErr) {
                 res.status(500).json({
                     "error": userErr,
@@ -161,8 +164,7 @@ export class ProposalController {
                 })
                 .then(function (proposalBacking) {
                     // Return the transaction ID
-                    res.status(200)
-                        .json(proposalBacking);
+                    res.json(proposalBacking);
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,
@@ -170,10 +172,7 @@ export class ProposalController {
                     });
                     return null;
                 });
-
         });
-
-
     }
 
     getBackers = (req: express.Request, res: express.Response) => {
@@ -202,5 +201,4 @@ export class ProposalController {
                 return null;
             })
     }
-
 }

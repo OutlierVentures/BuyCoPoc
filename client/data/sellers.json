@@ -1,0 +1,36 @@
+﻿[
+  {
+    "userExternalId": "bartvanderwal",
+    "isActive": "true",
+    "email": "bart@itoffthewall.nl",
+    "dateCreated": "2016-01-06T09:34:00+00:00",
+    "dateUpdated": "2016-01-06T09:34:30+00:00",
+    "company": "IT Off the Wall",
+    "addressLine1": "Nepveulaan 18",
+    "addressLine2": "",
+    "postalcode": "3705LD",
+    "city": "Zeist",
+    "country": "The Netherlands",
+    "countryCode": "NL",
+    "telephone": "+31 (0)6461 02065",
+    "region": "Utrecht",
+    "regionCode": "NL-UT"
+  },
+  {
+    "userExternalId": "aronvanammers",
+    "isActive": "false",
+    "email": "aron@",
+    "dateCreated": "2016-01-06T09:35:00+00:00",
+    "dateUpdated": "2016-01-06T09:35:00+00:00",
+    "company": "Outlier Ventures",
+    "addressLine1": "Lynwood house, 48 Highstreet",
+    "addressLine2": "",
+    "postalCode": "HP7 0DJ",
+    "city": "Amersham",
+    "country": "The United Kingdom",
+    "countryCode": "GB",
+    "telephone": "+44 (0)7590 488502 ",
+    "region": "Buckinghamshire",
+    "regionCode": "GB-BKM"
+  }
+]

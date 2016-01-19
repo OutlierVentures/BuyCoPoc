@@ -1,9 +1,15 @@
-﻿interface ILoginScope extends ng.IScope {
+﻿/// <reference path="../typings/tsd.d.ts" />
+
+interface ILoginScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated();
-    login();
+    isAuthenticated(): boolean;
+    login(): any;
     userInfo: IUser;
     isGlobalAdmin: boolean;
+}
+
+interface IOVWindowService extends ng.IWindowService {
+    _: UnderscoreStatic; // Extend with underscore.
 }
 
 /**
@@ -28,7 +34,7 @@ class LoginController {
         private $route: ng.route.IRouteService,
         private identityService: IdentityService) {
 
-        $scope.isAuthenticated = function (): boolean {
+        $scope.isAuthenticated = function(): boolean {
             return identityService.isAuthenticated();
         }
 
@@ -54,12 +60,12 @@ class LoginController {
 
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
-        } else if (this.$location.path() == "/auth/uphold/callback"
+        } else if (this.$location.path() === "/auth/uphold/callback"
         // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
             && !this.$rootScope.isProcessingLogin
-            ) {
+        ) {
             this.$rootScope.isProcessingLogin = true;
 
             // Handle OAuth callback
@@ -122,9 +128,11 @@ class LoginController {
     }
 }
 
-interface IDashboardScope {
+interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
-    allCards: any;
+    allCards: IUpholdCard[];
+    cardsToShow: any;
+    favoriteCardsOnly: boolean;
 }
 
 
@@ -133,13 +141,17 @@ class DashboardController {
         "$scope",
         "$rootScope",
         "$location",
-        "$http"];
+        "$http",
+        "$window",
+        "_"];
 
     constructor(
         private $scope: IDashboardScope,
         private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService,
-        private $http: ng.IHttpService) {
+        private $http: ng.IHttpService,
+        private $window: IOVWindowService,
+        private _: UnderscoreStatic) {
 
         var t = this;
 
@@ -151,10 +163,21 @@ class DashboardController {
         }
 
         // The logon could happen while the controller is already loaded.
-        $rootScope.$on('loggedOn', function () {
+        $rootScope.$on('loggedOn', function() {
             t.loadData();
         });
+        
+        // Get underscore from global (TODO: inject!)
+        // t._ = t.$window._;
 
+        t.$scope.favoriteCardsOnly = false;
+        t.determineCardsToShow();
+
+        t.$scope.$watch("favoriteCardsOnly", (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                t.determineCardsToShow();
+            }
+        });
     }
 
     private loadData() {
@@ -171,12 +194,13 @@ class DashboardController {
             method: 'GET',
             url: apiUrl + '/uphold/me/cards',
             headers: { AccessToken: t.$scope.userInfo.accessToken }
-        }).success(function (cards: any) {
+        }).success(function(cards: any) {
             console.log("Success on Uphold call through our API. Result:");
             console.log(cards);
 
             // Store in scope to show in view
             t.$scope.allCards = cards;
+            t.determineCardsToShow();
         }).error(function (error) {
             // Handle error
             console.log("Error on Uphold call through our API:");
@@ -184,8 +208,27 @@ class DashboardController {
 
             // TODO: further handling
         });
-
     }
+
+    private determineCardsToShow() {
+        var t = this;
+        t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
+            // When favoriteCardsOnly then show only cards with settings.starred = true.
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function(card: IUpholdCard) {
+                return card.settings.starred;
+            });
+        ;
+    }
+
+    private starredCards() {
+        var t = this;
+        var result = t._.filter<IUpholdCard>(t.$scope.allCards, (card) => {
+            return card.settings.starred;
+        });
+        return result;
+    }
+    
+    
 }
 
 class NavigationController {
@@ -201,24 +244,31 @@ class NavigationController {
 
 interface IUserAccountScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated();
+    isAuthenticated() : Boolean;
     userInfo: IUser;
+    version: string;
 }
 
 class UserAccountController {
     public static $inject = [
         "$scope",
         "$rootScope",
-        "$location"];
+        "$location",
+        "configurationService"
+    ];
 
     constructor(
         private $scope: IUserAccountScope,
         private $rootScope: BuyCoRootScope,
-        private $location: ng.ILocationService) {
+        private $location: ng.ILocationService,
+        private configurationService: IConfigurationService) {
 
         this.$rootScope.$on('loggedOn', function (event, data) {
             $scope.userInfo = $rootScope.userInfo;
+            configurationService.getVersion()
+            .then((version) => {
+                $scope.version = version;
+            });
         });
-
     }
 }

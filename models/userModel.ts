@@ -1,4 +1,5 @@
 ﻿import mongoose = require("mongoose");
+import { Promise } from "q";
 
 /**
  * Backing token of the user for a specific BuyCo.
@@ -23,6 +24,11 @@ export var userSchema = new mongoose.Schema({
     }]
 });
 
+export interface ICredentials {
+    externalId: string
+    accessToken: string
+}
+
 export interface IUser extends mongoose.Document {
     name: string;
     /**
@@ -37,7 +43,7 @@ export interface IUser extends mongoose.Document {
     accessToken: string;
 
     email: string;
-
+    
     /**
      * BuyCos this user has backed
      */
@@ -53,19 +59,107 @@ interface IUserCallback {
     (error: any, user: IUser)
 }
 
-/**
- * Get a user by their access token.
- */
-export var getUserByAccessToken = (token: string, cb: IUserCallback) => {
-    User.findOne({ accessToken: token }, function (err, user) {
-        // TODO: use promise to wait for creating new user.
-        if (!user) {
-            // No user with this token.
-            cb("Not found", null)
-        }
 
-        // TODO: check for validity of the token.
+export class UserRepository {
+    /**
+    * Get a user by their access token.
+    * TODO BW dd. 2015-01-11: Replace all calls with Promise-based variant and then remove this one.
+    */
+    public getUserByAccessToken(token: string, cb: IUserCallback): void {
+        User.findOne({ accessToken: token }, (err, user) => {
+            // TODO: use promise to wait for creating new user.
+            if (!user) {
+                // No user with this token.
+                cb("Not found", null);
+            }
 
-        cb(null, user);
-    });
+            // TODO: check for validity of the token.
+            cb(null, user);
+        });
+    };
+
+    /**
+    * Get a promise by their accessToken - promise version. 
+    */
+    public getUserByAccessToken2 (accessToken: string): Promise<IUser> {
+        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+            User.findOne({ accessToken: accessToken }, (err: any, resultUser: IUser) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(resultUser);
+            });
+        });
+        return result;
+    };
+
+    /**
+    * Get a user by their externalId. 
+    */
+    public getUserByExternalId(externalId: string): Promise<IUser> {
+        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+            User.findOne({ externalId: externalId }, (err: any, resultUser: IUser) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(resultUser);
+            });
+        });
+        return result;
+    };
+
+    /**
+     * Create a new user.
+     * For now just a simple one to one mapping with mongoose create function, but 'Promisied'.
+     * @param user
+     * @param cb
+     */
+    public create(newUser: IUser): Promise<IUser> { 
+        var result = Promise<IUser>(
+        (resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+            User.create(newUser, (err: any, resultUser: IUser) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(resultUser);
+            });
+        });
+        return result;
+    };
+
+
+    /**
+     * Find one or more users give some criteria (in an JS Object format).
+     * For now just a simple one to one mapping with the mongoose find function, but 'Promisied'.
+     */
+    public find(cond: Object): Promise<IUser[]> {
+        var result = Promise<IUser[]>(
+        (resolve: (users: IUser[]) => void, reject: (error: any) => void) => {
+            User.find(cond, (err: any, users: IUser[]) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(users);
+            });
+        });
+        return result;
+    };
+
+    /**
+     * Check if them credentials are credible :).
+     */
+    public checkCredentials(cred: ICredentials): Promise<Boolean> {
+        var result = Promise<Boolean>(
+        (resolve: (checksOut: Boolean) => void, reject: (error: any) => void) => {
+            this.getUserByExternalId(cred.externalId).then((user: IUser) => {
+                let credsValid = user.accessToken===cred.accessToken;
+                resolve(credsValid);
+            }).catch((err: any) => {
+                reject(err);
+            });
+        })
+        
+        return result;
+    }
 }
+

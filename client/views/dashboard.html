@@ -4,16 +4,38 @@
         <h2>{{userInfo.name}}</h2>
     </div>
 </div>
-
 <div class="container">
-    <h5 class="mc-page-heading">My Uphold cards</h5>
+    <!--
     <div class="row">
-        <div class="col-lg-4 col-md-6" ng-repeat="card in allCards track by card.id">
+        <div class="col-lg-4 col-md-6">
+            <button type="button" class="btn btn-default tooltip" data-toggle="tooltip" data-placement="left" title="Tooltip on left">Tooltip on left</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function() {
+            $(".tooltip").tooltip();
+        });
+    </script>
+    <br/><br/> -->
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h3 class="mc-page-heading">My Uphold cards</h3>
+        </div>
+        <div class="col-sm-6">
+            <label for="favoriteCardsOnly" class="pull-right">&nbsp;&nbsp;Show favorites only</label>
+            <input type="checkbox" id="favoriteCardsOnly" ng-model="favoriteCardsOnly" class="pull-right"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-md-6" ng-repeat="card in cardsToShow track by card.id">
             <div class="panel panel-default">
                 <div class="panel-heading">{{card.label}}</div>
                 <div class="panel-body">
                     <p>Balance:</p>
-                    <h3><a href="#">{{card.balance}} {{card.currency}}</a></h3>
+                    <h3>
+                        <a href="#">{{card.balance}} {{card.currency}}</a>
+                    </h3>
                     <p>Last transaction: {{card.lastTransactionAt || 'none'}}</p>
                 </div>
             </div>

@@ -1,0 +1,30 @@
+{
+    "version": "0.1.0",
+    "command": "tsc",
+    "suppresTaskName": true,
+    "isShellCommand": true,
+    "tasks": [
+        {
+            "taskName": "grunt serve",
+            "suppressTaskName": true,
+            "isBuildCommand": true,
+            "showOutput": "always",
+            "args": [ ]
+        },
+        {
+            "taskName": "tsc-old",
+            "suppressTaskName": true,
+            "isBuildCommand": false,
+            "showOutput": "always",
+            "args": []
+        },
+        {
+            "taskName": "gulp",
+            "suppressTaskName": true,
+            "isBuildCommand": false,
+            "isTestCommand": true,
+            "showOutput": "always",
+            "args": []
+        }
+    ]
+}

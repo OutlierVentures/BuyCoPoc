@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "target": "es5",
+        "watch": true
+    },
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "typings",
+        "client/typings"
+    ]
+}
