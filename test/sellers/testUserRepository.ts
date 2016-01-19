@@ -25,11 +25,6 @@ describe("User repository", () => {
         }
         mongoose.connect(dbUri, done);
     });
-
-    it("should have at least one unit test :)", done => {
-        assert.equal(1, 1);
-        done();
-    });
     
     it("should be able to create a user in the database", (done) => {
         repo.create(testUser1)

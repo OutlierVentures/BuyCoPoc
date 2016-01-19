@@ -61,8 +61,6 @@ export class SellerRepository {
                     if (err) {
                         reject(err);
                     }
-                    console.log("getSellerByUserExternalId: resultSeller");
-                    console.log(resultSeller);
                     resolve(resultSeller);
                 });
             });

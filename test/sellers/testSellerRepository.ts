@@ -124,13 +124,9 @@ describe("Seller repository", () => {
         .then(() => {
             return sellerRepo.create(testSeller1);
         }).then((seller: ISeller) => {
-            console.log("testUser1.externalId");
-            console.log(testUser1.externalId);
             return sellerRepo.getSellerByUserExternalId(testUser1.externalId)
         }).then((seller: ISeller) => {
             // Now it's there.
-            console.log("seller.userExternalId");
-            console.log(seller.userExternalId);
             assert.equal(seller.userExternalId, testUser1.externalId);
             return sellerRepo.deleteByExternalId(seller.userExternalId);
         }).then((result: ISeller) => {
