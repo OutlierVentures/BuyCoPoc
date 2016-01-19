@@ -65,35 +65,6 @@ interface IUpholdTransaction {
     };
 }
 
-interface IUpholdCard {
-    "address": {
-        "bitcoin": string
-    },
-    "available": number,
-    "balance": number,
-    "currency": string,
-    "id": string,
-    "label": string,
-    "lastTransactionAt": string,
-    "settings": {
-        "position": number,
-        "starred": boolean
-    },
-    "addresses": [
-        {
-            "id": string,
-            "network": string
-        }
-    ],
-    "normalized": [
-        {
-            "available": number,
-            "balance": number,
-            "currency": string
-        }
-    ]
-}
-
 interface IApplicationInfo {
     blockchain: {
         nodeUrl: string;
@@ -113,8 +84,9 @@ interface IProposal {
     endDate: Date;
     ultimateDeliveryDate: Date;
 }
-<<<<<<< HEAD
-    
+
+
+
 interface IUpholdCard {
     "address": {
         "bitcoin": string;
@@ -143,7 +115,6 @@ interface IUpholdCard {
         }
     ];
 }
-=======
 
 /**
  * A backer of a proposal, i.e. a buyer.
@@ -184,4 +155,3 @@ interface IProposalBacking {
      */
     endPaymentAmount: number;
 }
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d

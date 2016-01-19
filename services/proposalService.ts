@@ -165,34 +165,21 @@ export class ProposalService {
     /**
      * Get a single proposal by its contract address.
      */
-<<<<<<< HEAD
-    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacker>> {
-        var deferred = Q.defer<Array<proposalModel.IProposalBacker>>();
-=======
     getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacking>> {
         var deferred = Q.defer<Array<proposalModel.IProposalBacking>>();
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
         var t = this;
 
         // Get the proposal contract
         var proposalContract;
-<<<<<<< HEAD
-        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacker>>();
-=======
         var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacking>>();
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
         proposalContract = t.proposalContractDefinition.at(proposalId);
 
         var numBackers = proposalContract.backerIndex().toNumber();
 
         for (var i = 1; i <= numBackers; i++) {
-<<<<<<< HEAD
-            var defer = Q.defer<proposalModel.IProposalBacker>();
-=======
             var defer = Q.defer<proposalModel.IProposalBacking>();
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
 
             getBackerDetailsPromises.push(defer.promise);
             proposalContract.backers(i, function (backerErr, backer) {
@@ -202,12 +189,6 @@ export class ProposalService {
                 }
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
-<<<<<<< HEAD
-                defer.resolve({
-                    address: backerAddress,
-                    amount: amount,
-                    userId: "unknown", // TODO: get this
-=======
 
                 var startTx: string;
                 if (backer[2] && backer[2].length == 32)
@@ -233,7 +214,6 @@ export class ProposalService {
                     startPaymentAmount: startPaymentAmount,
                     endPaymentTransactionId: endTx,
                     endPaymentAmount: endPaymentAmount,
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
                 });
             });
         }
@@ -323,11 +303,6 @@ export class ProposalService {
                             defer.reject(userErr);
                             return;
                         }
-<<<<<<< HEAD
-                        defer.resolve(res);
-                    });
-                
-=======
 
                         // Do payment and store it
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
@@ -383,7 +358,6 @@ export class ProposalService {
                             });
                     });
 
->>>>>>> cafbf1698b2984cbc8fb9f338da26e46d69ee92d
             }, function (err) {
                 defer.reject(err);
             });
