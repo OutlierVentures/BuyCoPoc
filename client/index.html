@@ -5,24 +5,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>BuyCo Proof of Concept</title>
-    <!-- Bootstrap Core CSS -->
     <link href="vendors/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-    <!-- Font Awesome CSS -->
     <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="dist/app.css" rel="stylesheet">
     <style type="text/css">
-        /* Quick fix for navbar overlapping content */
-        #app {
-            padding: 40px 0;
-        }
-
         /* Override ng-hide here to hide panels before angular loads */
-        .ng-hide {
-            /* this is just another form of hiding an element */
+        /*.ng-hide {
+            /* this is just another form of hiding an element
             display: block !important;
             position: absolute;
             top: -9999px;
             left: -9999px;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -35,21 +29,21 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/" ng-show="isLoggedIn">
+                    <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn">
                         BuyCo                        
                         <!--<img src="images/logo-dot.png">-->
                         <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
                     </a>
-                    <a class="navbar-brand" href="/" ng-hide="isLoggedIn">
+                    <a class="navbar-brand" href="/" ng-cloak ng-hide="isLoggedIn">
                         BuyCo
                         <!-- <img class="logo" src="images/logo.png">-->
                     </a>
                 </div>
                 <div class="navbar-collapse collapse" ng-controller="UserAccountController" >
-                    <ul class="nav navbar-nav" ng-show="!isLoggedIn">
+                    <ul class="nav navbar-nav" ng-cloak ng-show="!isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
                     </ul>
-                    <ul class="nav navbar-nav" ng-show="isLoggedIn">
+                    <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
                         <li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>
                     </ul>
@@ -60,7 +54,7 @@
                         <li data-match-route="/user/login"><a href="/user/login">{{ userInfo.name }}</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li style="font-size: 10px; text-align: right;"><a>v{{ version }}</a></li>
+                        <li class="version" ng-hide="!version"><a>v{{ version }}-alpha</a></li>
                     </ul>
                 </div>
             </div>
