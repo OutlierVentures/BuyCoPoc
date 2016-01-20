@@ -35,7 +35,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="client\js\sellers\signup.html" />
     <Content Include="test\spec-runner.html" />
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
@@ -281,7 +280,6 @@
     <Content Include="client\data\countries\zimbabwe.json" />
     <Content Include="client\images\uphold-connect-with-gray%401x.png" />
     <Content Include="client\index.html" />
-    <Content Include="client\js\sellers\seller-list.html" />
     <Content Include="client\tsd.json" />
     <Content Include="client\vendors\bootstrap\less\.csscomb.json" />
     <Content Include="client\vendors\bootstrap\less\.csslintrc" />
@@ -485,9 +483,14 @@
     <TypeScriptCompile Include="test\sellers\testPersistance.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\sellers\testSellerRepository.ts" />
-    <TypeScriptCompile Include="test\sellers\testUserRepository.ts" />
+    <TypeScriptCompile Include="test\sellers\testSellerRepository.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\sellers\testUserRepository.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="test\testHelper.ts" />
+    <TypeScriptCompile Include="typings\assertion-error\assertion-error.d.ts" />
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\chai\chai.d.ts" />
     <TypeScriptCompile Include="typings\express\express.d.ts" />
@@ -545,6 +548,7 @@
     <Folder Include="test\sellers\" />
     <Folder Include="typings\" />
     <Folder Include="services\" />
+    <Folder Include="typings\assertion-error\" />
     <Folder Include="typings\body-parser\" />
     <Folder Include="typings\chai\" />
     <Folder Include="typings\express\" />
@@ -562,7 +566,6 @@
     <Folder Include="typings\underscore\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="client\js\sellers\seller-signup.controller.spec.js" />
     <TypeScriptCompile Include="client\js\sellers\seller.service.ts" />
     <Compile Include="GruntFile.js" />
   </ItemGroup>
