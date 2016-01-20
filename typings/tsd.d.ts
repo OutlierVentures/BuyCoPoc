@@ -14,3 +14,4 @@
 /// <reference path="superagent/superagent.d.ts" />
 /// <reference path="supertest/supertest.d.ts" />
 /// <reference path="underscore/underscore.d.ts" />
+/// <reference path="assertion-error/assertion-error.d.ts" />
