@@ -1,24 +1,34 @@
 ﻿import assert = require("assert");
 import mongoose = require("mongoose");
+import path = require('path');
+
 var mochaMongoose = require("mocha-mongoose");
 import testHelper = require("../testHelper");
 import { IUser, UserRepository } from "../../models/userModel";
 import configurationService = require("../../services/configurationService");
 
-var config = new configurationService.ConfigurationService().getConfiguration();
 // TODO BW dd. 2015-01-12: Dependency injection? :)
 var repo = new UserRepository();
 
-// Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
-const dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
-// Dummy to activate mocha-mongoose (clears database between each unit test).
-var clearDb = mochaMongoose(dbUri);
+var clearDb;
+var dbUri: string;
 
 describe("User repository", () => {
     const testUsers = require("../../client/data/users.json");
     const testUser1 = <IUser>testUsers[0].user;
     const testUser2 = <IUser>testUsers[1].user;
     
+    before(done => {
+        // Load configuration and initiate database connection
+        var cs = new configurationService.ConfigurationService();
+        cs.basePath = path.resolve(path.dirname(__filename), "../../") + "/";
+        var config = cs.getConfiguration();
+        // Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
+        dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
+        clearDb = mochaMongoose(dbUri);
+        done();
+    });
+
     before(done => {
         if (mongoose.connection.db) {
             return done();

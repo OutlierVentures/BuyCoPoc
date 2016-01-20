@@ -25,7 +25,7 @@ describe("Test discovery", () => {
     it("should discover tests", function (done) {
         this.timeout(1000000);
         var m = new mocha();
-        var filePath = path.resolve(path.dirname(__filename), "./testProposalController.js");
+        var filePath = path.resolve(path.dirname(__filename), "../sellers/testPersistance.js");
 
         console.log("Looking for test file at: " + filePath);
         m.addFile(filePath);

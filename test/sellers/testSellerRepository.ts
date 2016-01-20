@@ -1,6 +1,7 @@
 ﻿var assert = require("assert");
 var mongoose = require("mongoose");
 var mochaMongoose = require("mocha-mongoose");
+import path = require('path');
 
 import testHelper = require("../testHelper"); 
 import { IUser, UserRepository }  from "../../models/userModel";
@@ -10,12 +11,8 @@ import configurationService = require("../../services/configurationService");
 var userRepo = new UserRepository();
 var sellerRepo = new SellerRepository();
 
-var config = new configurationService.ConfigurationService().getConfiguration();
-
-// Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
-const dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
-
-var clearDb = mochaMongoose(dbUri);
+var clearDb;
+var dbUri: string;
 
 describe("Seller repository", () => {
     const testUsers = require("../../client/data/users.json");
@@ -25,6 +22,17 @@ describe("Seller repository", () => {
     const testSeller1 = <ISeller>testSellers[0];
     const testSeller2 = <ISeller>testSellers[1];
     
+    before(done => {
+        // Load configuration and initiate database connection
+        var cs = new configurationService.ConfigurationService();
+        cs.basePath = path.resolve(path.dirname(__filename), "../../") + "/";
+        var config = cs.getConfiguration();
+        // Use the MongoDB URL from config, but change the database to prevent clearing for instance the production db when running tests :). 
+        dbUri = testHelper.replaceLastUrlPart(config.database.url, "testClearingDB");
+        clearDb = mochaMongoose(dbUri);
+        done();
+    });
+
     before(done => {
         if (mongoose.connection.db) {
             return done();
