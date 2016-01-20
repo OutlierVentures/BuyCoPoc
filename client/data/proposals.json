@@ -1,4 +1,18 @@
 ﻿[
+   {
+    "id": "0xa4b16fc13695a22aaf4b1428e3e46461be123d7f",
+    "productName": "Ethiopia Adado Coop",
+    "productDescription": "A very special coffee, per kilogram",
+    "productCategory": "Food and drink - Coffee",
+    "partNumber": "0xa4b16fc13695a22aaf4b1428e3e46461be123d7f",
+    "minimumTotalAmount": 200.12,
+    "maxPrice": "100.00 GBP",
+    "endDate": "2016-03-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-05-01T00:00:00.000Z",
+    "nrOfBackings": 100, // Number of unique users that made a proposalbacking
+    // "nrOfBackers": 100, // Number of ProposalBackings
+    "totalAmount": 210 // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
+  },
   {
     "id": "2331",
     "productName": "Nike Air max",
@@ -8,7 +22,10 @@
     "minimumTotalAmount": 200.12,
     "maxPrice": 120,
     "endDate": "Date",
-    "ultimateDeliveryDate": "2016/08/01"
+    "ultimateDeliveryDate": "2016/08/01",
+    "nrOfBackings": 50,
+    "totalAmount": 105
+
   },
   {
     "id": "2332",
@@ -19,7 +36,9 @@
     "minimumTotalAmount": 1200,
     "maxPrice": 100,
     "endDate": "2016/04/01",
-    "ultimateDeliveryDate": "2016/08/01"
+    "ultimateDeliveryDate": "2016/08/01",
+    "nrOfBackings": 30,
+    "totalAmount": 5000
   },
   {
     "id": "2333",
@@ -30,7 +49,9 @@
     "minimumTotalAmount": 10000,
     "maxPrice": 110,
     "endDate": "2016/05/01",
-    "ultimateDeliveryDate": "2016/05/01"
+    "ultimateDeliveryDate": "2016/05/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "2334",
@@ -41,7 +62,9 @@
     "minimumTotalAmount": 50,
     "maxPrice": 90,
     "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/06"
+    "ultimateDeliveryDate": "2016/02/06",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "2335",
@@ -52,7 +75,9 @@
     "minimumTotalAmount": 100,
     "maxPrice": 180,
     "endDate": "2016/04/01",
-    "ultimateDeliveryDate": "2016/04/01"
+    "ultimateDeliveryDate": "2016/04/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3000",
@@ -63,7 +88,9 @@
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
     "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "ultimateDeliveryDate": "2016/02/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3001",
@@ -74,7 +101,9 @@
     "minimumTotalAmount": 1100,
     "maxPrice": 35,
     "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "ultimateDeliveryDate": "2016/02/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3003",
@@ -85,7 +114,9 @@
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
     "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "ultimateDeliveryDate": "2016/02/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3004",
@@ -96,7 +127,9 @@
     "minimumTotalAmount": 1000,
     "maxPrice": 2980,
     "endDate": "2018/04/01",
-    "ultimateDeliveryDate": "2018/04/02"
+    "ultimateDeliveryDate": "2018/04/02",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3000",
@@ -107,6 +140,8 @@
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
     "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "ultimateDeliveryDate": "2016/02/01",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   }
 ]

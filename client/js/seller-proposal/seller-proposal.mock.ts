@@ -2,28 +2,30 @@ mockRun.$inject = ["$httpBackend", "$http", "_"];
 
 function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: UnderscoreStatic) : void {
     if (!$httpBackend.whenGET) {
-        console.log("Cannot use $httpBackend.whenGet! The 'ngMockE2E' module is probably not declared as a dependency. Exiting.");
+        console.log("Cannot use $httpBackend.whenGet! The 'ngMockE2E' (or 'ngMock') module is probably not declared as a dependency. Exiting.");
         return;
     }
-    var sellers: Seller[];
+    var proposals: IProposal[];
     const sellerUrl = "/api/seller";
     const editingRegex = new RegExp(sellerUrl + "/w*", 'i');
     
     // Catch all for testing purposes
     $httpBackend.whenGET(sellerUrl).respond(function(method, url, data) {
-        return [200, sellers, {}];
+        return [200, proposals, {}];
     });
     
-    $httpBackend.whenGET(editingRegex).respond(function (method, url, data) {
-        const externalIdFromUrl = url.split('/').pop();
-        if (!externalIdFromUrl) {
-            return [500, `No seller id in url`, {}];
-        }
-        // var seller: Seller = _.find(sellers, (seller: Seller) => { return seller.userExternalId === externalIdFromUrl; };
-        // let _ = underscoreService;
-        const seller: ISeller = _.find(sellers, (seller: ISeller) => { return seller.userExternalId === externalIdFromUrl; });
-        return seller ? [200, seller, {}] : [200, {}, {}];
-        // return seller ? [200, seller, {}] : [200, `No seller with name ${externalIdFromUrl}`, {}];
+    $httpBackend.whenGET(editingRegex).respond(function(method, url, data) {
+        const maxPrice = url.split('/').pop();
+        const minAmount = url.split('/').pop();
+        
+        const proposal: IProposal = _.any (proposals, (item: IProposal) => {
+            var isMatch = 
+                (!maxPrice || item.maxPrice > maxPrice) &&
+                (!minAmount || item.totalAmount >= minAmount);
+            return isMatch 
+            
+        });
+        return [200, proposal, {}];
     });
     
     $httpBackend.whenPOST(editingRegex).respond(function (method, url, data) {
