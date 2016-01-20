@@ -1,0 +1,17 @@
+// Allow FOUC effect with angular stuff;
+// Source: https://docs.angularjs.org/api/ng/directive/ngCloak
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+/* Quick fix for navbar overlapping content. */
+#app {
+    padding: 40px 0;
+}
+
+navbar-header {
+    .version {
+        font-size: 10px;
+        text-align: right;
+    }
+}

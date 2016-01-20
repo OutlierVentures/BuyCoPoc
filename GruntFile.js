@@ -15,19 +15,19 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-
-		//less: {
-	 //     development: {
-	 //       options: {
-	 //         compress: true,
-	 //         yuicompress: true,
-	 //         optimization: 2
-	 //       },
-	 //       files: {
-	 //         "client/vendors/bootstrap/dist/css/bootstrap.css": "client/mc-theme/bootstrap.less" // destination file and source file
-	 //       }
-	 //     }
-	 //   },
+		less: {
+	      development: {
+	         options: {
+	           compress: true,
+	            yuicompress: true,
+	            optimization: 2
+	          },
+	          files: {
+                "client/dist/app.css": "client/less/app.less"
+	            // "client/vendors/bootstrap/dist/css/bootstrap.css": "client/mc-theme/bootstrap.less" // destination file and source file
+	          }
+	        }
+	    },
         watch : {
 			scripts : {
 				files : ['**/*.ts', '!node_modules/**/*.ts', '!client/**/*.*'], // the watched files
@@ -123,9 +123,7 @@ module.exports = function(grunt) {
 						"client/js/app.js",
 						"client/js/**/*controller.js",
 						"client/js/**/*.js", 
-						"!**/*.spec.js",
-						// "!client/js/sellers/seller-signup.controller.js",
-						"!js/sellers/seller-list.controller.js"
+						"!**/*.spec.js"
 					]
 				}
 			}
@@ -136,14 +134,14 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-nodemon");
 	grunt.loadNpmTasks("grunt-concurrent");
-	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-wiredep');
-	grunt.loadNpmTasks('grunt-injector');
+	grunt.loadNpmTasks("grunt-contrib-less");
+	grunt.loadNpmTasks("grunt-wiredep");
+	grunt.loadNpmTasks("grunt-injector");
 
 	// Default tasks.
 	grunt.registerTask("serve", ["concurrent:watchers"]);
 	// tslint disabled for now, gives 'Warning: Task "tslint:all" not found. Use --force to continue.'
 	// Even with latest tslint.
 	// grunt.registerTask('default', ["tslint:all", "ts:build"]);
-	grunt.registerTask('default', ['ts:build', 'wiredep', 'injector']);
+	grunt.registerTask('default', ['ts:build', 'wiredep', 'injector', 'less']);
 };
