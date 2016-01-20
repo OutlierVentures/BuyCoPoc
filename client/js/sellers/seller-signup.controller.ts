@@ -79,7 +79,7 @@ class SellerSignupController implements ISellerSignUp {
         
         // And message type, to update the messageClass used in the view.
         this.$scope.$watch(() => { return this.messageType; }, (newValue, oldValue) => {
-            if (newValue && (!this.messageClass || newValue !== oldValue)) {
+            if ((newValue || newValue===0) && (!this.messageClass || newValue !== oldValue)) {
                 this.messageClass = this.messageTypeAsBsClass(this.messageType);
             }
         });
