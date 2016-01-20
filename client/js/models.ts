@@ -10,6 +10,12 @@
 // TODO: remove duplication, allow a single file with model interfaces.
 // TODO: ensure that client-side model interfaces have a property "id".
 // TODO BW dd. 2016-01-07: DRYing up can perhaps be done using Browserify or TSify?
+
+/** Type aliases */
+type AccessToken = string;
+
+/** End type aliases */
+
 interface IDocument {
     _id: string;
 }
@@ -83,6 +89,9 @@ interface IProposal {
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
+    "nrOfBackings": number, // Number of unique users that made a proposalbacking
+    "nrOfBackers": number, // Number of ProposalBackings
+    "totalAmount": number // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
 
 

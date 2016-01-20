@@ -5,7 +5,7 @@
  * URL of the backend API. Currently a local URL, i.e. the static client files are hosted by the API server.
  * In the future the API could be split from the client, which is when the API URL will be made configurable
  */
-var apiUrl = "/api";
+const apiUrl = "/api";
 
 interface BuyCoRootScope extends ng.IRootScopeService {
     isLoggedIn: boolean;
