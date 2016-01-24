@@ -24,7 +24,6 @@ import proposalController = require('./controllers/proposalController');
 import sellerController = require('./controllers/sellerController');
 import configController = require('./controllers/configurationController');
 
-import bitReserveService = require('./services/upholdService');
 import serviceFactory = require('./services/serviceFactory');
 import configurationService = require('./services/configurationService');
 import stubOauthController = require('./controllers/stubOauthController');

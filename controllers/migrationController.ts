@@ -108,7 +108,7 @@ export class MigrationController {
                 proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
 
                 return con.addProposal("Ethiopia Adado Coop", "A very special coffee, per kilogram", "Food and drink", "Coffee",
-                    10000, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                    4, "2016-03-01", "2016-05-01", { gas: 2500000 });
             },
             function (regConErr) {
                 deferAddTestData.reject(regConErr);
