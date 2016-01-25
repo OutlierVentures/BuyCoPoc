@@ -4,7 +4,7 @@
     <div class="panel-body">
         <p ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
         <p>{{proposal.productDescription}}</p>
-        <p>Part number: {{proposal.partNumber}}</p>
+        <p>Part number: {{proposal.partNumber || "-" }}</p>
         <p>Maximum price: {{(proposal.maxPrice || 0) | number: 2}} GBP</p>
         <p>Closing date of proposal: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}"</p>
         <p>Ultimate delivery date of goods: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}"></span></p>
