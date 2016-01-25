@@ -8,16 +8,6 @@
     <link href="vendors/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="dist/app.css" rel="stylesheet">
-    <style type="text/css">
-        /* Override ng-hide here to hide panels before angular loads */
-        /*.ng-hide {
-            /* this is just another form of hiding an element
-            display: block !important;
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-        }*/
-    </style>
 </head>
 <body>
     <div ng-app="buyCoApp">
@@ -46,6 +36,7 @@
                     <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
                         <li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>
+                        <li data-match-route="/seller-proposals/list"><a href="/seller-proposal/list">Seller proposals</a></li>
                     </ul>
                     <!-- <form class="navbar-form navbar-left">
                         <input type="text" class="form-control" placeholder="Search">
@@ -109,7 +100,6 @@
     <script src="vendors/angular-resource/angular-resource.js"></script>
     <script src="vendors/async/lib/async.js"></script>
     
-    
     <!--END from bower-->
     <!-- TODO BW dd. 2015-12-30: Allow minification for perf/prod build, see f.i.: http://stackoverflow.com/questions/28860846/can-grunt-wiredep-wire-minify-version-in-html-file
     <!-- bower:js -->
@@ -123,6 +113,8 @@
     <script src="vendors/angular-mocks/angular-mocks.js"></script>
     <script src="vendors/underscore/underscore.js"></script>
     <script src="vendors/urijs/src/URI.js"></script>
+    <script src="vendors/moment/moment.js"></script>
+    <script src="vendors/angular-moment/angular-moment.js"></script>
     <!-- endbower -->
     <!-- injector:js -->
     <script src="js/app.module.js"></script>
@@ -131,16 +123,24 @@
     <script src="js/controllers.js"></script>
     <script src="js/app.routes.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/common/ov-message.controller.js"></script>
+    <script src="js/seller-proposals/seller-proposal-list.controller.js"></script>
+    <script src="js/seller-proposals/seller-proposal.controller.js"></script>
     <script src="js/sellers/seller-signup.controller.js"></script>
     <script src="js/common/dataAccess.service.js"></script>
+    <script src="js/common/ov-message.directive.js"></script>
+    <script src="js/common/proposal-detail.directive.js"></script>
+    <script src="js/common/types.js"></script>
     <script src="js/common/underscore.service.js"></script>
+    <script src="js/common/uri.service.js"></script>
     <script src="js/controllers/proposalController.js"></script>
     <script src="js/controllers/proposalListController.js"></script>
+    <script src="js/seller-proposals/seller-proposal-resource.mock.js"></script>
+    <script src="js/seller-proposals/seller-proposal.service.js"></script>
     <script src="js/sellers/configuration.service.js"></script>
+    <script src="js/sellers/seller-resource.mock.js"></script>
     <script src="js/sellers/seller.js"></script>
     <script src="js/sellers/seller.service.js"></script>
-    <script src="js/sellers/sellerResourceMock.js"></script>
-    <script src="js/sellers/userResourceMock.js"></script>
     <!-- endinjector -->
 </body>
 </html>

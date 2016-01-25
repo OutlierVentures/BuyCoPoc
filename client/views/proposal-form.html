@@ -26,14 +26,20 @@
                                         <p class="help-block">
                                             Choose a category for the product.
                                         </p>
-                                        <select class="form-control" ng-model="proposal.category" required>
+                                        <select class="form-control" ng-model="filter.category" required>
                                             <optgroup label="Electronics">
                                                 <option value="Electronics - Camera">Camera</option>
                                             </optgroup>
                                             <optgroup label="Food and drink">
                                                 <option value="Food and drink - Coffee">Coffee</option>
                                             </optgroup>
-                                        </select>
+                                            <optgroup label="Books">
+                                                <option value="Books - Fantasy books">Fantasy books</option>
+                                            </optgroup>
+                                            <optgroup label="Shoes">
+                                                <option value="Shoes - Running shoes">Running shoes</option>
+                                            </optgroup>
+                                        </select>                                  
                                     </div>
                                     <div class="form-group">
                                         <label>Product description</label>
