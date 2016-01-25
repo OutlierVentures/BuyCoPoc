@@ -1,0 +1,9 @@
+<!-- <pre>message: {{ message }}</pre>
+<pre>messageType: {{ messageType }}</pre>
+<pre>messageClass: {{ messageClass }}</pre> -->
+
+<div class="alert" role="alert" ng-hide="!message" ng-class="messageClass">
+    <strong>{{ message }}</strong>
+    <button type="button" ng-click="vm.resetMessage()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <ng-transclude></ng-transclude>
+</div>

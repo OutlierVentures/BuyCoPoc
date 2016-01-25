@@ -1,0 +1,91 @@
+﻿<div class="container">
+    <h2>Buying proposals</h2>
+    <ov-message message="vm.message" message-type="vm.messageType">
+        <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
+            <div ng-message="required">max price should be a number</div>
+        </div>
+    </ov-message>
+    <div class="row" ng-show="!vm.proposals">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>Loading...</h3></div>
+                <div class="panel-body">
+                    <p>Loading the latest proposal data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="row" ng-cloak ng-show="vm.proposals">
+        <div class="col-md-1"></div>
+        <div class="col-md-4 form-group">
+            <label>Category</label>
+        </div>
+        <div class="col-md-2 form-group">
+            <label>Part number</label>
+        </div>
+        <div class="col-md-2 form-group">
+            <label>Minimum total amount</label>
+        </div>
+        <div class="col-md-2 form-group">
+            <label>Maximum price</label>
+        </div>
+        <div class="col-md-1 form-group">
+        </div>
+    </div>
+    <div class="row" ng-cloak ng-show="vm.proposals.length==0">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>No active proposals</h3></div>
+                <div class="panel-body">
+                    <p>There are no active buying proposals <span ng-cloak ng-show="vm.proposalFilter">within current filter</span>.</p>
+                </div>
+            </div>
+        </div>
+   </div>
+    <div class="row" ng-cloak ng-show="vm.proposals">
+        <form name="form" novalidate>
+            <div class="col-md-1">
+                <h4 class="ng-binding" style="display: inline; vertical-align: bottom;">Filter</h4>
+            </div>
+            <div class="col-md-4 form-group">
+                <select class="form-control" ng-model="vm.proposalFilter.category" name="category" >
+                    <option value="">[any category]</option>
+                    <optgroup label="Electronics">
+                        <option value="Camera">Electronics - Camera</option>
+                    </optgroup>
+                    <optgroup label="Food and drink">
+                        <option value="Coffee">Food and drink - Coffee</option>
+                    </optgroup>
+                    <optgroup label="Books">
+                        <option value="Fantasy books">Books - Fantasy books</option>
+                    </optgroup>
+                    <optgroup label="Shoes">
+                        <option value="Running shoes">Shoes - Running shoes</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="col-md-2 form-group">
+                <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber" required>
+            </div>
+            <div class="col-md-2 form-group">
+                <input class="form-control" type="number" name="minimumTotalAmount" ng-model="vm.proposalFilter.minimumTotalAmount" required>
+            </div>
+            <div class="col-md-2 form-group">
+                <input class="form-control" type="number" name="maximumPrice" ng-model="vm.proposalFilter.maximumPrice" required>
+            </div>
+            <div class="col-md-1 form-group">
+                 <a class="btn btn-primary" ng-click="vm.search()" ng-show="!vm.isSearching" ng-disabled="!vm.filterChanged">
+                    <span class="glyphicon glyphicon-search"></span>
+                </a>
+                <a class="btn btn-primary" ng-cloak ng-show="vm.isSearching" ng-disabled="true">
+                    <span class="glyphicon glyphicon-refresh glyphicon-spin" aria-hidden="true"></span>
+                </a>
+            </div>
+        </form>
+    </div>
+    <div class="row" ng-show="vm.proposals.length>0">
+        <proposal-detail proposal="proposal" ng-repeat="proposal in vm.proposals track by proposal.id"></my-customer>
+    </div>
+</div>
+
+

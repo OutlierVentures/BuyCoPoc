@@ -4,8 +4,7 @@
         <h3 class="panel-title">Sign up as a seller</h3>
     </div>
     <div class="panel-body">
-        <div class="alert" role="alert" ng-hide="!vm.message" ng-class="vm.messageClass">
-            <strong>{{ vm.message }}</strong>
+        <ov-message message="vm.message" message-type="vm.messageType">
             <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
                 <div ng-message="required">Company name is required</div>
             </div>
@@ -15,7 +14,7 @@
             <div ng-messages="vm.form.country.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.country.$invalid && vm.form.country.$touched">
                 <div ng-message="required">Country is required</div>
             </div>
-            <button type="button" ng-click="vm.resetMessage()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </ov-message>
         </div>
         <form id="seller-signup" name="vm.form" class="form-horizontal" ng-submit="vm.signUp()" novalidate>
             <div class="row">

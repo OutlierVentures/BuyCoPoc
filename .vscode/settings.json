@@ -6,6 +6,8 @@
     "search.exclude": {
 		"**/*.js": true,
 		"**/bower_components": true,
-        "**/node_modules": true
+        "**/node_modules": true,
+        "client/data/countries/**": true,
+        "client/data/countries-regions.json": true
 	}
 }

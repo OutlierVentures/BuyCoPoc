@@ -11,11 +11,6 @@
 // TODO: ensure that client-side model interfaces have a property "id".
 // TODO BW dd. 2016-01-07: DRYing up can perhaps be done using Browserify or TSify?
 
-/** Type aliases */
-type AccessToken = string;
-
-/** End type aliases */
-
 interface IDocument {
     _id: string;
 }
@@ -83,15 +78,15 @@ interface IProposal {
     id: string;
     productName: string;
     productDescription: string;
-    //productSku: string;
     mainCategory: string;
     subCategory: string;
     maxPrice: number;
     endDate: Date;
+    partNumber: string,
     ultimateDeliveryDate: Date;
-    "nrOfBackings": number, // Number of unique users that made a proposalbacking
-    "nrOfBackers": number, // Number of ProposalBackings
-    "totalAmount": number // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
+    nrOfBackings: number, // Number of ProposalBackings
+    nrOfBackers: number,  // Number of (unique) users that made a proposalbacking.
+    totalAmount: number   // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
 
 

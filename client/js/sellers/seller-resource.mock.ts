@@ -1,12 +1,14 @@
-mockRun.$inject = ["$httpBackend", "$http", "_"];
+SellerResourceMockRun.$inject = ["$httpBackend", "$http", "_"];
 
-function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: UnderscoreStatic) : void {
+function SellerResourceMockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: UnderscoreStatic) : void {
+    // Mock only if the 'ngMockE2E' module is loaded (or 'ngMock').
     if (!$httpBackend.whenGET) {
-        console.log("Cannot use $httpBackend.whenGet! The 'ngMockE2E' module is probably not declared as a dependency. Exiting.");
         return;
     }
+    console.log("The 'ngMockE2E' module is declared as a dependency, so mocking teh thingz (seller things).");
+
     var sellers: Seller[];
-    const sellerUrl = "/api/seller";
+    const sellerUrl = apiUrl + "/seller";
     const editingRegex = new RegExp(sellerUrl + "/w*", 'i');
     
     $httpBackend.whenGET(sellerUrl).respond(function(method, url, data) {
@@ -28,7 +30,7 @@ function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _
         return false;
     });
         
-    // Pass through any requests for application files, so these are still allowed.
+    // Pass through any other requests, so things still work :).
     $httpBackend.whenGET(/.*/).passThrough();
     
     $http.get("data/sellers.json").then((result: any) => {
@@ -36,4 +38,4 @@ function mockRun($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _
     });
 }
 
-angular.module("buyCoApp.services").run(mockRun);
+angular.module("buyCoApp.services").run(SellerResourceMockRun);

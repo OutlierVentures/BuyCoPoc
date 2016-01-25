@@ -3,13 +3,6 @@
     signUp(): void;
 }
 
-enum MessageType {  // Bootstrap classes.
-    Success = 0,
-    Info = 1,
-    Warning = 2,
-    Danger = 3
-};
-
 enum DisplayMode {
     Add = 0,
     Read = 1,
@@ -48,6 +41,7 @@ class SellerSignupController implements ISellerSignUp {
         "$scope",
         "$rootScope",
         "$q",
+        "types",
         "dataAccessService",
         "_"
     ];
@@ -56,6 +50,7 @@ class SellerSignupController implements ISellerSignUp {
         private $scope: ISellerSignupScope,
         private $rootScope: BuyCoRootScope,
         private $q: ng.IQService,
+        private types: any,
         private dataAccessService: IDataAccessService,
         private _: UnderscoreStatic
     ) {

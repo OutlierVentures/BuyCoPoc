@@ -124,16 +124,6 @@ export class Server {
         // All routes which are directly accessible (i.e. not only from within the Angular SPA).
         // All open index.html, where Angular handles further routing to the right controller/ view.
         // Ideally all routes not matched by server-side routes are forwarded to Angular.
-        // TODO: introduce an "other" wildcard handler for this.
-        app.get('/', indexRoute.index);
-        app.get('/user/profile', indexRoute.index);
-        app.get('/user/login', indexRoute.index);
-
-        app.get('/proposal/list', indexRoute.index);
-        app.get('/proposal/:id', indexRoute.index);
-        app.get('/proposal/:id/back', indexRoute.index);
-        app.get('/proposal/new', indexRoute.index);
-        app.get('/seller/signup', indexRoute.index);
 
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
@@ -167,7 +157,8 @@ export class Server {
         app.post("/api/migration/update", mc.update);
         app.post("/api/migration/test/seed", mc.seedTestData);
 
-        // app.get("*", indexRoute.index);
+        // Removed all non api calls, and resolve them using this wildcard.
+        app.get("*", indexRoute.index);
 
         return app;
     }
