@@ -275,13 +275,12 @@ export class OAuthController {
                 var email: string;
 
                 if (err) {
-                    res.json(
-                        500,
-                        {
-                            "error": err,
-                            "error_location": "getting user data",
-                            "status": "Error"
-                        });;
+                    res.status(500).json({
+                        "error": err,
+                        "error_location": "getting user data",
+                        "status": "Error"
+                    });;
+                    return;
                 } else if (userInfo) {
                     name = userInfo.name;
                     externalUserId = userInfo.externalId;
@@ -291,7 +290,8 @@ export class OAuthController {
                         "error": "User info is empty",
                         "error_location": "getting user data",
                         "status": "Error"
-                     });
+                    });
+                    return;
                 }
         
                 // Get the user from our side, or create it.
@@ -322,16 +322,15 @@ export class OAuthController {
                         user.email = email;
 
                         // Save it
-                        userModel.User.update({ _id: user._id}, user, function (saveErr, affectedRows, raw) {
+                        userModel.User.update({ _id: user._id }, user, function (saveErr, affectedRows, raw) {
                             if (saveErr) {
-                                res.json(
-                                    500,
-                                    {
-                                        "error": saveErr,
-                                        "error_location": "saving user data",
-                                        "status": "Error",
-                                        "user": user,
-                                    });;
+                                res.status(500).json({
+                                    "error": saveErr,
+                                    "error_location": "saving user data",
+                                    "status": "Error",
+                                    "user": user,
+                                });
+                                return;
                             } else {
                                 res.json({
                                     "status": "Ok",
