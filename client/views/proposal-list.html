@@ -21,18 +21,6 @@
         </div>
     </div>
     <div class="row" ng-show="proposals.length>0">
-        <div class="col-lg-4 col-md-6" ng-repeat="proposal in proposals track by proposal.id">
-            <div class="panel panel-default">
-                <div class="panel-heading"><a href="/proposal/{{proposal.id}}"><h4>{{proposal.productName}}</h4></a></div>
-                <div class="panel-body">
-                    <p ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
-                    <p>{{proposal.productDescription}}</p>
-                    <p>Maximum price: {{(proposal.maxPrice || 0) | number: 2}} GBP</p>
-                    <p>Closing date of proposal: {{proposal.endDate}}</p>
-                    <p>Ultimate delivery date of goods: {{proposal.ultimateDeliveryDate}}</p>
-                    <a class="btn btn-primary btn-block" href="/proposal/{{proposal.id}}/back">Back this BuyCo!</a>
-                </div>
-            </div>
-        </div>
+        <proposal-detail proposal="proposal" ng-repeat="proposal in proposals track by proposal.id"></proposal-detail>
     </div>
 </div>
