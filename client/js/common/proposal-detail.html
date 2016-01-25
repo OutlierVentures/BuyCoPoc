@@ -1,0 +1,14 @@
+<div class="col-lg-4 col-md-6">
+  <div class="panel panel-default">
+    <div class="panel-heading"><a><h4>{{proposal.productName}}</h4></a></div>
+    <div class="panel-body">
+        <p ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
+        <p>{{proposal.productDescription}}</p>
+        <p>Part number: {{proposal.partNumber}}</p>
+        <p>Maximum price: {{(proposal.maxPrice || 0) | number: 2}} GBP</p>
+        <p>Closing date of proposal: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}"</p>
+        <p>Ultimate delivery date of goods: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}"></span></p>
+        <p>Minimum total amount: {{ proposal.minimumTotalAmount }}
+    </div>
+  </div>
+</div>

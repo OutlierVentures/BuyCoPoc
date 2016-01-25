@@ -1,112 +1,150 @@
 ﻿[
   {
+    "endDate": "2016-08-01T00:00:00.000Z",
     "id": "2331",
-    "productName": "Nike Air max",
+    "mainCategory": "Shoes",
+    "maxPrice": 120,
     "productDescription": "The one and only",
-    "productCategory": "shoes",
+    "productName": "Nike Air max",
+    "subCategory": "Running shoes",
+    "ultimateDeliveryDate": "2016-08-01T00:00:00.000Z",
     "partNumber": "EOI1",
     "minimumTotalAmount": 200.12,
-    "maxPrice": 120,
-    "endDate": "Date",
-    "ultimateDeliveryDate": "2016/08/01"
-  },
-  {
+    "nrOfBackings": 50,
+    "totalAmount": 105
+  },{
+    "endDate": "2015-01-02T23:00:00.000Z",
+    "id": "0x9063f6e37820e1bab8462f05697a560a1266ed4d",
+    "mainCategory": "Food and drink",
+    "maxPrice": 0.01,
+    "productDescription": "Coffee1",
+    "productName": "Coffee1",
+    "subCategory": "Coffee",
+    "ultimateDeliveryDate": "2015-02-02T23:00:00.000Z"
+  }, {
     "id": "2332",
     "productName": "Nike Air Pegasus",
     "productDescription": "Something else altogether",
-    "productCategory": "shoes",
+    "mainCategory": "Shoes",
+    "subCategory": "Running shoes",
     "partNumber": "EOI2",
     "minimumTotalAmount": 1200,
     "maxPrice": 100,
-    "endDate": "2016/04/01",
-    "ultimateDeliveryDate": "2016/08/01"
+    "endDate": "2016-04-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-08-01T00:00:00.000Z",
+    "nrOfBackings": 30,
+    "totalAmount": 5000
   },
   {
     "id": "2333",
     "productName": "Nike Free",
     "productDescription": "Free your feet",
-    "productCategory": "shoes",
+    "mainCategory": "Shoes",
+    "subCategory": "Running shoes",
     "partNumber": "EOI3",
     "minimumTotalAmount": 10000,
     "maxPrice": 110,
-    "endDate": "2016/05/01",
-    "ultimateDeliveryDate": "2016/05/01"
+    "endDate": "2016-05-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-05-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "2334",
     "productName": "Adidas Bottom up",
     "productDescription": "Rebuild from the .. :)",
-    "productCategory": "shoes",
+    "mainCategory": "Shoes",
+    "subCategory": "Running shoes",
     "partNumber": "EOI4",
     "minimumTotalAmount": 50,
     "maxPrice": 90,
-    "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/06"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-06T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "2335",
     "productName": "Adidas Zero",
     "productDescription": "Zero is less than the one",
-    "productCategory": "shoes",
+    "mainCategory": "Shoes",
+    "subCategory": "Running shoes",
     "partNumber": "EOI5",
     "minimumTotalAmount": 100,
     "maxPrice": 180,
-    "endDate": "2016/04/01",
-    "ultimateDeliveryDate": "2016/04/01"
+    "endDate": "2016-04-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3000",
     "productName": "Bolton stitches",
     "productDescription": "Careful with the stapler!",
-    "productCategory": "Fantasy books",
+    "mainCategory": "Books",
+    "subCategory": "Fantasy books",
     "partNumber": "FAN01",
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
-    "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3001",
     "productName": "Commonality",
     "productDescription": "Easy does it",
-    "productCategory": "Fantasy books",
+    "mainCategory": "Books",
+    "subCategory": "Fantasy books",
     "partNumber": "FAN02",
     "minimumTotalAmount": 1100,
     "maxPrice": 35,
-    "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3003",
     "productName": "Bolton stitches 2",
     "productDescription": "Still careful with the stapler!",
-    "productCategory": "Fantasy books",
+    "mainCategory": "Books",
+    "subCategory": "Fantasy books",
     "partNumber": "FAN03",
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
-    "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
     "id": "3004",
     "productName": "Google Goggles",
     "productDescription": "Glass for in the water",
-    "productCategory": "HiTech",
+    "mainCategory": "Tech",
+    "subCategory": "Hi tech",
     "partNumber": "TECH-A",
     "minimumTotalAmount": 1000,
     "maxPrice": 2980,
-    "endDate": "2018/04/01",
-    "ultimateDeliveryDate": "2018/04/02"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2018-04-02T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   },
   {
-    "id": "3000",
+    "id": "3005",
     "productName": "Bolton stitches",
     "productDescription": "Careful with the stapler!",
-    "productCategory": "Fantasy books",
+    "mainCategory": "Books",
+    "subCategory": "Fantasy books",
     "partNumber": "FAN01",
     "minimumTotalAmount": 1000,
     "maxPrice": 30,
-    "endDate": "2016/02/01",
-    "ultimateDeliveryDate": "2016/02/01"
+    "endDate": "2016-02-01T00:00:00.000Z",
+    "ultimateDeliveryDate": "2016-02-01T00:00:00.000Z",
+    "nrOfBackings": 0,
+    "totalAmount": 0
   }
 ]
