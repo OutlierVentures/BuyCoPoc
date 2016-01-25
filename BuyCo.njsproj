@@ -41,6 +41,7 @@
     <Content Include="client\js\offers\offer-form.html" />
     <Content Include="client\js\seller-proposals\seller-proposal-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
+    <Content Include="client\less\app.less" />
     <Content Include="test\spec-runner.html" />
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
@@ -388,6 +389,7 @@
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />
+    <Folder Include="client\less\" />
     <Folder Include="client\typings\" />
     <Folder Include="client\typings\angularjs\" />
     <Folder Include="client\typings\cryptojs\" />
