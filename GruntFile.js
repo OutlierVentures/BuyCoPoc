@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='injector, ts:build' ProjectOpened='watch' />
+/// <binding BeforeBuild='injector' AfterBuild='less:development' />
 module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
