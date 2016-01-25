@@ -1,0 +1,23 @@
+﻿
+<div class="container">
+    <div class="panel panel-danger" ng-show="errorMessage">
+        <div class="panel-heading">There was an error processing your request.</div>
+        <div class="panel-body">{{errorMessage}}</div>
+    </div>
+    <div class="jumbotron">
+        <h2>Offer for {{proposal.productName}}</h2>
+        <p class="text-muted" ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
+        <span class="small">
+            Offered price: <span class="text-muted">{{(offer.price || 0) | number: 2}} GBP</span>
+        </span><br><br>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2>Seller</h2>
+        </div>
+        <div class="panel-body">
+            <h3>{{seller.name}}</h3>
+            <p>{{seller.description}}</p>
+        </div>
+    </div>
+</div>

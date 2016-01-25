@@ -37,7 +37,7 @@ class OfferController {
         private $window: ng.IWindowService,
         private $timeout: ng.ITimeoutService,
         private $route: ng.route.IRouteService,
-        private $routeParams: IProposalRouteParameters,
+        private $routeParams: IOfferRouteParameters,
         private identityService: IdentityService) {
 
         $scope.vm = this;
@@ -47,7 +47,7 @@ class OfferController {
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
         if (this.$route.current.name === "create") {
-            this.back(proposalId);
+            this.create(proposalId);
         } else if (this.$route.current.name === "details") {
             this.view(proposalId);
         }
