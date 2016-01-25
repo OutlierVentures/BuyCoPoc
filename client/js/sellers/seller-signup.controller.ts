@@ -3,13 +3,6 @@
     signUp(): void;
 }
 
-enum MessageType {  // Bootstrap classes.
-    Success = 0,
-    Info = 1,
-    Warning = 2,
-    Danger = 3
-};
-
 enum DisplayMode {
     Add = 0,
     Read = 1,
@@ -26,6 +19,7 @@ interface ISellerSignupScope extends ng.IScope {
 
 class SellerSignupController implements ISellerSignUp {
     displayMode: DisplayMode;
+    displayModes: any;
     seller: ISeller;
     countries: ICountry[];
     currentCountry: ICountry;
@@ -47,6 +41,7 @@ class SellerSignupController implements ISellerSignUp {
         "$scope",
         "$rootScope",
         "$q",
+        "types",
         "dataAccessService",
         "_"
     ];
@@ -55,10 +50,12 @@ class SellerSignupController implements ISellerSignUp {
         private $scope: ISellerSignupScope,
         private $rootScope: BuyCoRootScope,
         private $q: ng.IQService,
+        private types: any,
         private dataAccessService: IDataAccessService,
         private _: UnderscoreStatic
     ) {
-        this.displayMode = DisplayMode.Add; 
+        this.displayMode = DisplayMode.Add;
+        this.displayModes = DisplayMode; 
         let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
         this.sellerResource = this.dataAccessService.getSellerResource(creds);
         this.countryResource = this.dataAccessService.getCountryResource();
@@ -158,12 +155,14 @@ class SellerSignupController implements ISellerSignUp {
                         if (seller.userExternalId) {
                             this.seller = seller;
                             this.loadCountryAndRegionDropdown();
+                            this.displayMode = DisplayMode.Read;
                         } else {
                             // User doesn't exist yet, initialize seller object with on user info
                             // Set isActive to true, as the user will sign up as active seller if he saves the form.
                             this.seller = new Seller(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
                             this.seller.countryCode = SellerSignupController.defaultCountryCode;
                             this.loadCountryAndRegionDropdown();
+                            this.displayMode = DisplayMode.Add;
                         }
                         resolve(this.seller);
                     },
@@ -231,6 +230,7 @@ class SellerSignupController implements ISellerSignUp {
                 // alert(`success: ${data}`);
                 this.seller = data.seller;
                 this.showMessage('You signed up as seller', false);
+                this.displayMode = DisplayMode.Read;
             },
             (httpResponse) => {
                 this.showMessage(httpResponse.message);

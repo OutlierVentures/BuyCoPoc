@@ -287,13 +287,11 @@ export class OAuthController {
                     externalUserId = userInfo.externalId;
                     email = userInfo.email;
                 } else {
-                    res.json(
-                        500,
-                        {
-                            "error": "User info is empty",
-                            "error_location": "getting user data",
-                            "status": "Error"
-                        });;
+                    res.status(500).json({
+                        "error": "User info is empty",
+                        "error_location": "getting user data",
+                        "status": "Error"
+                     });
                 }
         
                 // Get the user from our side, or create it.

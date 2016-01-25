@@ -131,7 +131,7 @@ class LoginController {
 interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
     allCards: IUpholdCard[];
-    cardsToShow: any;
+    cardsToShow: IUpholdCard[];
     favoriteCardsOnly: boolean;
 }
 
