@@ -32,6 +32,7 @@ function SellerResourceMockRun($httpBackend: ng.IHttpBackendService, $http: ng.I
         
     // Pass through any other requests, so things still work :).
     $httpBackend.whenGET(/.*/).passThrough();
+    $httpBackend.whenPOST(/.*/).passThrough();
     
     $http.get("data/sellers.json").then((result: any) => {
         sellers = result.data;

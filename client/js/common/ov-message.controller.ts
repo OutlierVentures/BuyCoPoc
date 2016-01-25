@@ -4,6 +4,7 @@ interface IMessageControllerScope extends ng.IScope {
     message: string;
     messageType: MessageType;
     messageClass: string;
+    hasValidationError: boolean;
 }
 
 class OVMessageController {
@@ -12,6 +13,7 @@ class OVMessageController {
     constructor(
         private $scope: IMessageControllerScope
     ) {
+        this.$scope.hasValidationError = false;
         // And message type, to update the messageClass used in the view.
         this.$scope.$watch(() => { return this.$scope.messageType; }, (newValue, oldValue) => {
             if ((newValue || newValue===0) && (!this.$scope.messageClass || newValue !== oldValue)) {

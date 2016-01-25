@@ -1,8 +1,11 @@
 ﻿<div class="container">
     <h2>Buying proposals</h2>
-    <ov-message message="vm.message" message-type="vm.messageType">
-        <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
-            <div ng-message="required">max price should be a number</div>
+    <ov-message message="vm.message" message-type="vm.messageType" has-validation-error="vm.form.$invalid">
+        <div ng-messages="vm.form.minimumTotalAmount.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.minimumTotalAmount.$invalid">
+            <div ng-message="">'Minimum total amount' must be a number</div>
+        </div>
+        <div ng-messages="vm.form.maximumPrice.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.maximumPrice.$invalid">
+            <div ng-message="number">'Maximum price' must be a number</div>
         </div>
     </ov-message>
     <div class="row" ng-show="!vm.proposals">
@@ -15,7 +18,7 @@
             </div>
         </div>
     </div>
-   <div class="row" ng-cloak ng-show="vm.proposals">
+    <div class="row" ng-cloak ng-show="vm.proposals">
         <div class="col-md-1"></div>
         <div class="col-md-4 form-group">
             <label>Category</label>
@@ -32,18 +35,8 @@
         <div class="col-md-1 form-group">
         </div>
     </div>
-    <div class="row" ng-cloak ng-show="vm.proposals.length==0">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading"><h3>No active proposals</h3></div>
-                <div class="panel-body">
-                    <p>There are no active buying proposals <span ng-cloak ng-show="vm.proposalFilter">within current filter</span>.</p>
-                </div>
-            </div>
-        </div>
-   </div>
     <div class="row" ng-cloak ng-show="vm.proposals">
-        <form name="form" novalidate>
+        <form name="vm.form" novalidate>
             <div class="col-md-1">
                 <h4 class="ng-binding" style="display: inline; vertical-align: bottom;">Filter</h4>
             </div>
@@ -65,13 +58,13 @@
                 </select>
             </div>
             <div class="col-md-2 form-group">
-                <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber" required>
+                <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber">
             </div>
-            <div class="col-md-2 form-group">
-                <input class="form-control" type="number" name="minimumTotalAmount" ng-model="vm.proposalFilter.minimumTotalAmount" required>
+            <div class="col-md-2 form-group" ng-class="{ 'has-error': vm.form.minimumTotalAmount.$invalid }">
+                <input class="form-control" type="number" name="minimumTotalAmount" ng-model="vm.proposalFilter.minimumTotalAmount">
             </div>
-            <div class="col-md-2 form-group">
-                <input class="form-control" type="number" name="maximumPrice" ng-model="vm.proposalFilter.maximumPrice" required>
+            <div class="col-md-2 form-group" ng-class="{ 'has-error': vm.form.maximumPrice.$invalid }">
+                <input class="form-control" type="number" name="maximumPrice" ng-model="vm.proposalFilter.maximumPrice">
             </div>
             <div class="col-md-1 form-group">
                  <a class="btn btn-primary" ng-click="vm.search()" ng-show="!vm.isSearching" ng-disabled="!vm.filterChanged">
@@ -82,6 +75,16 @@
                 </a>
             </div>
         </form>
+    </div>
+    <div class="row" ng-cloak ng-show="vm.proposals.length==0">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>No active proposals</h3></div>
+                <div class="panel-body">
+                    <p>There are no active buying proposals <span ng-cloak ng-show="vm.proposalFilter">within current filter</span>.</p>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row" ng-show="vm.proposals.length>0">
         <proposal-detail proposal="proposal" ng-repeat="proposal in vm.proposals track by proposal.id"></my-customer>

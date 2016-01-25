@@ -6,7 +6,8 @@ function OVMessage() {
         transclude: true,
         scope: {
             message: '=',
-            messageType: "="
+            messageType: "=",
+            hasValidationError: "="
         },
         templateUrl: "js/common/ov-message.html",
         controller: "ovMessageController",
@@ -14,4 +15,3 @@ function OVMessage() {
     };
 }
 angular.module("buyCoApp").directive('ovMessage', OVMessage);
-//# sourceMappingURL=proposal-detail.directive.js.map

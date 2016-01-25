@@ -1,6 +1,10 @@
 SellerProposalResourceMock.$inject = ["$httpBackend", "$http", "_", "uri"];
 
-function SellerProposalResourceMock($httpBackend: ng.IHttpBackendService, $http: ng.IHttpService, _: UnderscoreStatic, uri: uri.URIStatic) : void {
+function SellerProposalResourceMock(
+        $httpBackend: ng.IHttpBackendService,
+        $http: ng.IHttpService,
+        _: UnderscoreStatic,
+        uri: uri.URIStatic) : void {
     // Mock only if the 'ngMockE2E' module is loaded (or 'ngMock').
     if (!$httpBackend.whenGET) {
         return;
@@ -28,7 +32,7 @@ function SellerProposalResourceMock($httpBackend: ng.IHttpBackendService, $http:
     });
 
     // // Return filtered proposals when there are url parameters
-    const proposalRegex = new RegExp(url + "/\?w*", 'i');    
+    const proposalRegex = new RegExp(url + "/\?w*", 'i');
     $httpBackend.whenGET(proposalRegex).respond(function (method, url, data) {
         // Get the filter parameters from the URL - if any.
         var uri = new URI(url);
@@ -52,6 +56,7 @@ function SellerProposalResourceMock($httpBackend: ng.IHttpBackendService, $http:
         
     // Pass through any requests for application files, so these are still allowed.
     // $httpBackend.whenGET(/.*/).passThrough();
+    // $httpBackend.whenPOST(/.*/).passThrough();
     
     // Get the mock data from json file.
     $http.get("data/proposals.json").then((result: any) => {

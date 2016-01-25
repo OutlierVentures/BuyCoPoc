@@ -1,8 +1,13 @@
-<!-- <pre>message: {{ message }}</pre>
+<!-- TODO BW dd. 2016-01-25: Get validation messages working (seller-proposal-list)
+ 
+<pre>message: {{ message }}</pre>
 <pre>messageType: {{ messageType }}</pre>
-<pre>messageClass: {{ messageClass }}</pre> -->
+<pre>messageClass: {{ messageClass }}</pre>
+<pre>hasValidationError: {{ hasValidationError }}</pre>
+<pre>vm: {{ vm | json }}</pre>
+ -->
 
-<div class="alert" role="alert" ng-hide="!message" ng-class="messageClass">
+<div class="alert" role="alert" ng-cloak ng-show="message || hasValidationError" ng-class="messageClass">
     <strong>{{ message }}</strong>
     <button type="button" ng-click="vm.resetMessage()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <ng-transclude></ng-transclude>

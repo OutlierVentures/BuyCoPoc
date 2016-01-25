@@ -75,27 +75,19 @@ module.exports = function(grunt) {
 			// }
 		// },
 		ts : {
+            options : {
+                module : 'commonjs', // To compile TypeScript using external modules like NodeJS
+                fast : 'never', // You'll need to recompile all the files each time for NodeJS
+                sourceMap: false
+            },
 			build : {
 				src : ["**/*.ts", "!node_modules/**/*.ts"], // Avoid compiling TypeScript files in node_modules
-				options : {
-					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
-					fast : 'never', // You'll need to recompile all the files each time for NodeJS
-                    sourceMap: false
-				}
 			},
             buildBackend : {
 				src : ["**/*.ts", "!node_modules/**/*.ts", "!client/**/*.*"], // Avoid compiling TypeScript files in node_modules
-				options : {
-					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
-					fast : 'never' // You'll need to recompile all the files each time for NodeJS
-				}
 			},
             buildFrontend : {
 				src : ["client/**/*.ts", "!client/vendors/**/*.ts"], // Avoid compiling TypeScript files in node_modules
-				options : {
-					module : 'commonjs', // To compile TypeScript using external modules like NodeJS
-					fast : 'never' // You'll need to recompile all the files each time for NodeJS
-				}
 			}
 		},
 		wiredep: {
@@ -123,7 +115,8 @@ module.exports = function(grunt) {
 						"client/js/app.routes.js",
 						"client/js/app.js",
 						"client/js/**/*controller.js",
-						"client/js/**/*.js", 
+						"client/js/**/*.js",
+                        "client/js/**/*.mock.js",
 						"!**/*.spec.js"
 					]
 				}
