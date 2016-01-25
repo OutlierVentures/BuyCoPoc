@@ -7,6 +7,7 @@ import proposalService = require('../services/proposalService');
 import upholdService = require('../services/upholdService');
 
 import proposalModel = require('../models/proposalModel');
+import offerModel = require('../offers/offerModel');
 
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
@@ -14,90 +15,21 @@ import _ = require('underscore');
 var userRepo = new UserRepository();
 
 /**
- * Controller for Circle membership operations.
+ * Controller for offers.
  */
-export class ProposalController {
+export class OfferController {
     constructor() {
-    }
-
-    getAll = (req: express.Request, res: express.Response) => {
-        var token = req.headers["accesstoken"];
-
-        serviceFactory.createProposalService()
-            .then(
-            function (ps) {
-                return ps.getAll();
-            },
-            function (initErr) {
-                res.status(500).json({
-                    "error": initErr,
-                    "error_location": "initializing proposals service"
-                });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
-                return null;
-            })
-            .then(
-            function (proposals) {
-                res.json(proposals);
-            }, function (proposalsErr) {
-                res.status(500).json({
-                    "error": proposalsErr,
-                    "error_location": "getting proposals"
-                });
-                return null;
-            })
-    }
-
-    getOne = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
-
-        serviceFactory.createProposalService()
-            .then(
-            function (ps) {
-                return ps.getOne(req.params.id);
-            },
-            function (initErr) {
-                res.status(500).json({
-                    "error": initErr,
-                    "error_location": "initializing proposals service"
-                });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
-                return null;
-            })
-            .then(
-            function (proposals) {
-                res.json(proposals);
-            }, function (proposalsErr) {
-                res.status(500).json({
-                    "error": proposalsErr,
-                    "error_location": "getting proposals"
-                });
-                return null;
-            })
     }
 
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
-        var proposalData = <proposalModel.IProposal>req.body;
+        var proposalId = req.params.id;
+        var offerData = <offerModel.IOffer>req.body;
 
-        // The category arrives as a string: [main] - [sub]
-        // Example: "Electronics - Camera"
-        var categoryString: string = req.body.category;
-
-        if (categoryString && categoryString.indexOf(" - ")) {
-            var parts = categoryString.split(" - ")
-            if (parts.length == 2) {
-                proposalData.mainCategory = parts[0];
-                proposalData.subCategory = parts[1];
-            }
-        }
-
-        serviceFactory.createProposalService()
+        serviceFactory.createOfferContractService()
             .then(
-            function (ps) {
-                return ps.create(proposalData);
+            function (ocs) {
+                return ocs.create(proposalId, offerData);
             },
             function (initErr) {
                 res.status(500).json({
@@ -201,32 +133,4 @@ export class ProposalController {
                 return null;
             })
     }
-
-    getOffers = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
-
-        serviceFactory.createProposalService()
-            .then(
-            function (ps) {
-                return ps.getOffers(req.params.id);
-            },
-            function (initErr) {
-                res.status(500).json({
-                    "error": initErr,
-                    "error_location": "initializing proposal service"
-                });
-                return null;
-            })
-            .then(
-            function (offers) {
-                res.json(offers);
-            }, function (offersErr) {
-                res.status(500).json({
-                    "error": offersErr,
-                    "error_location": "getting offres"
-                });
-                return null;
-            })
-    }
-
 }

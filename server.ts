@@ -18,15 +18,12 @@ import fs = require('fs');
 
 import indexRoute = require('./routes/index');
 import oauthController = require('./controllers/oauthController');
-import upholdController = require('./controllers/upholdController');
-import migrationController = require('./controllers/migrationController');
-import proposalController = require('./controllers/proposalController');
-import sellerController = require('./controllers/sellerController');
-import configController = require('./controllers/configurationController');
 
 import serviceFactory = require('./services/serviceFactory');
 import configurationService = require('./services/configurationService');
 import stubOauthController = require('./controllers/stubOauthController');
+
+import apiRoutes = require('./routes/api');
 
 import stubBitReserveService = require('./services/stubUpholdService');
 
@@ -126,43 +123,8 @@ export class Server {
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
         app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
-        // Uphold API wrapper
-        // TODO refactor all '/api/...' calls to a separate ExpressAPIRouter (to reduce git merge issues for instance).
-        var apiRouter = express.Router();
-        app.use('/api', apiRouter);
-        
-        var uc = new upholdController.UpholdController();
-        apiRouter.route("/uphold/me/cards").get(uc.getCards);
-        apiRouter.route("/uphold/me/cards/withBalance").get(uc.getCardsWithBalance);
-
-        // Proposals
-        var pc = new proposalController.ProposalController();
-        apiRouter.route("/proposal").get(pc.getAll);
-        apiRouter.route("/proposal/:id").get(pc.getOne);
-        apiRouter.route("/proposal/:id/back").post(pc.back);
-        apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
-        apiRouter.route("/proposal").get(pc.create);
-
-        // Sellers
-        var sc = new sellerController.SellerController();
-        apiRouter.route("/seller/:id").get(sc.get);
-        apiRouter.route("/seller/:id").post(sc.save);
-
-        // Config
-        var cc = new configController.ConfigurationController();
-        apiRouter.route("/config/useStubs").get(cc.useStubs);
-        apiRouter.route("/config/getversion").get(cc.getVersion);
-        
-        // Migrations
-        var mc = new migrationController.MigrationController();
-        apiRouter.route("/migration/update").post(mc.update);
-        apiRouter.route("/migration/test/seed").post(mc.seedTestData);
-
-        // Catch non-existing api calls.
-        apiRouter.route("*").all(function(req, res) {
-            res.status(404).send(`No API method at '${req.url}'`);
-        });
-        // END TODO
+        // Routes for API functions
+        apiRoutes.configure(app);
 
         // All routes not matched by server-side routes are forwarded to Angular using this wildcard.
         app.get("*", indexRoute.index);

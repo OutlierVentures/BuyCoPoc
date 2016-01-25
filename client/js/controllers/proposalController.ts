@@ -1,6 +1,7 @@
 ﻿interface IProposalScope extends ng.IScope {
     proposal: IProposal;
     backers: Array<IProposalBacking>;
+    offers: Array<IOffer>;
     amount: number;
     fromCard: string;
     cards: Array<IUpholdCard>;
@@ -125,6 +126,30 @@ class ProposalController {
 
     }
 
+    private getProposalOffers(proposalId: string, cb: any) {
+        var t = this;
+
+        // Get statistics
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/proposal/' + proposalId + '/offers',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: Array<IOffer>) {
+            t.$scope.offers = resultData;
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            console.log("Error loading proposal offers:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error.error;
+
+            cb("Error getting offers data", null);
+        });
+
+    }
+
     view(proposalId: string) {
         var t = this;
 
@@ -133,6 +158,10 @@ class ProposalController {
         });
 
         t.getProposalBackers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+        t.getProposalOffers(proposalId, function (err, res) {
             // The getter already sets scope variables. Nothing to do here.
         });
 

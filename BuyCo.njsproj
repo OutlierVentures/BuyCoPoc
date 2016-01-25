@@ -90,8 +90,12 @@
     <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\sellerModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
+    <TypeScriptCompile Include="offers\offerController.ts" />
+    <TypeScriptCompile Include="offers\offerContractService.ts" />
+    <TypeScriptCompile Include="offers\offerModel.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="launcher.ts" />
+    <TypeScriptCompile Include="routes\api.ts" />
     <TypeScriptCompile Include="server.ts" />
     <Content Include="cert.default.pem" />
     <Content Include="client\.bowerrc" />
@@ -344,6 +348,9 @@
     <TypeScriptCompile Include="test\controllers\testMigrationController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="test\controllers\testOfferController.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
@@ -404,6 +411,7 @@
     <Folder Include="lib\" />
     <Folder Include="contracts\" />
     <Folder Include="models\" />
+    <Folder Include="offers\" />
     <Folder Include="routes\" />
     <Folder Include="test\" />
     <Folder Include="test\contracts\" />

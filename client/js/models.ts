@@ -159,3 +159,15 @@ interface IProposalBacking {
      */
     endPaymentAmount: number;
 }
+
+
+/**
+ * An offer made to a buying proposal by a seller.
+ */
+interface IOffer {
+    id: string;
+    sellerAddress: string;
+    price: number;
+    minimumAmount: number;
+    toCard: string;
+}

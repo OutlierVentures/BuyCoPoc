@@ -1,7 +1,10 @@
 ﻿import upholdService = require('./upholdService');
 import stubUpholdService = require('./stubUpholdService');
 import configurationService = require('./configurationService');
+
 import proposalService = require('./proposalService');
+import offerService = require('../offers/offerContractService');
+
 import Q = require('q');
 
 import configModel = require('../models/configModel');
@@ -50,6 +53,22 @@ export function createProposalService(): Q.Promise<proposalService.ProposalServi
     ps.initialize()
         .then(function () {
             defer.resolve(ps);
+        })
+        .catch(function (initializeErr) {
+            defer.reject(initializeErr);
+        });
+
+    return defer.promise;
+}
+
+export function createOfferContractService(): Q.Promise<offerService.OfferContractService> {
+    var defer = Q.defer<offerService.OfferContractService>();
+
+    var os = new offerService.OfferContractService();
+
+    os.initialize()
+        .then(function () {
+            defer.resolve(os);
         })
         .catch(function (initializeErr) {
             defer.reject(initializeErr);

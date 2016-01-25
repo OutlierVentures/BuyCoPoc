@@ -6,7 +6,7 @@
         <p>{{proposal.productDescription}}</p>
         <p ng-show="product.sku">Part number: {{proposal.sku || "-" }}</p>
         <p>Maximum price: {{(proposal.maxPrice || 0) | number: 2}} GBP</p>
-        <p>Closing date of proposal: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}"</p>
+        <p>Closing date of proposal: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}"></span></p>
         <p>Ultimate delivery date of goods: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}"></span></p>
         <p>Minimum total amount: {{ proposal.minimumTotalAmount }}</p>
         <!-- TODO: make these buttons appear according to view as a buyer or a seller -->

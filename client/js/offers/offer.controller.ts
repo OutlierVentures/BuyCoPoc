@@ -3,8 +3,7 @@
     cards: Array<IUpholdCard>;
     vm: OfferController;
 
-    price: number;
-    minimumAmount: number;
+    offer: IOffer;
     toCard: string;
 
     processMessage: string;
@@ -15,6 +14,7 @@
 
 interface IOfferRouteParameters extends ng.route.IRouteParamsService {
     proposalId: string;
+    offerId: string;
 }
 
 class OfferController {
@@ -43,13 +43,14 @@ class OfferController {
         $scope.vm = this;
 
         var proposalId = this.$routeParams.proposalId;
+        var offerId = this.$routeParams.offerId;
 
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
-        if (this.$route.current.name === "create") {
+        if (this.$route.current.name === "new") {
             this.create(proposalId);
         } else if (this.$route.current.name === "details") {
-            this.view(proposalId);
+            this.view(offerId, proposalId);
         }
 
     }
@@ -102,15 +103,15 @@ class OfferController {
         });
     }
 
-    view(offerId: string) {
+    view(offerId: string, proposalId: string) {
         var t = this;
 
         // TODO: get offer data
 
 
-        //t.getProposalData(proposalId, function (err, res) {
-        //    // The getter already sets scope variables. Nothing to do here.
-        //});
+        t.getProposalData(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
 
     }
 
@@ -138,17 +139,17 @@ class OfferController {
             method: 'POST',
             url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/offer',
             data: {
-                proposal: t.$scope.proposal,
-                price: t.$scope.price,
-                toCard: t.$scope.toCard
+                price: t.$scope.offer.price,
+                minimumAmount: t.$scope.offer.minimumAmount,
+                toCard: t.$scope.offer.toCard
             },
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: any) {
             t.$scope.processMessage = undefined;
             t.$scope.transactionId = resultData.startPaymentTransactionId;
-            t.$scope.successMessage = "You successfully created an offer for the price of " + t.$scope.price +
-                " for a minimum amount of " + t.$scope.minimumAmount
-                + "units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
+            t.$scope.successMessage = "You successfully created an offer for the price of " + t.$scope.offer.price +
+                " for a minimum amount of " + t.$scope.offer.minimumAmount
+                + " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
             t.$timeout(() => {
             }, 5000).then((promiseValue) => {
                 t.$scope.successMessage = undefined;

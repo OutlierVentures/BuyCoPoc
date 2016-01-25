@@ -1,6 +1,8 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
+import offerModel = require('../offers/offerModel');
+
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import tools = require('../lib/tools');
@@ -361,6 +363,42 @@ export class ProposalService {
             }, function (err) {
                 defer.reject(err);
             });
+
+        return defer.promise;
+    }
+
+    /**
+     * Get offers for a proposal.
+     * @param proposalId
+     */
+    getOffers(proposalId: string): Q.Promise<Array<offerModel.IOffer>> {
+        var defer = Q.defer<Array<offerModel.IOffer>>();
+        var t = this;
+
+        // Load the proposal contract
+        t.proposalContractDefinition.at(proposalId, (proposalContractErr, proposalContract) => {
+            if (proposalContractErr) {
+                defer.reject(proposalContractErr);
+                return;
+            }
+
+            serviceFactory.createOfferContractService()
+                .then((os) => {
+                    return os.getAll(proposalContract);
+                },
+                (createServiceError) => {
+                    defer.reject(createServiceError);
+                    return null;
+                })
+                .then((offers) => {
+                    defer.resolve(offers);
+                },
+                (offersErr) => {
+                    defer.reject(offersErr);
+                    return null;
+                });
+
+        });
 
         return defer.promise;
     }
