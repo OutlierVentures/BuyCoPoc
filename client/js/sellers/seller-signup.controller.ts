@@ -113,8 +113,8 @@ class SellerSignupController implements ISellerSignUp {
     setCurrentCountry(countryCode: string) {
         if (countryCode && this.countries) {
             let oldCountryCode = this.currentCountry; 
-            this.currentCountry = _.find(this.countries, (country: ICountry) => {
-                return country.code === countryCode;
+            this.currentCountry = _.find(this.countries, (aCountry) => {
+                return aCountry.code === countryCode;
             });
             if (!this.currentCountry) {
                 this.showMessage(`No country found with code ${countryCode}`);
@@ -122,12 +122,10 @@ class SellerSignupController implements ISellerSignUp {
             
             // Update the regions dropdown and reset the region value if the country changed.
             if (oldCountryCode !== this.currentCountry) {
+                // Reset current selected country.
                 this.currentRegionCode = null;
-                // Note: this change triggers getRegions() method due to $watch, so not calling getRegions an extra time here.
-                // Except if the regions was empty, because then the $watch is not triggered. 
-                if (!this.regions) {
-                    this.getRegions();
-                }
+                // Get regions for newly selected country.
+                this.getRegions();
             }
             this.currentCountryCode=countryCode;
         }
