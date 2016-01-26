@@ -26,7 +26,7 @@
         "jsonRpcUrl": "http://blockstars.io:9001",
         "nodeUrl": "blockstars.io:30301",
         "contracts": {
-            "proposalRegistry": "0x0b97c62080f2654bcf7204c242769d1062c31065"
+            "proposalRegistry": "0x17f118b4efb225e8d911d837512a2dcc0caf9392"
         }
     }
 }

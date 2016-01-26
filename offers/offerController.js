@@ -1,13 +1,9 @@
 var userModel_1 = require("../models/userModel");
 var serviceFactory = require('../services/serviceFactory');
 var userRepo = new userModel_1.UserRepository();
-/**
- * Controller for offers.
- */
 var OfferController = (function () {
     function OfferController() {
         this.create = function (req, res) {
-            //var token = req.header("AccessToken");
             var proposalId = req.params.id;
             var offerData = req.body;
             serviceFactory.createOfferContractService()
@@ -18,8 +14,6 @@ var OfferController = (function () {
                     "error": initErr,
                     "error_location": "initializing proposal service"
                 });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
                 return null;
             })
                 .then(function (proposal) {
@@ -32,21 +26,12 @@ var OfferController = (function () {
                 return null;
             });
         };
-        /**
-         * Back a proposal for an amount of products. This includes transferring the funds for
-         * the maximum price.
-         */
         this.back = function (req, res) {
             var token = req.header("AccessToken");
             var proposalData = req.body.proposal;
             var amount = req.body.amount;
             var fromCard = req.body.fromCard;
             var proposalService;
-            // TODO: transfer funds. This requires UX, including the user being informed of the transfer
-            // and the source card ID for the funds specified.
-            // For a more decentralized version this could be done client side. The Uphold token 
-            // could live in the browser. Server side would then check whether the transfer had completed.
-            // --> could we do this without holding the user's Uphold tokens entirely?
             userRepo.getUserByAccessToken(token, function (userErr, user) {
                 if (userErr) {
                     res.status(500).json({
@@ -63,12 +48,9 @@ var OfferController = (function () {
                         "error": initErr,
                         "error_location": "initializing proposal service"
                     });
-                    // How to ensure that the process stops here? Is the next then()
-                    // processed in this case?
                     return null;
                 })
                     .then(function (proposalBacking) {
-                    // Return the transaction ID
                     res.json(proposalBacking);
                 }, function (backErr) {
                     res.status(500).json({
@@ -80,7 +62,6 @@ var OfferController = (function () {
             });
         };
         this.getBackers = function (req, res) {
-            //var token = req.header("AccessToken");
             serviceFactory.createProposalService()
                 .then(function (ps) {
                 return ps.getBackers(req.params.id);
@@ -105,4 +86,3 @@ var OfferController = (function () {
     return OfferController;
 })();
 exports.OfferController = OfferController;
-//# sourceMappingURL=offerController.js.map
