@@ -27,7 +27,7 @@ export function configure(app: express.Express) {
     apiRouter.route("/proposal/:id/back").post(pc.back);
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
-    apiRouter.route("/proposal").get(pc.create);
+    apiRouter.route("/proposal").post(pc.create);
 
     // Offers
     var oc = new offerController.OfferController();
