@@ -98,7 +98,7 @@ describe("ProposalController", () => {
             .send({
                 "productName": "A testing product", "productDescription": "From the unit tests",
                 //"productSku": "SKU123",
-                "category" : "Electronics - Camera"
+                "category": "Electronics - Camera"
             })
             .expect('Content-Type', /json/)
             .expect(200)
@@ -157,9 +157,13 @@ describe("ProposalController", () => {
      */
     function getTestUserToken(): Q.Promise<string> {
         var defer = Q.defer<string>();
-        userModel.User.findOne().exec()
+        // TODO: make test user configurable
+        userModel.User.findOne().where("externalId").equals("RonnieDoubleA").exec()
             .then(function (user) {
-                defer.resolve(user.accessToken);
+                if (user)
+                    defer.resolve(user.accessToken);
+                else
+                    defer.reject("No user found");
             },
             function (userErr) {
                 defer.reject(userErr);
@@ -168,11 +172,20 @@ describe("ProposalController", () => {
         return defer.promise;
     }
 
+    /**
+     * Returns the card ID of the test user to use for sourcing funds in tests.
+     */
+    function getTestUserCardId(): string {
+        // TODO: make test card configurable
+        // "GBP card for unit tests"
+        return "9edd1208-8948-4b7a-b54d-3215a8a34de9";
+    }
+
     it("should back a proposal on POST /api/proposal/:id/back", function (done) {
         this.timeout(100000);
 
         var proposal: proposalModel.IProposal;
-        var amount = Math.round(Math.random() * 99) + 1;
+        var amount = 1;
         // Currently all our requests to the blockchain come from a
         // single address.
         var sourceAddress = web3.eth.coinbase;
@@ -180,25 +193,33 @@ describe("ProposalController", () => {
         // Find a valid user token to simulate the originating user
         getTestUserToken()
             .then(function (testUserToken) {
-                // Get the proposal list to obtain a valid ID
+
+                // Create a proposal with a low amount to keep the transfer amount low
                 request(theApp)
-                    .get('/api/proposal')
-                    .set({ AccessToken: testUserToken})
+                    .post('/api/proposal')
+                    .send({
+                        "productName": "A testing product", "productDescription": "From the unit tests",
+                        //"productSku": "SKU123",
+                        "category": "Electronics - Camera",
+                        "maxPrice": 0.02,
+                        "endDate": "2016-12-01",
+                        "ultimateDeliveryDate": "2017-12-01",
+                    })
                     .expect('Content-Type', /json/)
                     .expect(200)
-                    .expect(function (res) {
-                        var list = <Array<proposalModel.IProposal>>res.body;
-                        proposal = list[0];
-                    })
                     .end(function (err, res) {
                         if (err) done(err);
+
+                        var proposal = <proposalModel.IProposal>res.body;
+                        var cardId = getTestUserCardId();
 
                         request(theApp)
                             .post('/api/proposal/' + proposal.id + '/back')
                             .set("AccessToken", testUserToken)
                             .send({
                                 proposal: proposal,
-                                amount: amount
+                                amount: amount,
+                                fromCard: cardId
                             })
                             .expect(200)
                             .expect(function (res) {
@@ -226,7 +247,6 @@ describe("ProposalController", () => {
                                     });
 
                             });
-
                     });
             },
             function (userErr) {
