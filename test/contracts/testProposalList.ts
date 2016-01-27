@@ -53,9 +53,9 @@ describe("ProposalRegistry", () => {
                 var price3 = 189456;
 
                 registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
-                registryContract.addProposal(name2, "A very special product", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                registryContract.addProposal(name2, "A very special product", "Food and drink", "Coffee", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
-                registryContract.addProposal(name3, "A very special product", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
+                registryContract.addProposal(name3, "A very special product", "Food and drink", "Coffee", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
                     .then(web3plus.promiseCommital)
                     .then(function (tx) {
                         var firstProposalAddress = registryContract.proposals(1);
@@ -185,7 +185,7 @@ describe("ProposalRegistry", () => {
 
     it("should get properties of proposals within a reasonable time, but it doesn't", function (done) {
         // Getting should be fast.
-        this.timeout(10000);
+        this.timeout(30000);
 
 
         console.time("getProperty");

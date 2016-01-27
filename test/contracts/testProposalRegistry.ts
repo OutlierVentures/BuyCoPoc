@@ -99,7 +99,7 @@ describe("ProposalRegistry", () => {
 
         var proposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "A very special product", "Food and drink", "Coffee", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
@@ -109,7 +109,7 @@ describe("ProposalRegistry", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                var addProposalPromise = registryContract.addProposal(name2, "Another exceptional product", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
+                var addProposalPromise = registryContract.addProposal(name2, "Another exceptional product", "Food and drink", "Coffee", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
                 return addProposalPromise;
             })
             .then(web3plus.promiseCommital)
