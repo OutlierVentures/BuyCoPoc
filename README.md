@@ -349,6 +349,7 @@ Test code can be debugged just like normal code. Choose "Debug test" instead of 
 ### Common
 
 * Use `tsd` to search for and install TypeScript typings. These facilitate syntax completion and design-time error checking. Two separate `tsd` configurations are used: `/tsd.json` for the backend, `/client/tsd.json` for the front end.
+* Organize files by feature (work in progress)
 
 ### Backend
 
