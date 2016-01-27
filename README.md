@@ -1,5 +1,5 @@
 # BuyCo
-BuyCo.io Proof of Concept
+BuyCo.io Proof of Concept / MVP
 
 The implementation consists of:
 - Node.js backend (using TypeScript) - directory /
