@@ -113,7 +113,7 @@ describe("ProposalRegistry", () => {
                         // these synchronously and the proposals asynchronously. The speedup however
                         // is far larger.
                         
-                        p.id = proposalAddress;
+                        p.contractAddress = proposalAddress;
                         getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                         getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
                         getProperties.push(Q.denodeify<any>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber(); }));
@@ -271,7 +271,7 @@ describe("ProposalRegistry", () => {
 
 
                         var p: proposalModel.IProposal = {
-                            id: proposalAddress,
+                            contractAddress : proposalAddress,
                             productName: proposal.productName(),
                             productDescription: proposal.productDescription(),
                             //productSku: proposal.productSku(),
@@ -352,7 +352,7 @@ describe("ProposalRegistry", () => {
             console.log("After loading contract:" + Date.now());
 
             var p: proposalModel.IProposal = {
-                id: proposalAddress,
+                contractAddress : proposalAddress,
                 productName: proposal.productName(),
                 productDescription: proposal.productDescription(),
                 //productSku: proposal.productSku(),

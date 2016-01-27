@@ -46,7 +46,7 @@ describe("OfferController", () => {
             .expect(200)
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
-                proposalId = list[0].id;
+                proposalId = list[0].contractAddress;
             })
             .end(function (err, res) {
 
@@ -83,7 +83,7 @@ describe("OfferController", () => {
             .expect(200)
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
-                proposalId = list[0].id;
+                proposalId = list[0].contractAddress;
                 maxPrice = list[0].maxPrice;
                 offerPrice = maxPrice - 0.01;
             })

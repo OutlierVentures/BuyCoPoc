@@ -66,7 +66,7 @@ describe("ProposalController", () => {
             .expect(200)
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
-                proposalId = list[0].id;
+                proposalId = list[0].contractAddress;
                 productName = list[0].productName;
             })
             .end(function (err, res) {
@@ -79,7 +79,7 @@ describe("ProposalController", () => {
                         var proposal = <proposalModel.IProposal>res.body;
                 
                         // Assert stuff on the result
-                        assert.equal(proposal.id, proposalId, "Returned proposal has correct ID");
+                        assert.equal(proposal.contractAddress, proposalId, "Returned proposal has correct ID");
                         assert.equal(proposal.productName, productName, "Returned product has correct name");
                     })
                     .end(function (err, res) {
@@ -106,7 +106,7 @@ describe("ProposalController", () => {
                 var newProposal = <proposalModel.IProposal>res.body;
                 
                 // Assert stuff on the result
-                assert.notEqual(newProposal.id, "0x", "New proposal has an ID");
+                assert.notEqual(newProposal.contractAddress, "0x", "New proposal has an ID");
                 assert.equal(newProposal.endDate, "", "New proposal has an empty string as end date");
                 //assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
                 assert.equal(newProposal.mainCategory, "Electronics", "New proposal has correct main category");
@@ -134,7 +134,7 @@ describe("ProposalController", () => {
             .end(function (err, res) {
 
                 request(theApp)
-                    .get('/api/proposal/' + proposal.id + '/backers')
+                    .get('/api/proposal/' + proposal.contractAddress + '/backers')
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
@@ -214,7 +214,7 @@ describe("ProposalController", () => {
                         var cardId = getTestUserCardId();
 
                         request(theApp)
-                            .post('/api/proposal/' + proposal.id + '/back')
+                            .post('/api/proposal/' + proposal.contractAddress + '/back')
                             .set("AccessToken", testUserToken)
                             .send({
                                 proposal: proposal,
@@ -231,7 +231,7 @@ describe("ProposalController", () => {
                                 // We check the result by doing another request, to see if the list of backers
                                 // contains our address and amount.
                                 request(theApp)
-                                    .get('/api/proposal/' + proposal.id + '/backers')
+                                    .get('/api/proposal/' + proposal.contractAddress + '/backers')
                                     .expect('Content-Type', /json/)
                                     .expect(200)
                                     .expect(function (res) {

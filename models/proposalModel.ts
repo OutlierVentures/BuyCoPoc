@@ -1,5 +1,22 @@
-﻿export interface IProposal {
-    id: string;
+﻿import mongoose = require("mongoose");
+import { Promise } from "q";
+
+
+export var proposalSchema = new mongoose.Schema({
+    id: String,
+    contractAddress: String,
+    productName: String,
+    productDescription: String,
+    //productSku: String,
+    mainCategory: String,
+    subCategory: String,
+    maxPrice: Number,
+    endDate: Date,
+    ultimateDeliveryDate: Date
+});
+
+export interface IProposal {
+    contractAddress: string;
     productName: string;
     productDescription: string;
     //productSku: string;
@@ -12,6 +29,14 @@
     // nrOfBackers: number;  // Number of ProposalBackings
     // totalAmount: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
+
+export interface IMongoProposal extends mongoose.Document, IProposal {
+}
+
+/**
+ * Cached version of a buying proposal (BuyCo)
+ */
+export var Proposal = mongoose.model<IMongoProposal>("Proposals", proposalSchema);
 
 /**
  * A backer of a proposal, i.e. a buyer.
