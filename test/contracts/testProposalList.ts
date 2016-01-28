@@ -184,14 +184,12 @@ describe("ProposalRegistry", () => {
 
 
     it("should get properties of proposals within a reasonable time, but it doesn't", function (done) {
-        // Getting should be fast.
-        this.timeout(30000);
-
+        // Getting should be fast, but it's very slow.
+        this.timeout(60000);
 
         console.time("getProperty");
 
         // Result with remote geth node with 10 calls: +-400ms per call
-
         var numTimes = 10;
         for (var j = 0; j < numTimes; j++) {
             //var price = firstProposal.maxPrice();
