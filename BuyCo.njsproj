@@ -43,6 +43,9 @@
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\data\cacheController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
@@ -77,6 +80,7 @@
     <TypeScriptCompile Include="client\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
     <TypeScriptCompile Include="client\typings\urijs\URIjs.d.ts" />
+    <TypeScriptCompile Include="api\data\cacheController.ts" />
     <TypeScriptCompile Include="controllers\configurationController.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
@@ -321,6 +325,7 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="services\configurationService.ts" />
+    <TypeScriptCompile Include="services\cachedProposalService.ts" />
     <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
@@ -386,6 +391,7 @@
     <TypeScriptCompile Include="typings\underscore\underscore.d.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="api\data\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />
     <Folder Include="client\data\countries\" />
@@ -411,6 +417,7 @@
     <Folder Include="lib\" />
     <Folder Include="contracts\" />
     <Folder Include="models\" />
+    <Folder Include="api\" />
     <Folder Include="offers\" />
     <Folder Include="routes\" />
     <Folder Include="test\" />

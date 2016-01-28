@@ -21,6 +21,6 @@
         </div>
     </div>
     <div class="row" ng-show="proposals.length>0">
-        <proposal-detail proposal="proposal" ng-repeat="proposal in proposals track by proposal.id"></proposal-detail>
+        <proposal-detail proposal="proposal" ng-repeat="proposal in proposals track by proposal.contractAddress"></proposal-detail>
     </div>
 </div>

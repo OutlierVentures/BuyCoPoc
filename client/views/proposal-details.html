@@ -18,9 +18,9 @@
         <span class="small">
             Ultimate delivery date: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}" class="text-muted"></span>
         </span><br><br>
-        <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.id}}</span></span>
+        <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.contractAddress}}</span></span>
         <form role="form" name="proposalForm" novalidate>
-            <a href="/proposal/{{proposal.id}}/back" class="btn btn-primary">
+            <a href="/proposal/{{proposal.contractAddress}}/back" class="btn btn-primary">
                 Back this BuyCo
             </a>
         </form>

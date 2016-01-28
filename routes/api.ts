@@ -6,6 +6,7 @@ import proposalController = require('../controllers/proposalController');
 import offerController = require('../offers/offerController');
 import sellerController = require('../controllers/sellerController');
 import configController = require('../controllers/configurationController');
+import cacheController = require('../api/data/cacheController');
 
 /**
  * Configure the routes for all API functions on an Express app.
@@ -27,7 +28,7 @@ export function configure(app: express.Express) {
     apiRouter.route("/proposal/:id/back").post(pc.back);
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
-    apiRouter.route("/proposal").get(pc.create);
+    apiRouter.route("/proposal").post(pc.create);
 
     // Offers
     var oc = new offerController.OfferController();
@@ -47,6 +48,10 @@ export function configure(app: express.Express) {
     var mc = new migrationController.MigrationController();
     apiRouter.route("/migration/update").post(mc.update);
     apiRouter.route("/migration/test/seed").post(mc.seedTestData);
+
+    // Cache
+    var cacheCon = new cacheController.CacheController()
+    apiRouter.route("/data/cache/update").post(cacheCon.update);
 
     // Catch non-existing api calls.
     apiRouter.route("*").all(function (req, res) {

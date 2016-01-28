@@ -7,6 +7,9 @@ import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
+
+import cachedProposalService = require('../services/cachedProposalService');
+
 import Q = require('q');
 
 interface IBigNumber {
@@ -74,7 +77,7 @@ export class ProposalService {
                 // This leads to unreadable code, but it's the only known way of delivering
                 // reasonable performance. See testProposalList.ts for more info.
                         
-                p.id = proposalAddress;
+                p.contractAddress = proposalAddress;
 
                 // These could be written more compactly as both the property of proposal and of
                 // p are named identical.
@@ -263,11 +266,22 @@ export class ProposalService {
                 var proposalIndex = t.registryContract.proposalIndex().toNumber();
                 var newProposalAddress = t.registryContract.proposals(proposalIndex);
 
-                p.id = newProposalAddress;
+                p.contractAddress = newProposalAddress;
 
-                // Normalize amount for display, again
-                p.maxPrice = p.maxPrice / 100;
-                defer.resolve(p);
+                // Update cache for this proposal only
+                var cps = new cachedProposalService.CachedProposalService();
+                cps.initialize(this)
+                    .then(res => {
+                        return cps.ensureCacheProposal(p);
+                    })
+                    .then(res => {
+                        // Normalize amount for display, again
+                        p.maxPrice = p.maxPrice / 100;
+                        defer.resolve(p);
+                    }, err => {
+                        defer.reject("Error while updating proposal cache: " + err);
+                    });
+
             }, function getProposalErr(err) {
                 defer.reject(err);
             });
@@ -285,7 +299,7 @@ export class ProposalService {
 
         var defer = Q.defer<proposalModel.IProposalBacking>();
 
-        var proposalContract = this.proposalContractDefinition.at(p.id);
+        var proposalContract = this.proposalContractDefinition.at(p.contractAddress);
 
         var backPromise = proposalContract.back(amount, { gas: 2500000 });
 
@@ -297,7 +311,7 @@ export class ProposalService {
                 // Save link to the backing in our database. Just save the address. In the contract itself
                 // we don't store user data (yet) for privacy reasons.
                 backingUser.backings.push({
-                    proposalAddress: p.id
+                    proposalAddress: p.contractAddress
                 });
                 backingUser.save(
                     function (userErr, userRes) {
@@ -402,5 +416,4 @@ export class ProposalService {
 
         return defer.promise;
     }
-
 }
