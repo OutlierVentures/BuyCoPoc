@@ -269,25 +269,20 @@ export class ProposalService {
 
                 p.contractAddress = newProposalAddress;
 
-                // Normalize amount for display, again
-                p.maxPrice = p.maxPrice / 100;
+                // Update cache for this proposal only
+                var cps = new cachedProposalService.CachedProposalService();
+                cps.initialize(this)
+                    .then(res => {
+                        return cps.ensureCacheProposal(p);
+                    })
+                    .then(res => {
+                        // Normalize amount for display, again
+                        p.maxPrice = p.maxPrice / 100;
+                        defer.resolve(p);
+                    }, err => {
+                        defer.reject("Error while updating proposal cache: " + err);
+                    });
 
-                // TODO: update cache for this proposal only
-                //var cps = new cachedProposalService.CachedProposalService();
-                //cps.initialize()
-                //    .then(res => {
-                //        return cps.ensureMongoCache();
-                //    }, err=> {
-                //        console.error("Error while initializing proposal cache", err);
-                //        return null;
-                //    })
-                //    .then(res=> {
-                //        console.log("Proposal cache updated.", res);
-                //    }, err => {
-                //        console.error("Error while updating proposal cache", err);
-                //    });
-
-                defer.resolve(p);
             }, function getProposalErr(err) {
                 defer.reject(err);
             });

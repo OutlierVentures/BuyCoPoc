@@ -93,13 +93,17 @@ describe("ProposalController", () => {
     it("should create a proposal on POST /api/proposal", function (done) {
         this.timeout(200000);
 
+        var newProposalData = {
+            "productName": "A testing product",
+            "productDescription": "From the unit tests",
+            //"productSku": "SKU123",
+            "category": "Electronics - Camera",
+            "maxPrice": 0.02,
+        };
+
         request(theApp)
             .post('/api/proposal')
-            .send({
-                "productName": "A testing product", "productDescription": "From the unit tests",
-                //"productSku": "SKU123",
-                "category": "Electronics - Camera"
-            })
+            .send(newProposalData)
             .expect('Content-Type', /json/)
             .expect(200)
             .expect(function (res) {

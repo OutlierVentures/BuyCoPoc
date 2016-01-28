@@ -26,19 +26,23 @@ export class CachedProposalService {
     constructor() {
     }
 
-    initialize(): Q.IPromise<boolean> {
-        var defer = Q.defer<boolean>();
-
-        serviceFactory.createProposalService()
-            .then((ps) => {
-                this.proposalService = ps;
-                defer.resolve(true);
-            })
-            .catch((err) => {
-                defer.reject(err);
-            });
-
-        return defer.promise;
+    initialize(psParam?: proposalService.ProposalService): Q.IPromise<boolean> {
+        return Promise<boolean>((resolve, reject) => {
+            if (psParam) {
+                this.proposalService = psParam;
+                resolve(true);
+            }
+            else {
+                serviceFactory.createProposalService()
+                    .then((ps) => {
+                        this.proposalService = ps;
+                        resolve(true);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            }
+        });
     }
 
     /**
@@ -74,7 +78,11 @@ export class CachedProposalService {
         });
     }
 
-    private ensureCacheProposal(p: proposalModel.IProposal): Promise<proposalModel.IProposal> {
+    /**
+     * Ensure that this proposal is present and up to date in the Mongo cache.
+     * @param p
+     */
+    ensureCacheProposal(p: proposalModel.IProposal): Promise<proposalModel.IProposal> {
         return Promise<proposalModel.IProposal>((resolve, reject) => {
             proposalModel.Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec()
                 .then((currentProposal) => {
