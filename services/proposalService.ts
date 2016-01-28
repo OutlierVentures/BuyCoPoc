@@ -78,7 +78,6 @@ export class ProposalService {
                 // reasonable performance. See testProposalList.ts for more info.
                         
                 p.contractAddress = proposalAddress;
-                p.contractAddress = proposalAddress;
 
                 // These could be written more compactly as both the property of proposal and of
                 // p are named identical.

@@ -76,6 +76,7 @@ interface IApplicationInfo {
 
 interface IProposal {
     id: string;
+    contractAddress: string;
     productName: string;
     productDescription: string;
     mainCategory: string;

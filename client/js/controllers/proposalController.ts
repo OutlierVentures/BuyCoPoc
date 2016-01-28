@@ -189,7 +189,7 @@ class ProposalController {
 
         this.$http({
             method: 'POST',
-            url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/back',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/back',
             data: {
                 proposal: t.$scope.proposal,
                 amount: t.$scope.amount,
@@ -206,7 +206,7 @@ class ProposalController {
                 t.$scope.successMessage = undefined;
 
                 // Redirect to the proposal view
-                t.$location.path("/proposal/" + t.$scope.proposal.id)
+                t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
             });
         }).error(function (error) {
             t.$scope.processMessage = undefined;

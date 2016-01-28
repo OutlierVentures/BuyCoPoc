@@ -16,7 +16,7 @@ describe("CacheController", function () {
         done();
     });
     it("should update the cache on POST /api/data/cache/update", function (done) {
-        this.timeout(100000);
+        this.timeout(1000000);
         request(theApp)
             .post('/api/data/cache/update')
             .expect('Content-Type', /json/)
