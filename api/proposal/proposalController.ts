@@ -13,7 +13,7 @@ import _ = require('underscore');
 var userRepo = new UserRepository();
 
 /**
- * Controller for Circle membership operations.
+ * Controller for BuyCo proposals.
  */
 export class ProposalController {
     constructor() {
@@ -188,31 +188,6 @@ export class ProposalController {
                 res.status(500).json({
                     "error": backersErr,
                     "error_location": "getting backers"
-                });
-                return null;
-            })
-    }
-
-    getMainCategories = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
-
-        serviceFactory.createCachedProposalService()
-            .then(cps => {
-                return cps.getMainCategories();
-            },
-            err => {
-                res.status(500).json({
-                    "error": err,
-                    "error_location": "initializing proposal service"
-                });
-                return null;
-            })
-            .then(categories => {
-                res.json(categories);
-            }, err => {
-                res.status(500).json({
-                    "error": err,
-                    "error_location": "getting main categories"
                 });
                 return null;
             })

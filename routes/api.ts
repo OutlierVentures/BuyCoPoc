@@ -3,6 +3,7 @@
 import upholdController = require('../controllers/upholdController');
 import migrationController = require('../controllers/migrationController');
 import proposalController = require('../api/proposal/proposalController');
+import categoryController = require('../api/category/categoryController');
 import offerController = require('../offers/offerController');
 import sellerController = require('../controllers/sellerController');
 import configController = require('../controllers/configurationController');
@@ -24,14 +25,19 @@ export function configure(app: express.Express) {
     // Proposals
     var pc = new proposalController.ProposalController();
     apiRouter.route("/proposal").get(pc.getAll);
-    // Categories
-    apiRouter.route("/proposal/category").get(pc.getMainCategories);
 
     apiRouter.route("/proposal/:id").get(pc.getOne);
     apiRouter.route("/proposal/:id/back").post(pc.back);
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
     apiRouter.route("/proposal").post(pc.create);
+    // TODO: proposals by sub category
+    //apiRouter.route("/proposal/category/:mainCategory/:subCategory/").get(pc.getByCategory);
+
+    // Categories
+    var catCon = new categoryController.CategoryController();
+    apiRouter.route("/category").get(catCon.getMainCategories);
+    apiRouter.route("/category/:mainCategory").get(catCon.getSubCategories);
 
     // Offers
     var oc = new offerController.OfferController();

@@ -43,6 +43,11 @@
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\category\categoryService.ts" />
+    <TypeScriptCompile Include="api\category\categoryController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="api\category\categoryController.ts" />
     <TypeScriptCompile Include="api\data\cacheController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>

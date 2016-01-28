@@ -156,27 +156,6 @@ describe("ProposalController", () => {
 
     });
 
-    it("should get the main categories on GET /api/proposal/category", function (done) {
-        this.timeout(100000);
-
-        request(theApp)
-            .get('/api/proposal/category')
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .expect(function (res) {
-                var list = <categoryModel.IMainCategory[]>res.body;
-
-                assert.ok(list.length > 0, "At least one category");
-                var first = list[0];
-                assert.ok(first.name, "First category has a name");
-                assert.ok(first.totalProposalCount > 0, "First category has at least one proposal");
-            })
-            .end(function (err, res) {
-                done(err);
-            });
-
-    });
-
     /**
      * Get a token of any user in the database. Returns a promise that resolves
      * with the token.
