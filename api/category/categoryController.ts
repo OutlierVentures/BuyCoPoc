@@ -49,4 +49,35 @@ export class CategoryController {
                 return null;
             })
     }
+
+    getUsedMainCategories = (req: express.Request, res: express.Response) => {
+        //var token = req.header("AccessToken");
+
+        this.categoryService.getUsedMainCategories()
+            .then(categories => {
+                res.json(categories);
+            }, err => {
+                res.status(500).json({
+                    "error": err,
+                    "error_location": "getting main categories"
+                });
+                return null;
+            })
+    }
+
+    getUsedSubCategories = (req: express.Request, res: express.Response) => {
+        //var token = req.header("AccessToken");
+        var mainCategory = req.params.mainCategory;
+
+        this.categoryService.getUsedSubCategories(mainCategory)
+            .then(subCategories => {
+                res.json(subCategories);
+            }, err => {
+                res.status(500).json({
+                    "error": err,
+                    "error_location": "getting subcategories"
+                });
+                return null;
+            })
+    }
 }

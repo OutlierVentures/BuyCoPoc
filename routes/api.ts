@@ -22,6 +22,15 @@ export function configure(app: express.Express) {
     apiRouter.route("/uphold/me/cards").get(uc.getCards);
     apiRouter.route("/uphold/me/cards/withBalance").get(uc.getCardsWithBalance);
 
+    // Categories
+    var catCon = new categoryController.CategoryController();
+    // All categories (to fill dropdowns etc)
+    apiRouter.route("/category").get(catCon.getMainCategories);
+    apiRouter.route("/category/:mainCategory").get(catCon.getSubCategories);
+    // Categories used in proposals (for browsing)
+    apiRouter.route("/proposal/category/").get(catCon.getUsedMainCategories);
+    apiRouter.route("/proposal/category/:mainCategory").get(catCon.getUsedSubCategories);
+
     // Proposals
     var pc = new proposalController.ProposalController();
     apiRouter.route("/proposal").get(pc.getAll);
@@ -32,12 +41,8 @@ export function configure(app: express.Express) {
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
     apiRouter.route("/proposal").post(pc.create);
     // TODO: proposals by sub category
-    //apiRouter.route("/proposal/category/:mainCategory/:subCategory/").get(pc.getByCategory);
+    //apiRouter.route("/category/:mainCategory/:subCategory").get(pc.getByCategory);
 
-    // Categories
-    var catCon = new categoryController.CategoryController();
-    apiRouter.route("/category").get(catCon.getMainCategories);
-    apiRouter.route("/category/:mainCategory").get(catCon.getSubCategories);
 
     // Offers
     var oc = new offerController.OfferController();
