@@ -164,9 +164,12 @@ describe("ProposalController", () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .expect(function (res) {
-                var list = <Array<categoryModel.IMainCategory[]>>res.body;
+                var list = <categoryModel.IMainCategory[]>res.body;
 
-                // TODO: assert
+                assert.ok(list.length > 0, "At least one category");
+                var first = list[0];
+                assert.ok(first.name, "First category has a name");
+                assert.ok(first.totalProposalCount > 0, "First category has at least one proposal");
             })
             .end(function (err, res) {
                 done(err);
