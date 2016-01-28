@@ -1,11 +1,11 @@
 ﻿<div class="container">
-    <h2>Categories</h2>
+    <h2>BuyCo</h2>
     <div class="row" ng-show="!categories">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading"><h3>Loading...</h3></div>
                 <div class="panel-body">
-                    <p>Loading the latest categories...</p>
+                    <p>Loading the latest BuyCo's...</p>
                 </div>
             </div>
         </div>
@@ -13,9 +13,9 @@
     <div class="row" ng-show="categories.length==0">
         <div class="col-lg-12">
             <div class="panel panel-default">
-                <div class="panel-heading"><h3>No active proposals</h3></div>
+                <div class="panel-heading"><h3>No active BuyCo's</h3></div>
                 <div class="panel-body">
-                    <p>There are no active buying proposals.</p>
+                    <p>There are no active BuyCo's.</p>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
                         <img ng-show="category.imageUrl" class="img-responsive img-rounded" src="/data/{{category.imageUrl}}" />
                     </a>
                     <p><strong>{{category.totalProposalCount}}</strong> BuyCo's</p>
-                    <a class="btn btn-primary btn-block" href="/proposal/category{{category.name}}">See what's for sale</a>
+                    <a class="btn btn-primary btn-block" href="/proposal/category/{{category.name}}">See what's for sale</a>
                 </div>
             </div>
         </div>

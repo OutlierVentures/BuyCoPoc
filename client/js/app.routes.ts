@@ -7,6 +7,7 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
     $routeProvider
         .when('/', { controller: CategoryController, controllerAs: "vm", templateUrl: 'js/categories/category-list.html', name: 'mainCategoryList' })
         .when('/proposal/category', { controller: CategoryController, controllerAs: "vm", templateUrl: 'js/categories/category-list.html', name: 'mainCategoryList' })
+        .when('/proposal/category/:mainCategory', { controller: CategoryController, controllerAs: "vm", templateUrl: 'js/categories/main-category-details.html', name: 'mainCategory' })
         .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html' })
