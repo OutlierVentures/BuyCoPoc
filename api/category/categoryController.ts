@@ -1,9 +1,9 @@
 ﻿import express = require("express");
+
 import { UserRepository } from "../../models/userModel";
 
 import configModel = require('../../models/configModel');
 import categoryService = require('./categoryService');
-
 import proposalModel = require('../../models/proposalModel');
 
 import _ = require('underscore');

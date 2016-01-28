@@ -117,6 +117,10 @@ export class Server {
         var clientDir = path.join(__dirname, 'client')
         app.use(express.static(clientDir));
 
+        // Static assets for other data
+        var categoryDir = path.join(__dirname, 'api/category/data')
+        app.use("/data/category", express.static(categoryDir));
+
         // All routes which are directly accessible (i.e. not only from within the Angular SPA).
         // All open index.html, where Angular handles further routing to the right controller/ view.
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);

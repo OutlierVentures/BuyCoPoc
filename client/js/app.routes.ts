@@ -5,7 +5,8 @@ angular.module("buyCoApp").config(AppRoutes);
 
 function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: ng.ILocationProvider) {
     $routeProvider
-        .when('/', { controller: DashboardController, templateUrl: 'views/dashboard.html' })
+        .when('/', { controller: CategoryController, controllerAs: "vm", templateUrl: 'js/categories/category-list.html', name: 'mainCategoryList' })
+        .when('/proposal/category', { controller: CategoryController, controllerAs: "vm", templateUrl: 'js/categories/category-list.html', name: 'mainCategoryList' })
         .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html' })

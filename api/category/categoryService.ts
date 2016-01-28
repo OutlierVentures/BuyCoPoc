@@ -1,6 +1,7 @@
 ﻿import proposalModel = require('../../models/proposalModel');
 import {IMainCategory, ISubCategory} from '../../models/categoryModel';
 import fs = require('fs');
+import path = require('path');
 import Q = require('q');
 import { Promise } from "q";
 import _ = require("underscore");
@@ -98,8 +99,9 @@ export class CategoryService {
         return Promise<IMainCategory>((catResolve, catReject) => {
             // Check whether there's an image file for this main category.
             // COULD DO: allow .png as well.
-            var imageUrl = "data/" + mainCat.name + "/main.jpg";
-            fs.access("./" + imageUrl,
+            var imageUrl = mainCat.name + "/main.jpg";
+            var fullPath = path.resolve(path.dirname(__filename), "data/" + imageUrl)
+            fs.access(fullPath,
                 (err) => {
                     if (!err) {
                         mainCat.imageUrl = "category/" + imageUrl;
@@ -139,9 +141,9 @@ export class CategoryService {
         return Promise<ISubCategory>((catResolve, catReject) => {
             // Check whether there's an image file for this main category.
             // COULD DO: allow .png as well.
-            var imageUrl = "data/" + mainCat.name + "/" + subCat.name + "/main.jpg";
-
-            fs.access("./" + imageUrl,
+            var imageUrl = mainCat.name + "/" + subCat.name + "/main.jpg";
+            var fullPath = path.resolve(path.dirname(__filename), "data/" + imageUrl)
+            fs.access(fullPath,
                 (err) => {
                     if (!err) {
                         subCat.imageUrl = "category/" + imageUrl;
