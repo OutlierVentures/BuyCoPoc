@@ -36,8 +36,6 @@ export class OfferController {
                     "error": initErr,
                     "error_location": "initializing proposal service"
                 });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
                 return null;
             })
             .then(
@@ -90,8 +88,6 @@ export class OfferController {
                         "error": initErr,
                         "error_location": "initializing proposal service"
                     });
-                    // How to ensure that the process stops here? Is the next then()
-                    // processed in this case?
                     return null;
                 })
                 .then(function (proposalBacking) {

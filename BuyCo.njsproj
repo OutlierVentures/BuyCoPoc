@@ -85,12 +85,13 @@
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="controllers\sellerController.ts" />
-    <TypeScriptCompile Include="controllers\proposalController.ts" />
+    <TypeScriptCompile Include="api\proposal\proposalController.ts" />
     <TypeScriptCompile Include="controllers\stubOauthController.ts" />
     <TypeScriptCompile Include="controllers\upholdController.ts" />
     <TypeScriptCompile Include="lib\tools.ts" />
     <TypeScriptCompile Include="lib\web3config.ts" />
     <TypeScriptCompile Include="models\configModel.ts" />
+    <TypeScriptCompile Include="models\categoryModel.ts" />
     <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\sellerModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
@@ -359,7 +360,7 @@
     <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\controllers\testProposalController.ts">
+    <TypeScriptCompile Include="api\proposal\proposalController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\sellers\testPersistance.ts">
@@ -392,6 +393,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="api\data\" />
+    <Folder Include="api\proposal\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />
     <Folder Include="client\data\countries\" />

@@ -3,9 +3,11 @@ import stubUpholdService = require('./stubUpholdService');
 import configurationService = require('./configurationService');
 
 import proposalService = require('./proposalService');
+import cachedProposalService = require('./cachedProposalService');
 import offerService = require('../offers/offerContractService');
 
 import Q = require('q');
+import { Promise } from "q";
 
 import configModel = require('../models/configModel');
 
@@ -45,20 +47,32 @@ export function createUpholdService(token: string): IUpholdService {
     }
 }
 
-export function createProposalService(): Q.Promise<proposalService.ProposalService> {
-    var defer = Q.defer<proposalService.ProposalService>();
+export function createProposalService(): Promise<proposalService.ProposalService> {
+    return Promise<proposalService.ProposalService>((resolve, reject) => {
+        var ps = new proposalService.ProposalService();
 
-    var ps = new proposalService.ProposalService();
+        ps.initialize()
+            .then(() => {
+                resolve(ps);
+            })
+            .catch(initializeErr => {
+                reject(initializeErr);
+            });
+    });
+}
 
-    ps.initialize()
-        .then(function () {
-            defer.resolve(ps);
-        })
-        .catch(function (initializeErr) {
-            defer.reject(initializeErr);
-        });
 
-    return defer.promise;
+export function createCachedProposalService(): Promise<cachedProposalService.CachedProposalService> {
+    return Promise<cachedProposalService.CachedProposalService>((resolve, reject) => {
+        var cps = new cachedProposalService.CachedProposalService();
+
+        cps.initialize()
+            .then(() => {
+                resolve(cps);
+            }, initializeErr => {
+                reject(initializeErr);
+            });
+    });
 }
 
 export function createOfferContractService(): Q.Promise<offerService.OfferContractService> {
