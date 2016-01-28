@@ -208,6 +208,7 @@ When working from Visual Studio, you don't need to run `grunt`. NTVS takes care 
 * Great intellisense and code completion
 * Debugging of server-side code
 * Running and debugging tests
+* Edit and continue while debugging the running app or tests
 
 #### Troubleshooting
 
