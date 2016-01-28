@@ -393,6 +393,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="api\data\" />
+    <Folder Include="api\category\" />
     <Folder Include="api\proposal\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />
