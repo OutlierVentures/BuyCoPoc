@@ -30,13 +30,13 @@ export interface IProposal {
     // totalAmount: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
 
-export interface IMongoProposal extends mongoose.Document, IProposal {
+export interface IProposalDocument extends mongoose.Document, IProposal {
 }
 
 /**
  * Cached version of a buying proposal (BuyCo)
  */
-export var Proposal = mongoose.model<IMongoProposal>("Proposals", proposalSchema);
+export var Proposal = mongoose.model<IProposalDocument>("Proposals", proposalSchema);
 
 /**
  * A backer of a proposal, i.e. a buyer.

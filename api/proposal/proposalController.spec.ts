@@ -5,10 +5,11 @@ import request = require('supertest');
 import express = require('express');
 import Q = require('q');
 
-import web3config = require('../contracts/web3config');
+import web3config = require('../../test/contracts/web3config');
 import server = require('../../server');
 
 import proposalModel = require('../../models/proposalModel');
+import categoryModel = require('../../models/categoryModel');
 import userModel = require('../../models/userModel');
 import _ = require('underscore');
 
@@ -151,6 +152,27 @@ describe("ProposalController", () => {
                         done(err);
                     });
 
+            });
+
+    });
+
+    it("should get the main categories on GET /api/proposal/category", function (done) {
+        this.timeout(100000);
+
+        request(theApp)
+            .get('/api/proposal/category')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var list = <categoryModel.IMainCategory[]>res.body;
+
+                assert.ok(list.length > 0, "At least one category");
+                var first = list[0];
+                assert.ok(first.name, "First category has a name");
+                assert.ok(first.totalProposalCount > 0, "First category has at least one proposal");
+            })
+            .end(function (err, res) {
+                done(err);
             });
 
     });
