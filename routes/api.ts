@@ -26,10 +26,10 @@ export function configure(app: express.Express) {
     var catCon = new categoryController.CategoryController();
     // All categories (to fill dropdowns etc)
     apiRouter.route("/category").get(catCon.getMainCategories);
-    apiRouter.route("/category/:mainCategory").get(catCon.getSubCategories);
+    apiRouter.route("/category/:mainCategory").get(catCon.getOneMainCategory);
     // Categories used in proposals (for browsing)
-    apiRouter.route("/proposal/category/").get(catCon.getUsedMainCategories);
-    apiRouter.route("/proposal/category/:mainCategory").get(catCon.getUsedSubCategories);
+    apiRouter.route("/proposal/category").get(catCon.getUsedMainCategories);
+    apiRouter.route("/proposal/category/:mainCategory").get(catCon.getOneUsedMainCategory);
 
     // Proposals
     var pc = new proposalController.ProposalController();

@@ -34,11 +34,11 @@ export class CategoryController {
             })
     }
 
-    getSubCategories = (req: express.Request, res: express.Response) => {
+    getOneMainCategory = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
-        var mainCategory = req.params.mainCategory;
+        var mainCategoryName = req.params.mainCategory;
 
-        this.categoryService.getSubCategories(mainCategory)
+        this.categoryService.getOneMainCategory(mainCategoryName)
             .then(subCategories => {
                 res.json(subCategories);
             }, err => {
@@ -65,11 +65,11 @@ export class CategoryController {
             })
     }
 
-    getUsedSubCategories = (req: express.Request, res: express.Response) => {
+    getOneUsedMainCategory = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
         var mainCategory = req.params.mainCategory;
 
-        this.categoryService.getUsedSubCategories(mainCategory)
+        this.categoryService.getOneUsedMainCategory(mainCategory)
             .then(subCategories => {
                 res.json(subCategories);
             }, err => {

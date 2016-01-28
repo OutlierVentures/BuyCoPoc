@@ -56,7 +56,7 @@ describe("CategoryController", () => {
     });
 
 
-    it("should get all the sub categories for a main category on GET /api/category/:mainCategory", function (done) {
+    it("should get the main category with all the sub categories on GET /api/category/:mainCategory", function (done) {
         this.timeout(100000);
 
         var mainCat: string;
@@ -78,10 +78,10 @@ describe("CategoryController", () => {
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        var list = <categoryModel.ISubCategory[]>res.body;
+                        var cat = <categoryModel.IMainCategory>res.body;
 
-                        assert.ok(list.length > 0, "At least one subcategory");
-                        var first = list[0];
+                        assert.ok(cat.subCategories.length > 0, "At least one subcategory");
+                        var first = cat.subCategories[0];
                         assert.ok(first.name, "First subcategory has a name");
                     })
                     .end(function (err, res) {
@@ -114,10 +114,10 @@ describe("CategoryController", () => {
     });
 
 
-    it("should get the used sub categories for a used main category on GET /api/proposal/category/:mainCategory", function (done) {
+    it("should get one used used main category with its sub categories on GET /api/proposal/category/:mainCategory", function (done) {
         this.timeout(100000);
 
-        var mainCat: string;
+        var mainCatName: string;
         request(theApp)
             .get('/api/proposal/category')
             .expect('Content-Type', /json/)
@@ -128,20 +128,20 @@ describe("CategoryController", () => {
                 assert.ok(list.length > 0, "At least one category");
                 var first = list[0];
                 assert.ok(first.name, "First category has a name");
-                mainCat = first.name;
+                mainCatName = first.name;
                 assert.ok(first.totalProposalCount > 0, "First category has at least one proposal");
             })
             .end(function (err, res)
             {
                 request(theApp)
-                    .get('/api/proposal/category/' + mainCat)
+                    .get('/api/proposal/category/' + mainCatName)
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        var list = <categoryModel.ISubCategory[]>res.body;
+                        var mainCat = <categoryModel.IMainCategory>res.body;
 
-                        assert.ok(list.length > 0, "At least one subcategory");
-                        var first = list[0];
+                        assert.ok(mainCat.subCategories.length > 0, "At least one subcategory");
+                        var first = mainCat.subCategories[0];
                         assert.ok(first.name, "First subcategory has a name");
                         assert.ok(first.totalProposalCount > 0, "First category has at least one proposal");
                     })
