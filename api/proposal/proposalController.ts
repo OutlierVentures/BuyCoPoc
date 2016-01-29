@@ -13,19 +13,23 @@ import _ = require('underscore');
 var userRepo = new UserRepository();
 
 /**
- * Controller for Circle membership operations.
+ * Controller for BuyCo proposals.
  */
 export class ProposalController {
     constructor() {
     }
 
-    getAll = (req: express.Request, res: express.Response) => {
+    get = (req: express.Request, res: express.Response) => {
         var token = req.headers["accesstoken"];
+
+        // Get filters from request
+        var mainCategory = req.params.mainCategory;
+        var subCategory = req.params.subCategory;
 
         serviceFactory.createCachedProposalService()
             .then(
             function (cps) {
-                return cps.get();
+                return cps.get(mainCategory, subCategory);
             },
             function (initErr) {
                 res.status(500).json({
@@ -188,31 +192,6 @@ export class ProposalController {
                 res.status(500).json({
                     "error": backersErr,
                     "error_location": "getting backers"
-                });
-                return null;
-            })
-    }
-
-    getMainCategories = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
-
-        serviceFactory.createCachedProposalService()
-            .then(cps => {
-                return cps.getMainCategories();
-            },
-            err => {
-                res.status(500).json({
-                    "error": err,
-                    "error_location": "initializing proposal service"
-                });
-                return null;
-            })
-            .then(categories => {
-                res.json(categories);
-            }, err => {
-                res.status(500).json({
-                    "error": err,
-                    "error_location": "getting main categories"
                 });
                 return null;
             })

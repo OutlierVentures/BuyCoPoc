@@ -35,6 +35,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="client\js\categories\main-category-details.html" />
+    <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
     <Content Include="client\js\common\proposal-detail.html" />
     <Content Include="client\js\offers\offer-details.html" />
@@ -43,12 +45,18 @@
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\category\categoryService.ts" />
+    <TypeScriptCompile Include="api\category\categoryController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="api\category\categoryController.ts" />
     <TypeScriptCompile Include="api\data\cacheController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
+    <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.directive.ts" />
     <TypeScriptCompile Include="client\js\common\proposal-detail.directive.ts" />
@@ -402,6 +410,7 @@
     <Folder Include="client\js\" />
     <Folder Include="client\js\controllers\" />
     <Folder Include="client\js\common\" />
+    <Folder Include="client\js\categories\" />
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />
