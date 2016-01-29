@@ -24,15 +24,20 @@ class ProposalListController {
 
         $scope.vm = this;
 
-        this.list();
+        this.list($route.current.params.mainCategory, $route.current.params.subCategory);
     }
 
-    list() {
+    list(mainCategory?: string, subCategory?: string) {
         var t = this;
+        var url: string;
+
+        if (mainCategory && subCategory)
+            url = "/proposal/category/" + mainCategory + "/" + subCategory;
+        else url = "/proposal";
 
         this.$http({
             method: 'GET',
-            url: apiUrl + '/proposal',
+            url: apiUrl + url,
             headers: { "AccessToken": t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: any) {
             t.$scope.proposals = resultData;

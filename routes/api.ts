@@ -33,15 +33,15 @@ export function configure(app: express.Express) {
 
     // Proposals
     var pc = new proposalController.ProposalController();
-    apiRouter.route("/proposal").get(pc.getAll);
+    apiRouter.route("/proposal").get(pc.get);
 
     apiRouter.route("/proposal/:id").get(pc.getOne);
     apiRouter.route("/proposal/:id/back").post(pc.back);
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
     apiRouter.route("/proposal").post(pc.create);
-    // TODO: proposals by sub category
-    //apiRouter.route("/category/:mainCategory/:subCategory").get(pc.getByCategory);
+    // Proposals by sub category. Same function, but now with params.
+    apiRouter.route("/proposal/category/:mainCategory/:subCategory").get(pc.get);
 
 
     // Offers

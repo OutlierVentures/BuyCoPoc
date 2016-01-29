@@ -50,8 +50,14 @@ export class CachedProposalService {
      * Gets all proposals.
      * TODO: allow filtering.
      */
-    get(): PromiseLike<proposalModel.IProposalDocument[]> {
-        return proposalModel.Proposal.find({}).exec();
+    get(mainCategory?: string, subCategory?: string): PromiseLike<proposalModel.IProposalDocument[]> {
+        var cond = <any>{};
+        if (mainCategory)
+            cond.mainCategory = mainCategory;
+        if (subCategory)
+            cond.subCategory = subCategory;
+
+        return proposalModel.Proposal.find(cond).exec();
     }
 
     /**
