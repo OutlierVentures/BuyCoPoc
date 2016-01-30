@@ -6,8 +6,8 @@ function OVMessage() {
         transclude: true,
         scope: {
             message: '=',
-            messageType: "=",
-            hasValidationError: "="
+            messageType: "="
+            // , hasValidationError: "="
         },
         templateUrl: "js/common/ov-message.html",
         controller: "ovMessageController",
