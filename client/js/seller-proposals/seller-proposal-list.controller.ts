@@ -49,7 +49,8 @@ class SellerProposalListController implements ISellerProposalListController {
         this.$scope.$watch(() => { return this.proposalFilter; }, (newValue, oldValue) => {
             if (newValue !== oldValue) {
                 this.filterChanged = true;
-                this.isFilterSet = this.isEmptyObject(this.proposalFilter);
+                var isFilterSet = !this.isEmptyObject(this.proposalFilter);
+                this.isFilterSet = isFilterSet;
             }
         }, true);
     }
@@ -72,7 +73,8 @@ class SellerProposalListController implements ISellerProposalListController {
     
     private isEmptyObject = (o) => {
         return Object.keys(o).every(function(x) {
-            return o[x];
+            var result = !o[x];
+            return result;
         });
     };
 }
