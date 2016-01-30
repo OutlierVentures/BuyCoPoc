@@ -21,9 +21,9 @@ Fork the repo to your own private repo*. Then check out your own fork to your ow
 Go into the just cloned folder, and add the original repo as a remote named `upstream`.
 
     cd BuyCo/
-    git remote -v // Before there's only `origin
+    git remote -v // Before there's only `origin`
     git remote add upstream https://github.com/OutlierVentures/BuyCo.git
-    git remote -v // After there's both your own `origin` and the new `upstream` (a `fetch` and `push` for both, so 4 in total) 
+    git remote -v // After there's both your own `origin` and the new `upstream` (a `fetch` and `push` for both, so 4 in total)
 
 When you want to resync your local folder with the main one do: (you might need to do merging, stashing beforehand etc.)
 
@@ -46,7 +46,7 @@ Before doing a pull request, you want to resync your local folder based on the f
 
 To get the commits nice it's best to rebase. And you have to manually merge any changes from the upstream, and push them to your own remote repo.
 After that you should test if your new functionality is still correct, and changes from the upstream - if any - also work.
-If so then you can do a pull request, and there should be no conflicts with pulling it into the original fork. 
+If so then you can do a pull request, and there should be no conflicts with pulling it into the original fork.
 
 Ideally you'd sync your changes back after every major change you do. So you don't diverge too muc.
 But as mentioned you should at least do thi before doing a pull request to get that code to the original.
