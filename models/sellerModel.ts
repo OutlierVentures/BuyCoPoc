@@ -29,7 +29,7 @@ export interface ISeller extends mongoose.Document { // , TODO inherit (extra) f
     company: string;
     email: string;
     addressLine1: string;
-    addressline2: string;
+    addressLine2: string;
     postalCode: string;
     city: string;
     country: string;

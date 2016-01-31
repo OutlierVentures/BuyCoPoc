@@ -59,11 +59,12 @@ export class SellerController {
             // Note: using 'object literal' instead of constructor+ set props, because it refactors more easily).
             var input = {
                 userExternalId: userExternalId,
+                
                 isActive: true,
                 email: req.body.email,
                 company: req.body.company,
                 addressLine1: req.body.addressLine1,
-                addressline2: req.body.addressLine2,
+                addressLine2: req.body.addressLine2,
                 postalCode: req.body.postalCode,
                 city: req.body.city,
                 country: req.body.country,

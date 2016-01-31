@@ -9,7 +9,7 @@ interface ISeller {
     dateUpdated: Date;
     company: string;
     addressLine1: string;
-    addressline2: string;
+    addressLine2: string;
     postalCode: string;
     city: string;
     country: string;
@@ -24,7 +24,7 @@ class Seller implements ISeller {
     dateUpdated: Date;
     company: string;
     addressLine1: string;
-    addressline2: string;
+    addressLine2: string;
     postalCode: string;
     city: string;
     country: string;
