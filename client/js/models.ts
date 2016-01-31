@@ -90,7 +90,13 @@ interface IProposal {
     totalAmount: number   // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
 
-
+interface IProposalFilter {
+    maximumPrice?: number;
+    minimumTotalAmount?: number;
+    partNumber?: string;
+    mainCategory?: string;
+    subCategory?: string;
+}
 
 interface IUpholdCard {
     "address": {

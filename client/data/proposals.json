@@ -2,6 +2,7 @@
   {
     "endDate": "2016-08-01T00:00:00.000Z",
     "id": "2331",
+    "contractAddress": "0x0063f6e37820e1bab8462f05697a560a1266ed40",
     "mainCategory": "Shoes",
     "maxPrice": 120,
     "productDescription": "The one and only",
@@ -12,17 +13,9 @@
     "minimumTotalAmount": 200.12,
     "nrOfBackings": 50,
     "totalAmount": 105
-  },{
-    "endDate": "2015-01-02T23:00:00.000Z",
-    "id": "0x9063f6e37820e1bab8462f05697a560a1266ed4d",
-    "mainCategory": "Food and drink",
-    "maxPrice": 0.01,
-    "productDescription": "Coffee1",
-    "productName": "Coffee1",
-    "subCategory": "Coffee",
-    "ultimateDeliveryDate": "2015-02-02T23:00:00.000Z"
   }, {
     "id": "2332",
+    "contractAddress": "0x1063f6e37820e1bab8462f05697a560a1266ed41",
     "productName": "Nike Air Pegasus",
     "productDescription": "Something else altogether",
     "mainCategory": "Shoes",
@@ -37,6 +30,7 @@
   },
   {
     "id": "2333",
+    "contractAddress": "0x2063f6e37820e1bab8462f05697a560a1266ed42",
     "productName": "Nike Free",
     "productDescription": "Free your feet",
     "mainCategory": "Shoes",
@@ -51,6 +45,7 @@
   },
   {
     "id": "2334",
+    "contractAddress": "0x3063f6e37820e1bab8462f05697a560a1266ed43",
     "productName": "Adidas Bottom up",
     "productDescription": "Rebuild from the .. :)",
     "mainCategory": "Shoes",
@@ -65,6 +60,7 @@
   },
   {
     "id": "2335",
+    "contractAddress": "0x4063f6e37820e1bab8462f05697a560a1266ed44",
     "productName": "Adidas Zero",
     "productDescription": "Zero is less than the one",
     "mainCategory": "Shoes",
@@ -79,6 +75,7 @@
   },
   {
     "id": "3000",
+    "contractAddress": "0x5063f6e37820e1bab8462f05697a560a1266ed45",
     "productName": "Bolton stitches",
     "productDescription": "Careful with the stapler!",
     "mainCategory": "Books",
@@ -93,6 +90,7 @@
   },
   {
     "id": "3001",
+    "contractAddress": "0x6063f6e37820e1bab8462f05697a560a1266ed46",
     "productName": "Commonality",
     "productDescription": "Easy does it",
     "mainCategory": "Books",
@@ -107,6 +105,7 @@
   },
   {
     "id": "3003",
+    "contractAddress": "0x7063f6e37820e1bab8462f05697a560a1266ed47",
     "productName": "Bolton stitches 2",
     "productDescription": "Still careful with the stapler!",
     "mainCategory": "Books",
@@ -121,6 +120,7 @@
   },
   {
     "id": "3004",
+    "contractAddress": "0x8063f6e37820e1bab8462f05697a560a1266ed48",
     "productName": "Google Goggles",
     "productDescription": "Glass for in the water",
     "mainCategory": "Tech",
@@ -135,6 +135,7 @@
   },
   {
     "id": "3005",
+    "contractAddress": "0x9063f6e37820e1bab8462f05697a560a1266ed49",
     "productName": "Bolton stitches",
     "productDescription": "Careful with the stapler!",
     "mainCategory": "Books",

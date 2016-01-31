@@ -7,13 +7,6 @@
     proposalFilter: IProposalFilter;
 }
 
-interface IProposalFilter {
-    maximumPrice?: number;
-    minimumTotalAmount?: number;
-    partNumber?: string;
-    productCategory?: string;
-}
-
 class SellerProposalListController implements ISellerProposalListController {
     public static $inject = [
         "$scope",
@@ -33,7 +26,8 @@ class SellerProposalListController implements ISellerProposalListController {
         maximumPrice: null,
         minimumTotalAmount: null,
         partNumber: null,
-        productCategory: null
+        mainCategory: null,
+        subCategory: null
     };
     
     constructor(

@@ -14,7 +14,6 @@ import cacheController = require('../api/data/cacheController');
  * @param app
  */
 export function configure(app: express.Express) {
-    // TODO refactor all '/api/...' calls to a separate ExpressAPIRouter (to reduce git merge issues for instance).
     var apiRouter = express.Router();
     app.use('/api', apiRouter);
 
