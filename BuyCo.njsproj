@@ -44,6 +44,7 @@
     <Content Include="client\js\seller-proposals\seller-proposal-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
+    <Content Include="config.json" />
     <Content Include="test\spec-runner.html" />
     <TypeScriptCompile Include="api\category\categoryService.ts" />
     <TypeScriptCompile Include="api\category\categoryController.spec.ts">

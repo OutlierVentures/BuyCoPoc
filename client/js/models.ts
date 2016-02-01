@@ -85,9 +85,9 @@ interface IProposal {
     endDate: Date;
     partNumber: string,
     ultimateDeliveryDate: Date;
-    nrOfBackings: number, // Number of ProposalBackings
-    nrOfBackers: number,  // Number of (unique) users that made a proposalbacking.
-    totalAmount: number   // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
+    nrOfBackings: number; // Number of ProposalBackings
+    nrOfBackers: number;  // Number of (unique) users that made a proposalbacking.
+    totalAmount: number;   // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
 
 interface IProposalFilter {
