@@ -1,6 +1,5 @@
 ﻿import express = require("express");
 import { UserRepository } from "../../models/userModel";
-
 import configModel = require('../../models/configModel');
 import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');

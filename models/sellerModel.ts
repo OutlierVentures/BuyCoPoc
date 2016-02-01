@@ -10,7 +10,7 @@ export var sellerSchema = new mongoose.Schema({
     company: String,
     email: String,
     addressLine1: String,
-    addressline2: String,
+    addressLine2: String,
     postalCode: String,
     city: String,
     country: String,

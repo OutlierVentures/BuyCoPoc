@@ -5,7 +5,7 @@ import migrationController = require('../controllers/migrationController');
 import proposalController = require('../api/proposal/proposalController');
 import categoryController = require('../api/category/categoryController');
 import offerController = require('../offers/offerController');
-import sellerController = require('../controllers/sellerController');
+import sellerController = require('../api/seller/sellerController');
 import configController = require('../controllers/configurationController');
 import cacheController = require('../api/data/cacheController');
 

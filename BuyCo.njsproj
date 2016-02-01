@@ -92,7 +92,7 @@
     <TypeScriptCompile Include="controllers\configurationController.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
-    <TypeScriptCompile Include="controllers\sellerController.ts" />
+    <TypeScriptCompile Include="api\seller\sellerController.ts" />
     <TypeScriptCompile Include="api\proposal\proposalController.ts" />
     <TypeScriptCompile Include="controllers\stubOauthController.ts" />
     <TypeScriptCompile Include="controllers\upholdController.ts" />
@@ -402,6 +402,7 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
+    <Folder Include="api\seller\" />
     <Folder Include="api\proposal\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />

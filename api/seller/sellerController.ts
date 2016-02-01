@@ -1,6 +1,6 @@
 ﻿import express = require("express");
-import { IUser, User, UserRepository } from "../models/userModel";
-import { ISeller, SellerRepository } from "../models/sellerModel";
+import { IUser, User, UserRepository } from "../../models/userModel";
+import { ISeller, SellerRepository } from "../../models/sellerModel";
 
 var userRepo = new UserRepository();
 var sellerRepo = new SellerRepository();
@@ -33,7 +33,7 @@ export class SellerController {
             return res.status(401);
         };
         userRepo.getUserByAccessToken2(accessToken).then((user: IUser) => {
-            return sellerRepo.getSellerByUserExternalId(user.externalId)
+            return sellerRepo.getSellerByUserExternalId(user.externalId);
         }).then((seller: ISeller) => {
             if (seller) {
                 return res.send(seller);
