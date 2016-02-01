@@ -15,7 +15,7 @@ export class CacheController {
                 res.status(500).json({
                     "status": "Error",
                     "location": "initializing CachedProposalService",
-                    "error": err,
+                    "error": err
                 });
                 return null;
             })

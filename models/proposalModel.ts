@@ -33,6 +33,14 @@ export interface IProposal {
 export interface IProposalDocument extends mongoose.Document, IProposal {
 }
 
+export interface IProposalFilter {
+    maximumPrice?: number;
+    minimumTotalAmount?: number;
+    partNumber?: string;
+    mainCategory?: string;
+    subCategory?: string;
+}
+
 /**
  * Cached version of a buying proposal (BuyCo)
  */

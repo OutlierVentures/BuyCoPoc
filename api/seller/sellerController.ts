@@ -1,6 +1,6 @@
 ﻿import express = require("express");
-import { IUser, User, UserRepository } from "../models/userModel";
-import { ISeller, SellerRepository } from "../models/sellerModel";
+import { IUser, User, UserRepository } from "../../models/userModel";
+import { ISeller, SellerRepository } from "../../models/sellerModel";
 
 var userRepo = new UserRepository();
 var sellerRepo = new SellerRepository();
@@ -33,7 +33,7 @@ export class SellerController {
             return res.status(401);
         };
         userRepo.getUserByAccessToken2(accessToken).then((user: IUser) => {
-            return sellerRepo.getSellerByUserExternalId(user.externalId)
+            return sellerRepo.getSellerByUserExternalId(user.externalId);
         }).then((seller: ISeller) => {
             if (seller) {
                 return res.send(seller);
@@ -59,11 +59,12 @@ export class SellerController {
             // Note: using 'object literal' instead of constructor+ set props, because it refactors more easily).
             var input = {
                 userExternalId: userExternalId,
+                
                 isActive: true,
                 email: req.body.email,
                 company: req.body.company,
                 addressLine1: req.body.addressLine1,
-                addressline2: req.body.addressLine2,
+                addressLine2: req.body.addressLine2,
                 postalCode: req.body.postalCode,
                 city: req.body.city,
                 country: req.body.country,

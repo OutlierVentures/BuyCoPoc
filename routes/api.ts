@@ -5,7 +5,7 @@ import migrationController = require('../controllers/migrationController');
 import proposalController = require('../api/proposal/proposalController');
 import categoryController = require('../api/category/categoryController');
 import offerController = require('../offers/offerController');
-import sellerController = require('../controllers/sellerController');
+import sellerController = require('../api/seller/sellerController');
 import configController = require('../api/configuration/configurationController');
 import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
@@ -15,7 +15,6 @@ import cacheController = require('../api/data/cacheController');
  * @param app
  */
 export function configure(app: express.Express) {
-    // TODO refactor all '/api/...' calls to a separate ExpressAPIRouter (to reduce git merge issues for instance).
     var apiRouter = express.Router();
     app.use('/api', apiRouter);
 

@@ -23,37 +23,37 @@
                         <label for="company" class="col-sm-2 control-label">Company</label>
                         <div class="col-sm-10">
                             <span ng-if="vm.displayMode===vm.displayModes.read">{{ vm.seller.company }}</span>
-                            <input ng-if="vm.displayMode!==vm.displayModes.read" type="text" class="form-control" id="company" name="company" ng-model="vm.seller.company" required="required">
+                            <input ng-if="vm.displayMode!==vm.displayModes.read" type="text" class="form-control" id="company" name="company" ng-model="vm.seller.company" required="required" />
                         </div>
                     </div>
                     <div class="form-group" ng-class="{ 'has-error': vm.form.email.$invalid && vm.form.email.$touched}">
                         <label for="email" class="col-sm-2 control-label">Email</label>
                         <div class="col-sm-10">
-                            <input type="email" class="form-control" id="email" name="email" ng-model="vm.seller.email">
+                            <input type="email" class="form-control" id="email" name="email" ng-model="vm.seller.email" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="addressLine1" class="col-sm-2 control-label">Address line 1</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="addressLine1" ng-model="vm.seller.addressLine1">
+                            <input type="text" class="form-control" id="addressLine1" ng-model="vm.seller.addressLine1" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="addressLine2" class="col-sm-2 control-label">Address line 2</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="addressLine2" ng-model="vm.seller.addressLine2">
+                            <input type="text" class="form-control" id="addressLine2" ng-model="vm.seller.addressLine2" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="postalcode" class="col-sm-2 control-label">Postalcode</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="postalcode" ng-model="vm.seller.postalcode">
+                            <input type="text" class="form-control" id="postalcode" ng-model="vm.seller.postalCode" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="city" class="col-sm-2 control-label">City</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="city" ng-model="vm.seller.city">
+                            <input type="text" class="form-control" id="city" ng-model="vm.seller.city" />
                         </div>
                     </div>
                     <div class="form-group" ng-class="{ 'has-error': vm.form.country.$invalid && vm.form.country.$touched}">
@@ -68,7 +68,7 @@
                     <div class="form-group">
                         <label for="telephone" class="col-sm-2 control-label">Telephone number</label>
                         <div class="col-sm-10">
-                            <input type="tel" class="form-control" id="telephone" ng-model="vm.seller.telephone">
+                            <input type="tel" class="form-control" id="telephone" ng-model="vm.seller.telephone" />
                         </div>
                     </div>
                     <div class="form-group">

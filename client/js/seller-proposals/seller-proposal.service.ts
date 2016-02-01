@@ -32,7 +32,7 @@ class SellerProposalService implements ISellerProposalService {
             .then((result) => {
                 resolve(result.data);
             }).catch((error)  => {
-                reject(`Error getting proposal data: ${error}`, null);
+                reject(`Error getting proposal data: ${error}`);
             });
         });
     }
