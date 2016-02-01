@@ -411,6 +411,7 @@
     <Folder Include="client\js\controllers\" />
     <Folder Include="client\js\common\" />
     <Folder Include="client\js\categories\" />
+    <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />

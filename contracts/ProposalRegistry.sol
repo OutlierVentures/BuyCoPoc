@@ -98,6 +98,16 @@ contract Proposal {
         uint amount;
 
         /**
+         * Transaction ID of the pledge payment (before closing a deal).
+         */
+        string pledgePaymentTransactionID;
+
+        /**
+         * Amount of the pledge payment.
+         */
+        uint pledgePaymentAmount;
+
+        /**
          * Transaction ID of the initial payment (at moment of backing).
          */
         string startPaymentTransactionID;
@@ -188,12 +198,12 @@ contract Proposal {
     /**
      * Register a payment for a backer.
      * @param backerAddress the backer that paid
-     * @param paymentType 1=start, 2=end
+     * @param paymentType 1=pledge, 2=start, 3=end
      * @param transactionID the external transaction ID of the payment
      * @param amount the payment amount
      */
     function setPaid(address backerAddress, uint paymentType, string transactionID, uint amount) {
-        // TODO: check whether tx.origin is proposal creator? Or admin?
+        // TODO: check whether tx.origin is proposal creator? Or admin? Or the backer?
         // TODO: check whether the amount is correct according to payment
         // schedule
 
@@ -208,6 +218,12 @@ contract Proposal {
             b.startPaymentAmount = amount;
         }
         else if (paymentType == 2) {
+            // End payment
+            // TODO: validate that start payment has been registered
+            b.pledgePaymentTransactionID = transactionID;
+            b.pledgePaymentAmount = amount;
+        }
+        else if (paymentType == 3) {
             // End payment
             // TODO: validate that start payment has been registered
             b.endPaymentTransactionID = transactionID;
