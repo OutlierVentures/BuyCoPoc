@@ -40,7 +40,7 @@ interface IUpholdTransactionNode {
     "type": string,
     "username": string
 }
-        
+
 interface IUpholdTransaction {
     "id": string;
     "type": string;
@@ -76,6 +76,7 @@ interface IApplicationInfo {
 
 interface IProposal {
     id: string;
+    contractAddress: string;
     productName: string;
     productDescription: string;
     mainCategory: string;
@@ -170,4 +171,28 @@ interface IOffer {
     price: number;
     minimumAmount: number;
     toCard: string;
+}
+
+
+interface ICategoryBase {
+    name: string;
+    totalProposalCount: number;
+    /**
+     * URL of the main category image, relative to /api/. For example "category/data/Food%20and%20drink/main.jpg"
+     */
+    imageUrl: string;
+}
+
+/**
+ * A sub category of BuyCo's, e.g. "Camera"
+ */
+interface ISubCategory extends ICategoryBase {
+
+}
+
+/**
+ * A main category of BuyCo's, e.g. "Electronics"
+ */
+interface IMainCategory extends ICategoryBase {
+    subCategories: ISubCategory[];
 }

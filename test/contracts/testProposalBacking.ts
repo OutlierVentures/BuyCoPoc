@@ -149,7 +149,7 @@ describe("ProposalRegistry", () => {
                 assert.equal(newBacker[0], backerAddress1);
                 assert.equal(newBacker[1].toNumber(), amount1);
 
-                // Register a payment for this backer
+                // Register a pledge payment for this backer
                 return proposalContract.setPaid(backerAddress1, 1, txID1, paymentAmount1);
             })
             .then(web3plus.promiseCommital)

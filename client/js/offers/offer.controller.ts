@@ -137,7 +137,7 @@ class OfferController {
 
         this.$http({
             method: 'POST',
-            url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/offer',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/offer',
             data: {
                 price: t.$scope.offer.price,
                 minimumAmount: t.$scope.offer.minimumAmount,
@@ -155,7 +155,7 @@ class OfferController {
                 t.$scope.successMessage = undefined;
 
                 // Redirect to the proposal view
-                t.$location.path("/proposal/" + t.$scope.proposal.id)
+                t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
             });
         }).error(function (error) {
             t.$scope.processMessage = undefined;

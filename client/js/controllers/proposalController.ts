@@ -49,6 +49,8 @@ class ProposalController {
             this.back(proposalId);
         } else if (this.$route.current.name === "details") {
             this.view(proposalId);
+        } else if (this.$route.current.name === "close") {
+            this.close(proposalId);
         }
 
     }
@@ -168,6 +170,27 @@ class ProposalController {
     }
 
     /**
+     * Initiate closing the sale.
+     * @param proposalId
+     */
+    close(proposalId: string) {
+        var t = this;
+
+        t.getProposalData(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+        t.getProposalBackers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+        t.getProposalOffers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+    }
+
+    /**
      * Show screen to back a proposal.
      */
     back(proposalId: string) {
@@ -189,7 +212,7 @@ class ProposalController {
 
         this.$http({
             method: 'POST',
-            url: apiUrl + '/proposal/' + t.$scope.proposal.id + '/back',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/back',
             data: {
                 proposal: t.$scope.proposal,
                 amount: t.$scope.amount,
@@ -206,7 +229,7 @@ class ProposalController {
                 t.$scope.successMessage = undefined;
 
                 // Redirect to the proposal view
-                t.$location.path("/proposal/" + t.$scope.proposal.id)
+                t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
             });
         }).error(function (error) {
             t.$scope.processMessage = undefined;

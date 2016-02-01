@@ -208,10 +208,13 @@ When working from Visual Studio, you don't need to run `grunt`. NTVS takes care 
 * Great intellisense and code completion
 * Debugging of server-side code
 * Running and debugging tests
+* Edit and continue while debugging the running app or tests
 
 #### Troubleshooting
 
-However, it doesn't always work. NTVS has some performance issues which might or might not occur on your system, and these might be so serious that they make VS unusable. If they do, try this:
+However, it doesn't always work. NTVS has some performance issues which might or might not occur on your system, and these might be so serious that they make VS unusable (see NTVS GitHub issues, for example [this one](https://github.com/Microsoft/nodejstools/issues/663)).
+
+If they do, try this:
 
 * Set Node.js Intellisense to a lower level through the VS options.
 * Close Visual Studio, delete `.ntvs_analysis.dat` from the project folder and open the solution again.

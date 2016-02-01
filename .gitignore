@@ -206,6 +206,7 @@ routes/*.js
 lib/*.js
 test/**/*.js
 offers/*.js
+api/**/*.js
 **/.node*
 
 /*.js

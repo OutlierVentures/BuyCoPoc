@@ -1,4 +1,4 @@
-/// <binding BeforeBuild='injector' AfterBuild='less:development' />
+/// <binding BeforeBuild='injector, wiredep:task' AfterBuild='less:development' />
 module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
@@ -107,13 +107,13 @@ module.exports = function(grunt) {
 			},
 			local_dependencies: {
 				files: {
-					"client/index.html": [
+                    "client/index.html": [
 						"client/js/**/*.module.js",
 						"client/js/models.js",
 						"client/js/services.js",
 						"client/js/controllers.js",
-						"client/js/app.routes.js",
-						"client/js/app.js",
+                        "client/js/app.routes.js",
+                        "client/js/app.js",
 						"client/js/**/*controller.js",
 						"client/js/**/*.js",
                         "client/js/**/*.mock.js",

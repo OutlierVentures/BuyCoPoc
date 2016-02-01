@@ -141,3 +141,5 @@ class IdentityService {
         return this.primaryProvider && this.primaryProvider.isAuthenticated();
     }
 }
+
+angular.module("buyCoApp").service("identityService", IdentityService);

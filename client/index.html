@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <base href="/" />
@@ -20,7 +20,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn">
-                        BuyCo                        
+                        BuyCo
                         <!--<img src="images/logo-dot.png">-->
                         <!-- <span class="glyphicon glyphicon-home" aria-hidden="true"></span> -->
                     </a>
@@ -29,13 +29,13 @@
                         <!-- <img class="logo" src="images/logo.png">-->
                     </a>
                 </div>
-                <div class="navbar-collapse collapse" ng-controller="UserAccountController" >
+                <div class="navbar-collapse collapse" ng-controller="UserAccountController">
                     <ul class="nav navbar-nav" ng-cloak ng-show="!isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
                     </ul>
                     <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
                         <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
-                        <li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>
+                        <!--<li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>-->
                         <li data-match-route="/seller-proposals/list"><a href="/seller-proposal/list">Seller proposals</a></li>
                     </ul>
                     <!-- <form class="navbar-form navbar-left">
@@ -93,28 +93,30 @@
     <!--START from bower-->
     <!-- jQuery -->
     <script src="vendors/jquery/jquery.js"></script>
-
     <!-- Bootstrap Core JavaScript -->
     <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="vendors/angular/angular.js"></script>
     <script src="vendors/angular-resource/angular-resource.js"></script>
     <script src="vendors/async/lib/async.js"></script>
-    
+
     <!--END from bower-->
     <!-- TODO BW dd. 2015-12-30: Allow minification for perf/prod build, see f.i.: http://stackoverflow.com/questions/28860846/can-grunt-wiredep-wire-minify-version-in-html-file
     <!-- bower:js -->
-    <script src="vendors/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="vendors/angular-route/angular-route.js"></script>
-    <script src="vendors/angular-sanitize/angular-sanitize.js"></script>
-    <script src="vendors/bignumber.js/bignumber.js"></script>
-    <script src="vendors/angular-strap/dist/angular-strap.js"></script>
-    <script src="vendors/angular-strap/dist/angular-strap.tpl.js"></script>
     <script src="vendors/angular-messages/angular-messages.js"></script>
     <script src="vendors/angular-mocks/angular-mocks.js"></script>
-    <script src="vendors/underscore/underscore.js"></script>
-    <script src="vendors/urijs/src/URI.js"></script>
     <script src="vendors/moment/moment.js"></script>
     <script src="vendors/angular-moment/angular-moment.js"></script>
+    <script src="vendors/angular-route/angular-route.js"></script>
+    <script src="vendors/angular-sanitize/angular-sanitize.js"></script>
+    <script src="vendors/angular-strap/dist/angular-strap.js"></script>
+    <script src="vendors/angular-strap/dist/angular-strap.tpl.js"></script>
+    <script src="vendors/bignumber.js/bignumber.js"></script>
+    <script src="vendors/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="vendors/underscore/underscore.js"></script>
+    <script src="vendors/urijs/src/URI.js"></script>
+    <script src="vendors/crypto-js/index.js"></script>
+    <script src="vendors/web3/dist/web3.js"></script>
+    <script src="vendors/web3/dist/web3.min.js"></script>
     <!-- endbower -->
     <!-- injector:js -->
     <script src="js/app.module.js"></script>
@@ -127,6 +129,7 @@
     <script src="js/offers/offer.controller.js"></script>
     <script src="js/seller-proposals/seller-proposal-list.controller.js"></script>
     <script src="js/sellers/seller-signup.controller.js"></script>
+    <script src="js/categories/categoryController.js"></script>
     <script src="js/common/dataAccess.service.js"></script>
     <script src="js/common/ov-message.directive.js"></script>
     <script src="js/common/proposal-detail.directive.js"></script>
@@ -135,6 +138,8 @@
     <script src="js/common/uri.service.js"></script>
     <script src="js/controllers/proposalController.js"></script>
     <script src="js/controllers/proposalListController.js"></script>
+    <script src="js/lib/ethereumjs-accounts.js"></script>
+    <script src="js/lib/hooked-web3-provider.js"></script>
     <script src="js/seller-proposals/seller-proposal-resource.mock.js"></script>
     <script src="js/seller-proposals/seller-proposal.service.js"></script>
     <script src="js/sellers/configuration.service.js"></script>
@@ -142,6 +147,8 @@
     <script src="js/sellers/seller.js"></script>
     <script src="js/sellers/seller.service.js"></script>
     <script src="js/sellers/userResourceMock.js"></script>
+    <script src="js/user/blockchainService.js"></script>
+    <script src="js/user/userAccountController.js"></script>
     <!-- endinjector -->
 </body>
 </html>

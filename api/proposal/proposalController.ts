@@ -1,40 +1,41 @@
 ﻿import express = require("express");
-import { UserRepository } from "../models/userModel";
+import { UserRepository } from "../../models/userModel";
 
-import configModel = require('../models/configModel');
-import serviceFactory = require('../services/serviceFactory');
-import proposalService = require('../services/proposalService');
-import upholdService = require('../services/upholdService');
+import configModel = require('../../models/configModel');
+import serviceFactory = require('../../services/serviceFactory');
+import proposalService = require('../../services/proposalService');
+import upholdService = require('../../services/upholdService');
 
-import proposalModel = require('../models/proposalModel');
+import proposalModel = require('../../models/proposalModel');
 
-import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
 
 var userRepo = new UserRepository();
 
 /**
- * Controller for Circle membership operations.
+ * Controller for BuyCo proposals.
  */
 export class ProposalController {
     constructor() {
     }
 
-    getAll = (req: express.Request, res: express.Response) => {
+    get = (req: express.Request, res: express.Response) => {
         var token = req.headers["accesstoken"];
 
-        serviceFactory.createProposalService()
+        // Get filters from request
+        var mainCategory = req.params.mainCategory;
+        var subCategory = req.params.subCategory;
+
+        serviceFactory.createCachedProposalService()
             .then(
-            function (ps) {
-                return ps.getAll();
+            function (cps) {
+                return cps.get(mainCategory, subCategory);
             },
             function (initErr) {
                 res.status(500).json({
                     "error": initErr,
                     "error_location": "initializing proposals service"
                 });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
                 return null;
             })
             .then(
@@ -62,8 +63,6 @@ export class ProposalController {
                     "error": initErr,
                     "error_location": "initializing proposals service"
                 });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
                 return null;
             })
             .then(
@@ -86,6 +85,14 @@ export class ProposalController {
         // Example: "Electronics - Camera"
         var categoryString: string = req.body.category;
 
+        if (!categoryString) {
+            res.status(500).json({
+                "error": "category is required",
+                "error_location": "creating proposal"
+            });
+            return;
+        }
+
         if (categoryString && categoryString.indexOf(" - ")) {
             var parts = categoryString.split(" - ")
             if (parts.length == 2) {
@@ -104,8 +111,6 @@ export class ProposalController {
                     "error": initErr,
                     "error_location": "initializing proposal service"
                 });
-                // How to ensure that the process stops here? Is the next then()
-                // processed in this case?
                 return null;
             })
             .then(
@@ -158,8 +163,6 @@ export class ProposalController {
                         "error": initErr,
                         "error_location": "initializing proposal service"
                     });
-                    // How to ensure that the process stops here? Is the next then()
-                    // processed in this case?
                     return null;
                 })
                 .then(function (proposalBacking) {

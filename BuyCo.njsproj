@@ -35,6 +35,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="client\js\categories\main-category-details.html" />
+    <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
     <Content Include="client\js\common\proposal-detail.html" />
     <Content Include="client\js\offers\offer-details.html" />
@@ -43,9 +45,22 @@
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\category\categoryService.ts" />
+    <TypeScriptCompile Include="api\category\categoryController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="api\category\categoryController.ts" />
+    <TypeScriptCompile Include="api\contract\contractController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="api\contract\contractController.ts" />
+    <TypeScriptCompile Include="api\data\cacheController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
+    <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.directive.ts" />
     <TypeScriptCompile Include="client\js\common\proposal-detail.directive.ts" />
@@ -67,6 +82,8 @@
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller.ts" />
+    <TypeScriptCompile Include="client\js\user\blockchainService.ts" />
+    <TypeScriptCompile Include="client\js\user\userAccountController.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-resource.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-sanitize.d.ts" />
@@ -77,16 +94,18 @@
     <TypeScriptCompile Include="client\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
     <TypeScriptCompile Include="client\typings\urijs\URIjs.d.ts" />
-    <TypeScriptCompile Include="controllers\configurationController.ts" />
+    <TypeScriptCompile Include="api\data\cacheController.ts" />
+    <TypeScriptCompile Include="api\configuration\configurationController.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="controllers\sellerController.ts" />
-    <TypeScriptCompile Include="controllers\proposalController.ts" />
+    <TypeScriptCompile Include="api\proposal\proposalController.ts" />
     <TypeScriptCompile Include="controllers\stubOauthController.ts" />
     <TypeScriptCompile Include="controllers\upholdController.ts" />
     <TypeScriptCompile Include="lib\tools.ts" />
     <TypeScriptCompile Include="lib\web3config.ts" />
     <TypeScriptCompile Include="models\configModel.ts" />
+    <TypeScriptCompile Include="models\categoryModel.ts" />
     <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\sellerModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
@@ -321,6 +340,7 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="services\configurationService.ts" />
+    <TypeScriptCompile Include="services\cachedProposalService.ts" />
     <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
@@ -354,7 +374,7 @@
     <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\controllers\testProposalController.ts">
+    <TypeScriptCompile Include="api\proposal\proposalController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\sellers\testPersistance.ts">
@@ -386,6 +406,11 @@
     <TypeScriptCompile Include="typings\underscore\underscore.d.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="api\data\" />
+    <Folder Include="api\category\" />
+    <Folder Include="api\configuration\" />
+    <Folder Include="api\contract\" />
+    <Folder Include="api\proposal\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />
     <Folder Include="client\data\countries\" />
@@ -393,10 +418,14 @@
     <Folder Include="client\js\" />
     <Folder Include="client\js\controllers\" />
     <Folder Include="client\js\common\" />
+    <Folder Include="client\js\categories\" />
+    <Folder Include="client\js\user\" />
+    <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />
     <Folder Include="client\less\" />
+    <Folder Include="client\js\lib\" />
     <Folder Include="client\typings\" />
     <Folder Include="client\typings\angularjs\" />
     <Folder Include="client\typings\cryptojs\" />
@@ -411,6 +440,7 @@
     <Folder Include="lib\" />
     <Folder Include="contracts\" />
     <Folder Include="models\" />
+    <Folder Include="api\" />
     <Folder Include="offers\" />
     <Folder Include="routes\" />
     <Folder Include="test\" />
