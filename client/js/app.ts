@@ -21,12 +21,6 @@ interface BuyCoRootScope extends ng.IRootScopeService {
 
 // angular.module("buyCoApp", ["ngResource", "ngRoute", "ngSanitize", "mgcrea.ngStrap"]);
 
-// All controllers are registered here.
-// TODO Suggestion BW: Follow John Papa's Angular styleguide.
-angular.module("buyCoApp").controller("NavigationController", NavigationController);
-angular.module("buyCoApp").controller("LoginController", LoginController);
-angular.module("buyCoApp").controller("UserAccountController", UserAccountController);
-
 angular.module("buyCoApp").run(['$rootScope', function ($rootScope: BuyCoRootScope) {
     /**
      * Returns whether this is a public page.
@@ -38,10 +32,6 @@ angular.module("buyCoApp").run(['$rootScope', function ($rootScope: BuyCoRootSco
         return window.location.pathname.indexOf('/audit') === 0;
     };
 }]);
-
-// Note: the string name provided to angular has to match the parameter names as used in the controllers,
-// case-sensitive.
-angular.module("buyCoApp").service("identityService", IdentityService);
 
 /**
  * Shorthand method for getting an Angular service from the debug console.

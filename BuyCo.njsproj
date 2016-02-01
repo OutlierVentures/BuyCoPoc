@@ -50,6 +50,10 @@
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="api\category\categoryController.ts" />
+    <TypeScriptCompile Include="api\contract\contractController.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="api\contract\contractController.ts" />
     <TypeScriptCompile Include="api\data\cacheController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
@@ -78,6 +82,8 @@
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller.ts" />
+    <TypeScriptCompile Include="client\js\user\blockchainService.ts" />
+    <TypeScriptCompile Include="client\js\user\userAccountController.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-resource.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-sanitize.d.ts" />
@@ -89,7 +95,7 @@
     <TypeScriptCompile Include="client\typings\tsd.d.ts" />
     <TypeScriptCompile Include="client\typings\urijs\URIjs.d.ts" />
     <TypeScriptCompile Include="api\data\cacheController.ts" />
-    <TypeScriptCompile Include="controllers\configurationController.ts" />
+    <TypeScriptCompile Include="api\configuration\configurationController.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="controllers\sellerController.ts" />
@@ -402,6 +408,8 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
+    <Folder Include="api\configuration\" />
+    <Folder Include="api\contract\" />
     <Folder Include="api\proposal\" />
     <Folder Include="client\" />
     <Folder Include="client\data\" />
@@ -411,11 +419,13 @@
     <Folder Include="client\js\controllers\" />
     <Folder Include="client\js\common\" />
     <Folder Include="client\js\categories\" />
+    <Folder Include="client\js\user\" />
     <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />
     <Folder Include="client\less\" />
+    <Folder Include="client\js\lib\" />
     <Folder Include="client\typings\" />
     <Folder Include="client\typings\angularjs\" />
     <Folder Include="client\typings\cryptojs\" />

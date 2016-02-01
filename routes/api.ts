@@ -6,7 +6,8 @@ import proposalController = require('../api/proposal/proposalController');
 import categoryController = require('../api/category/categoryController');
 import offerController = require('../offers/offerController');
 import sellerController = require('../controllers/sellerController');
-import configController = require('../controllers/configurationController');
+import configController = require('../api/configuration/configurationController');
+import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
 
 /**
@@ -57,6 +58,10 @@ export function configure(app: express.Express) {
     var cc = new configController.ConfigurationController();
     apiRouter.route("/config/useStubs").get(cc.useStubs);
     apiRouter.route("/config/getversion").get(cc.getVersion);
+    apiRouter.route("/config/ethereum/jsonRpcUrl").get(cc.getEthereumJsonRpcUrl);
+
+    var contractCon = new contractController.ContractController();
+    apiRouter.route("/contract/:contractName/abi").get(contractCon.getAbi);    
         
     // Migrations
     var mc = new migrationController.MigrationController();

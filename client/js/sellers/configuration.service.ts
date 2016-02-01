@@ -1,6 +1,7 @@
 interface IConfigurationService {
     getUseStubs(): ng.IPromise<boolean>;
     getVersion(): ng.IPromise<string>;
+    getEthereumJsonRpcUrl(): ng.IPromise<string>;
 }
 
 class ConfigurationService implements IConfigurationService {
@@ -20,7 +21,18 @@ class ConfigurationService implements IConfigurationService {
             });
         });
     }
-    
+
+    getEthereumJsonRpcUrl() : ng.IPromise<string>{
+        return this.$q((resolve, reject) => {
+            this.$http.get(apiUrl + "/config/ethereum/jsonRpcUrl")
+                .then(result => {
+                    resolve(result.data);
+                }).catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+        
     getVersion() {
         return this.$q((resolve, reject) => {
             this.$http.get(apiUrl + "/config/getversion")

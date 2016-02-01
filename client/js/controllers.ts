@@ -23,7 +23,9 @@ class LoginController {
         "$location",
         "$window",
         "$route",
-        "identityService"];
+        "identityService",
+        "blockchainService",
+        "configurationService"];
 
     constructor(
         private $scope: ILoginScope,
@@ -32,9 +34,11 @@ class LoginController {
         private $location: ng.ILocationService,
         private $window: ng.IWindowService,
         private $route: ng.route.IRouteService,
-        private identityService: IdentityService) {
+        private identityService: IdentityService,
+        private blockchainService: BlockchainService,
+        private configurationService: ConfigurationService) {
 
-        $scope.isAuthenticated = function(): boolean {
+        $scope.isAuthenticated = function (): boolean {
             return identityService.isAuthenticated();
         }
 
@@ -61,7 +65,7 @@ class LoginController {
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
         } else if (this.$location.path() === "/auth/uphold/callback"
-        // Don't handle a login attempt while already logged in
+            // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
             && !this.$rootScope.isProcessingLogin
@@ -109,6 +113,20 @@ class LoginController {
                 // Log on with it
                 identityService.logon(brip);
 
+                // Set up the web3 blockchain connection
+                // COULD DO: model this as an IIdentityProvider as well. Arguably it is a provider
+                // of an identity.
+                // Blockchain connection from client disabled for now, til https connection is solved.
+                //configurationService.getEthereumJsonRpcUrl()
+                //    .then(url=> {
+                //        blockchainService.connect(url);
+                //    }, err => {
+                //        // TODO: handle error when connecting to blockchain.
+                //        // Should also be handled in other places, e.g. before transacting (isConnected()?),
+                //        // on user profile page.
+                //    });
+
+
                 // Store in scope to show in view
                 $scope.userInfo = resultData.user;
             }).error(function (error) {
@@ -127,6 +145,9 @@ class LoginController {
 
     }
 }
+
+angular.module("buyCoApp").controller("LoginController", LoginController);
+
 
 interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
@@ -163,7 +184,7 @@ class DashboardController {
         }
 
         // The logon could happen while the controller is already loaded.
-        $rootScope.$on('loggedOn', function() {
+        $rootScope.$on('loggedOn', function () {
             t.loadData();
         });
         
@@ -194,7 +215,7 @@ class DashboardController {
             method: 'GET',
             url: apiUrl + '/uphold/me/cards',
             headers: { AccessToken: t.$scope.userInfo.accessToken }
-        }).success(function(cards: any) {
+        }).success(function (cards: any) {
             console.log("Success on Uphold call through our API. Result:");
             console.log(cards);
 
@@ -214,7 +235,7 @@ class DashboardController {
         var t = this;
         t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
             // When favoriteCardsOnly then show only cards with settings.starred = true.
-            t.$scope.allCards : t._.filter(t.$scope.allCards, function(card: IUpholdCard) {
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function (card: IUpholdCard) {
                 return card.settings.starred;
             });
         ;
@@ -227,8 +248,8 @@ class DashboardController {
         });
         return result;
     }
-    
-    
+
+
 }
 
 class NavigationController {
@@ -242,33 +263,4 @@ class NavigationController {
     }
 }
 
-interface IUserAccountScope extends ng.IScope {
-    //credentials: Credentials;
-    isAuthenticated() : Boolean;
-    userInfo: IUser;
-    version: string;
-}
-
-class UserAccountController {
-    public static $inject = [
-        "$scope",
-        "$rootScope",
-        "$location",
-        "configurationService"
-    ];
-
-    constructor(
-        private $scope: IUserAccountScope,
-        private $rootScope: BuyCoRootScope,
-        private $location: ng.ILocationService,
-        private configurationService: IConfigurationService) {
-
-        this.$rootScope.$on('loggedOn', function (event, data) {
-            $scope.userInfo = $rootScope.userInfo;
-            configurationService.getVersion()
-            .then((version) => {
-                $scope.version = version;
-            });
-        });
-    }
-}
+angular.module("buyCoApp").controller("NavigationController", NavigationController);
