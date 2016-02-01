@@ -212,6 +212,7 @@ api/**/*.js
 /*.js
 !GruntFile.js
 client/js/**/*.js
+!client/js/lib/*.js
 
 # TSD typings
 typings/

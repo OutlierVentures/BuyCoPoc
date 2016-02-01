@@ -1,6 +1,5 @@
 ﻿import express = require("express");
 import { UserRepository } from "../../models/userModel";
-
 import configModel = require('../../models/configModel');
 import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
@@ -23,13 +22,12 @@ export class ProposalController {
         var token = req.headers["accesstoken"];
 
         // Get filters from request
-        var mainCategory = req.params.mainCategory;
-        var subCategory = req.params.subCategory;
-
+        let proposalFilter = req.query;
+        
         serviceFactory.createCachedProposalService()
             .then(
             function (cps) {
-                return cps.get(mainCategory, subCategory);
+                return cps.get(proposalFilter);
             },
             function (initErr) {
                 res.status(500).json({

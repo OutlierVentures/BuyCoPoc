@@ -19,29 +19,12 @@
         </div>
     </div>
     <div class="row" ng-cloak ng-show="vm.proposals">
-        <div class="col-md-1"></div>
-        <div class="col-md-4 form-group">
-            <label>Category</label>
-        </div>
-        <div class="col-md-2 form-group">
-            <label>Part number</label>
-        </div>
-        <div class="col-md-2 form-group">
-            <label>Minimum total amount</label>
-        </div>
-        <div class="col-md-2 form-group">
-            <label>Maximum price</label>
-        </div>
-        <div class="col-md-1 form-group">
-        </div>
-    </div>
-    <div class="row" ng-cloak ng-show="vm.proposals">
         <form name="vm.form" novalidate>
             <div class="col-md-1">
-                <h4 class="ng-binding" style="display: inline; vertical-align: bottom;">Filter</h4>
             </div>
             <div class="col-md-4 form-group">
-                <select class="form-control" ng-model="vm.proposalFilter.category" name="category" >
+                <label for="filterCategory">Category</label>
+                <select class="form-control" ng-model="vm.proposalFilter.subCategory" name="category" id="filterCategory" >
                     <option value="">[any category]</option>
                     <optgroup label="Electronics">
                         <option value="Camera">Electronics - Camera</option>
@@ -58,15 +41,19 @@
                 </select>
             </div>
             <div class="col-md-2 form-group">
-                <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber">
+                <label for="filterPartNumber">Part number</label>
+                <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber" id="filterPartNumber">
             </div>
             <div class="col-md-2 form-group" ng-class="{ 'has-error': vm.form.minimumTotalAmount.$invalid }">
-                <input class="form-control" type="number" name="minimumTotalAmount" ng-model="vm.proposalFilter.minimumTotalAmount">
+                <label for="filterMinimumTotalAmount">Minimum total amount</label>
+                <input class="form-control" type="number" name="minimumTotalAmount" ng-model="vm.proposalFilter.minimumTotalAmount" id="filterMinimumTotalAmount">
             </div>
             <div class="col-md-2 form-group" ng-class="{ 'has-error': vm.form.maximumPrice.$invalid }">
-                <input class="form-control" type="number" name="maximumPrice" ng-model="vm.proposalFilter.maximumPrice">
+                <label for="filterMaximumPrice">Maximum price</label>
+                <input class="form-control" type="number" name="maximumPrice" ng-model="vm.proposalFilter.maxPrice" id="filterMaximumPrice">
             </div>
             <div class="col-md-1 form-group">
+                 <label for="filterCategory">Filter</label>
                  <a class="btn btn-primary" ng-click="vm.search()" ng-show="!vm.isSearching" ng-disabled="!vm.filterChanged">
                     <span class="glyphicon glyphicon-search"></span>
                 </a>
@@ -81,7 +68,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading"><h3>No active proposals</h3></div>
                 <div class="panel-body">
-                    <p>There are no active buying proposals <span ng-cloak ng-show="vm.proposalFilter">within current filter</span>.</p>
+                    <p>There are no active buying proposals<span ng-cloak ng-show="vm.isFilterSet"> within current filter</span>.</p>
                 </div>
             </div>
         </div>
