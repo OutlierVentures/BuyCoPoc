@@ -22,7 +22,7 @@ export class ProposalController {
         var token = req.headers["accesstoken"];
 
         // Get filters from request
-        let proposalFilter = req.params;
+        let proposalFilter = req.query;
         
         serviceFactory.createCachedProposalService()
             .then(
