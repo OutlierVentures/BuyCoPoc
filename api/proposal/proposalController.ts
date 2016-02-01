@@ -83,6 +83,14 @@ export class ProposalController {
         // Example: "Electronics - Camera"
         var categoryString: string = req.body.category;
 
+        if (!categoryString) {
+            res.status(500).json({
+                "error": "category is required",
+                "error_location": "creating proposal"
+            });
+            return;
+        }
+
         if (categoryString && categoryString.indexOf(" - ")) {
             var parts = categoryString.split(" - ")
             if (parts.length == 2) {

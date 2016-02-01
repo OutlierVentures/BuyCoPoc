@@ -49,6 +49,8 @@ class ProposalController {
             this.back(proposalId);
         } else if (this.$route.current.name === "details") {
             this.view(proposalId);
+        } else if (this.$route.current.name === "close") {
+            this.close(proposalId);
         }
 
     }
@@ -151,6 +153,27 @@ class ProposalController {
     }
 
     view(proposalId: string) {
+        var t = this;
+
+        t.getProposalData(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+        t.getProposalBackers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+        t.getProposalOffers(proposalId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
+
+    }
+
+    /**
+     * Initiate closing the sale.
+     * @param proposalId
+     */
+    close(proposalId: string) {
         var t = this;
 
         t.getProposalData(proposalId, function (err, res) {
