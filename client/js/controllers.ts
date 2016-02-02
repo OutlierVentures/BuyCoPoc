@@ -116,16 +116,15 @@ class LoginController {
                 // Set up the web3 blockchain connection
                 // COULD DO: model this as an IIdentityProvider as well. Arguably it is a provider
                 // of an identity.
-                // Blockchain connection from client disabled for now, til https connection is solved.
-                //configurationService.getEthereumJsonRpcUrl()
-                //    .then(url=> {
-                //        blockchainService.connect(url);
-                //    }, err => {
-                //        // TODO: handle error when connecting to blockchain.
-                //        // Should also be handled in other places, e.g. before transacting (isConnected()?),
-                //        // on user profile page.
-                //    });
-
+                // Blockchain connection from client
+                configurationService.getEthereumJsonRpcUrl()
+                    .then(url=> {
+                        blockchainService.connect(url);
+                    }, err => {
+                        // TODO: handle error when connecting to blockchain.
+                        // Should also be handled in other places, e.g. before transacting (isConnected()?),
+                        // on user profile page.
+                    });
 
                 // Store in scope to show in view
                 $scope.userInfo = resultData.user;

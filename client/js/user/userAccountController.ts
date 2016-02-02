@@ -29,13 +29,13 @@ class UserAccountController {
                     $scope.version = version;
                 });
 
-            // Blockchain connection from client disabled for now, til https connection is solved.
-            //if (!blockchainService.isConnected()) {
-            //    configurationService.getEthereumJsonRpcUrl()
-            //        .then(url=> {
-            //            blockchainService.connect(url);
-            //        });
-            //}
+            // Blockchain node connection from client
+            if (!blockchainService.isConnected()) {
+                configurationService.getEthereumJsonRpcUrl()
+                    .then(url=> {
+                        blockchainService.connect(url);
+                    });
+            }
         });
     }
 }

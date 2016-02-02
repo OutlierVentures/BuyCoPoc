@@ -44,7 +44,17 @@ export class ConfigurationController implements IConfigurationController {
     };
 
     getEthereumJsonRpcUrl = (req: express.Request, res: express.Response) => {
-        res.send(this.config.ethereum.jsonRpcUrl);
+        var url: string;
+
+        // If the Ethereum node is wrapped in a HTTPS proxy, we present
+        // that URL for clients to connect to.
+        if (this.config.ethereum.httpsProxy)
+            url = this.config.server.baseUrl + ":" + this.config.ethereum.httpsProxy.port;
+        else
+            // If no HTTPS wrapper, pass the plain JSON RPC URL as we know it.
+            this.config.ethereum.jsonRpcUrl;
+
+        res.send(url);
     };
 }
 
