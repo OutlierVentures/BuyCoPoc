@@ -4,7 +4,7 @@
     "server": {
         "httpPort": 4123,
         "httpsPort": 4124,
-        "baseUrl": "https://buyco-poc-dev.projects.blockstars.io"
+        "baseUrl": "https://selfsigned.blockstars.io"
     },
     "database": {
         "url": "mongodb://buyco-poc-dev-user:Uiwjde84ybeqwZEJWho2@ds027505.mongolab.com:27505/buyco-poc-dev"
@@ -22,8 +22,11 @@
         }
     },
     "ethereum": {
-        "__comment" : "This configuration uses the development Ethereum node on blockstars.io.",
+        "__comment": "This configuration uses the development Ethereum node on blockstars.io.",
         "jsonRpcUrl": "http://blockstars.io:9001",
+        "httpsProxy": {
+            "port": 4125
+        },
         "nodeUrl": "blockstars.io:30301",
         "contracts": {
             "proposalRegistry": "0x17f118b4efb225e8d911d837512a2dcc0caf9392"

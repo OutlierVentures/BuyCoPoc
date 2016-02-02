@@ -7,6 +7,8 @@ import web3config = require('./lib/web3config');
 import assert = require('assert');
 import http = require('http');
 import https = require('https');
+import uriJs = require('urijs');
+var httpProxy = require('http-proxy');
 
 import configModel = require('./models/configModel');
 
@@ -183,10 +185,35 @@ export class Server {
         }
 
         http.createServer(app).listen(this.HTTP_PORT);
-        https.createServer(httpsOptions, app).listen(this.HTTPS_PORT);
-
         console.log('http server started on port ' + this.HTTP_PORT);
+
+        https.createServer(httpsOptions, app).listen(this.HTTPS_PORT);
         console.log('https server started on port ' + this.HTTPS_PORT);
+
+        // Create an HTTPS proxy for the ethereum node, to allow calling it securely from 
+        // the client.
+        // Because we serve the DApp over HTTPS, the calls it makes (including those to
+        // the Ethereum node) should be over HTTPS as well. 
+        // See: https://ethereum.stackexchange.com/questions/794/what-are-best-practices-for-serving-a-dapp-over-https-connecting-to-an-ethereum/857#857
+        if (this.config.ethereum.httpsProxy) {
+            var ethJsonRpcUrl = uriJs.parse(this.config.ethereum.jsonRpcUrl);
+            var ethProxyPort = this.config.ethereum.httpsProxy.port;
+
+            // The HTTPS proxy is exposed at one port higher than the HTTPS port of the
+            // application. For example, the application runs on https://blockstars.io:4124, 
+            // then the ethereum node will be made available under https://blockstars.io:4125.
+            // In production deployments, those should be made available under different
+            // host names through the normal https port 443 in order to prevent firewall 
+            // issues for users.
+            httpProxy.createServer({
+                target: {
+                    host: ethJsonRpcUrl.hostname,
+                    port: ethJsonRpcUrl.port
+                },
+                ssl: httpsOptions
+            }).listen(ethProxyPort);
+            console.log('https proxy for Ethereum node started on port ' + ethProxyPort);
+        }
     }
 
     /**

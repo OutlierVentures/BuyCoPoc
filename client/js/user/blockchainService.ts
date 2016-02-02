@@ -36,18 +36,11 @@ class BlockchainService {
         });
         web3.setProvider(provider);
 
+        console.log("Connected to Ethereum node at " + url);
         // Extend the web3 object
-        Accounts.log = function (msg) { console.log(msg); };
+        this.accounts.log = function (msg) { console.log(msg); };
 
-        console.log(Accounts.length);
-
-        // Get a proposal contract for testing
-        this.getProposalContract("0xd690e15a3d8cccc636c97cc6a07cf632072baec4")
-            .then(con => {
-                console.log(con);
-            }, err => {
-                console.log(err);
-            });
+        console.log("Number of accounts configured", this.accounts.length);
     }
 
     getProposalContract(address: string): PromiseLike<any> {
