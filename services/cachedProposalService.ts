@@ -12,6 +12,7 @@ import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
 
+import Q = require('q');
 import { IPromise, Promise } from "q";
 
 interface IBigNumber {
@@ -36,13 +37,13 @@ export class CachedProposalService {
             }
             else {
                 serviceFactory.createProposalService()
-                .then((ps) => {
-                    this.proposalService = ps;
-                    resolve(true);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
+                    .then((ps) => {
+                        this.proposalService = ps;
+                        resolve(true);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
             }
         });
     }
@@ -63,6 +64,8 @@ export class CachedProposalService {
             // Get all promises. Then for each of them, ensure it's stored in Mongo.
             this.proposalService.getAll()
                 .then((proposals) => {
+                    console.log("ensureMongoCache: got " + proposals.length + " proposals from blockchain. Ensuring cache for each of them.");
+
                     var proposalsPromises = new Array<Promise<IProposal>>();
 
                     for (var i = 0; i < proposals.length; i++) {
@@ -94,45 +97,46 @@ export class CachedProposalService {
     ensureCacheProposal(p: IProposal): Promise<IProposal> {
         return Promise<IProposal>((resolve, reject) => {
             Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec()
-            .then((currentProposal) => {
-                // TODO: refactor this to a separate method too
-                var saveDefer = Q.defer<IProposal>();
+                .then((currentProposal) => {
+                    // TODO: refactor this to a separate method too
+                    var saveDefer = Q.defer<IProposal>();
 
-                if (!currentProposal) {
-                    // Create it
-                    Proposal.create(p, (err, res) => {
-                        if (err) saveDefer.reject(err);
-                        else saveDefer.resolve(res);
+                    if (!currentProposal) {
+                        // Create it
+                        Proposal.create(p, (err, res) => {
+                            if (err) saveDefer.reject(err);
+                            else saveDefer.resolve(res);
+                        });
+                    }
+                    else {
+                        // Update it
+                        currentProposal.productName = p.productName;
+                        currentProposal.productDescription = p.productDescription;
+                        currentProposal.mainCategory = p.mainCategory;
+                        currentProposal.subCategory = p.subCategory;
+
+                        currentProposal.endDate = p.endDate;
+                        currentProposal.ultimateDeliveryDate = p.ultimateDeliveryDate;
+
+                        currentProposal.maxPrice = p.maxPrice;
+
+                        currentProposal.save((err, res) => {
+                            if (err) saveDefer.reject(err);
+                            else saveDefer.resolve(currentProposal);
+                        });
+
+                        // TODO: process backers, offers, ... - best as related objects in Mongo
+                    }
+
+                    saveDefer.promise.then(savedProposal => {
+                        console.log("Proposal " + p.contractAddress + " added or updated in cache.");
+                        resolve(savedProposal);
+                    }, err => {
+                        reject(err);
                     });
-                }
-                else {
-                    // Update it
-                    currentProposal.productName = p.productName;
-                    currentProposal.productDescription = p.productDescription;
-                    currentProposal.mainCategory = p.mainCategory;
-                    currentProposal.subCategory = p.subCategory;
-
-                    currentProposal.endDate = p.endDate;
-                    currentProposal.ultimateDeliveryDate = p.ultimateDeliveryDate;
-
-                    currentProposal.maxPrice = p.maxPrice;
-
-                    currentProposal.save((err, res) => {
-                        if (err) saveDefer.reject(err);
-                        else saveDefer.resolve(currentProposal);
-                    });
-
-                    // TODO: process backers, offers, ... - best as related objects in Mongo
-                }
-
-                saveDefer.promise.then(savedProposal => {
-                    resolve(savedProposal);
-                }, err => {
+                }, (err) => {
                     reject(err);
                 });
-            }, (err) => {
-                reject(err);
-            });
         });
     }
 }
