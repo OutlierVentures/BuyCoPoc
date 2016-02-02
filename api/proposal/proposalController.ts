@@ -130,6 +130,7 @@ export class ProposalController {
      */
     back = (req: express.Request, res: express.Response) => {
         var token = req.header("AccessToken");
+        var transactionId = <string>req.body.transactionId;
         var proposalData = <proposalModel.IProposal>req.body.proposal;
         var amount = <number>req.body.amount;
         var fromCard = <string>req.body.fromCard;
@@ -154,7 +155,11 @@ export class ProposalController {
                 function (ps) {
                     proposalService = ps;
 
-                    return ps.back(proposalData, amount * 1, user, fromCard);
+                    if (transactionId)
+                        // User has submitted backing transaction
+                        return ps.processBacking(transactionId, proposalData, amount * 1, user, fromCard);
+                    else
+                        return ps.back(proposalData, amount * 1, user, fromCard);
                 },
                 function (initErr) {
                     res.status(500).json({
