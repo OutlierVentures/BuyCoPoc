@@ -42,14 +42,51 @@ export class UserAccountService {
      * Save the user's blockchain accounts to our storage. The private keys are encrypted,
      * so this serves only as a backup.
      */
-    saveAccounts = (accessToken: string, accounts: userModel.IBlockchainAccountCollection): Promise<userModel.IUser> => {
+    saveAccounts = (accessToken: string, col: userModel.IBlockchainAccountCollection): Promise<userModel.IUser> => {
         var t = this;
 
         return Promise<userModel.IUser>((resolve, reject) => {
             userRepo.getUserByAccessToken2(accessToken)
                 .then(user => {
-                    // Save the user
-                    user.blockchainAccounts = accounts;
+                    // Never lose an account. In case somehow an account was in the backup but 
+                    // not in the new set from the client, we don't want to lose that. Merge them.
+                    if (user.blockchainAccounts) {
+                        for (var i = 0; i < col.accounts.length; i++) {
+                            var acct = col.accounts[i];
+
+                            var isExisting = false;
+
+                            for (var j = 0; j < user.blockchainAccounts.accounts.length; j++) {
+                                var existingAcct = user.blockchainAccounts.accounts[j];
+                                if (existingAcct.address == acct.address) {
+                                    // Existing address, replace
+                                    user.blockchainAccounts.accounts[j] = acct;
+                                    isExisting = true;
+                                    break;
+                                }
+                            }
+
+                            if (!isExisting) {
+                                // New address, add
+                                user.blockchainAccounts.accounts.push(acct);
+                            }
+                        }
+                        user.blockchainAccounts.selected = col.selected;
+                    }
+                    else
+                        user.blockchainAccounts = col;
+
+                    // Ensure an account is set as selected.
+                    if (user.blockchainAccounts
+                        && !user.blockchainAccounts.selected
+                        && user.blockchainAccounts.accounts.length > 0)
+                        user.blockchainAccounts.selected = user.blockchainAccounts.accounts[0].address;
+
+                    // There could be other cases where the accounts data is corrupted. 
+                    // In that case this code will crash. 
+                    // TODO: realize a graceful way to continue. I.e. save old accounts content somewhere
+                    // and provide user with an empty collection, or provide message "call support"
+
                     user.save((saveErr, saveRes) => {
                         if (saveErr) {
                             reject(saveErr);
@@ -137,15 +174,32 @@ export class UserAccountService {
         return Promise<userModel.IBlockchainAccountCollection>((resolve, reject) => {
             userRepo.getUserByAccessToken2(accessToken)
                 .then(user => {
-                    // Get balance for each of the addresses.
-                    // Does this run synchronously? Better use promises and Q.all() anyway.
-                    if (user.blockchainAccounts) {
-                        for (var i = 0; i < user.blockchainAccounts.accounts.length; i++) {
-                            var account = user.blockchainAccounts.accounts[i];
-                            account.balance = web3plus.web3.fromWei(web3plus.web3.eth.getBalance(account.address), "ether").toNumber();
-                        };
-                    }
-                    resolve(user.blockchainAccounts);
+                    // Do some normalization / fixes on the account.
+                    // Ensure an account is set as selected.
+                    if (user.blockchainAccounts
+                        && !user.blockchainAccounts.selected
+                        && user.blockchainAccounts.accounts.length > 0)
+                        user.blockchainAccounts.selected = user.blockchainAccounts.accounts[0].address;
+
+                    // Ensure each of the accounts has enough funds to transact. 
+                    // Note If funds are added, this will not be included in the 
+                    // balance computed below as the transaction will not have 
+                    // been processed.
+                    t.ensureMinFunds(user)
+                        .then(u => {
+                            // Get balance for each of the addresses.
+                            if (user.blockchainAccounts) {
+                                for (var i = 0; i < user.blockchainAccounts.accounts.length; i++) {
+                                    var account = user.blockchainAccounts.accounts[i];
+                                    account.balance = web3plus.web3.fromWei(web3plus.web3.eth.getBalance(account.address), "ether").toNumber();
+                                };
+                            }
+                            resolve(user.blockchainAccounts);
+                        },
+                        err => { }
+                        );
+
+
                 },
                 userErr => { reject(userErr) });
         })

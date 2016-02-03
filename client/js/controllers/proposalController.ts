@@ -226,15 +226,21 @@ class ProposalController {
         this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
             proposalContract => {
                 var options = {
-                    gas: 2500000,
+                    // Still unclear how much gas should really be used. 25000 works at this point.
+                    // If too low, it will be shown in the UX.
+                    gas: 25000,
                     from: t.blockchainService.getCurrentAccount()
                 };
 
                 proposalContract.back(t.$scope.amount, options, function (err, transactionId) {
                     if (err) {
-                        // WARNING: these error messages are not shown yet. Need t.$scope.$apply()?
                         t.$scope.processMessage = undefined;
+                        if (err.message) err = err.message;
                         t.$scope.errorMessage = err;
+                        // Unless we do $scope.$apply, the error message doesn't appear. I still don't fully
+                        // understand when this is and when this isn't necessary. It can lead to errors
+                        // when calling it at points where it should not be called.
+                        t.$scope.$apply();
                         return;
                     }
 

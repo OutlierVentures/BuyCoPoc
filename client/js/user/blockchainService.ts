@@ -3,6 +3,14 @@ var Accounts;
 var HookedWeb3Provider;
 var web3;
 
+
+/**
+ * Currently we don't allow users to provide the password for their ethereum accounts. Accounts
+ * are encrypted (to prepare for proper security) but we use the same trivial password for all
+ * (to favor usability in the proof of concept).
+ */
+var DUMMY_PASSWORD = "12345678";
+
 /**
  * Wrapper for the connection to the blockchain node. Managing transactions and accounts.
  */
@@ -63,6 +71,18 @@ class BlockchainService {
         console.log("Connected to Ethereum node at " + url);
         // Extend the web3 object
         this.accounts.log = function (msg) { console.log(msg); };
+        
+        // Override the password request function for decrypting the password.
+        // ethereumjs-accounts calls this function with the account info any 
+        // time a transaction sent from that account has to be signed.  
+        this.accounts.options.request = function(accountObject) {
+            // TODO: securely let the user provide a password.
+            // The user could be requested the password for address accountObject.address.
+            // Any integration of key management should be done at this point.
+
+            // Currently using dummy password.
+            return DUMMY_PASSWORD;
+        }
 
         this.afterConnect();
     }
@@ -74,7 +94,7 @@ class BlockchainService {
         var t = this;
 
         t.loadAccounts()
-            .then(res => { 
+            .then(res => {
                 console.log("Number of accounts configured:", this.accounts.length);
 
                 // Ensure we have at least one account
@@ -82,19 +102,22 @@ class BlockchainService {
                     // Always create an account to ensure the user has a unique one. And use that.
                     // We use encrypted account data, but don't allow user to set a password yet.
                     // TODO MVP: introduce proper security for key management.
-                    t.accounts.new("12345678");
+                    t.accounts.new(DUMMY_PASSWORD);
                     t.saveAccounts();
                 }
             }, err => {
                 // On error, also ensure we have at least one account. This could be a new
                 // user without any accounts.
                 if (t.accounts.length == 0) {
-                    t.accounts.new("secret");
+                    t.accounts.new(DUMMY_PASSWORD);
                     t.saveAccounts();
                 }
             });
     }
 
+    /**
+     * Load Ethereum accounts from the server backup and unlock them.
+     */
     private loadAccounts(): ng.IPromise<boolean> {
         var t = this;
 
@@ -110,8 +133,13 @@ class BlockchainService {
                 var ethJsFormat = t.toEthereumJsAccountsFormat(col);
 
                 var accountsString = JSON.stringify(ethJsFormat);
-                if (accountsString)
+                if (accountsString) {
+                    // Import them in ethereumjs-accounts. They stay encrypted until used.
                     t.accounts.import(accountsString);
+
+                    // The import function doesn't process the selected account. Process manually.
+                    t.accounts.select(col.selected);
+                }
             }
 
             defer.resolve(true);
@@ -210,7 +238,6 @@ class BlockchainService {
             defer.resolve(con);
         }).error(function (error) {
             // Handle error
-
             defer.reject(error);
         });
 
