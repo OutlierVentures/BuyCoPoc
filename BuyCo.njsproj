@@ -107,6 +107,7 @@
     <TypeScriptCompile Include="lib\web3config.ts" />
     <TypeScriptCompile Include="models\configModel.ts" />
     <TypeScriptCompile Include="models\categoryModel.ts" />
+    <TypeScriptCompile Include="models\proposalBackingModel.ts" />
     <TypeScriptCompile Include="models\proposalModel.ts" />
     <TypeScriptCompile Include="models\sellerModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />

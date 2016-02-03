@@ -9,6 +9,7 @@ import web3config = require('../../test/contracts/web3config');
 import server = require('../../server');
 
 import proposalModel = require('../../models/proposalModel');
+import proposalBackingModel = require('../../models/proposalBackingModel');
 import categoryModel = require('../../models/categoryModel');
 import userModel = require('../../models/userModel');
 import _ = require('underscore');
@@ -143,7 +144,7 @@ describe("ProposalController", () => {
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        var backers = <Array<proposalModel.IProposalBacking>>res.body;
+                        var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
                         // We can't assert much here. The fact that we got here without error is the result of the test.
                        
@@ -240,7 +241,7 @@ describe("ProposalController", () => {
                                     .expect('Content-Type', /json/)
                                     .expect(200)
                                     .expect(function (res) {
-                                        var backers = <Array<proposalModel.IProposalBacking>>res.body;
+                                        var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
                                         var backerAddress = sourceAddress;
 
