@@ -124,7 +124,7 @@ interface IProposal {
 }
 
 interface IProposalFilter {
-    maximumPrice?: number;
+    maxPrice?: number;
     minimumTotalAmount?: number;
     partNumber?: string;
     mainCategory?: string;

@@ -12,16 +12,6 @@ function SellerProposalResourceMock(
         // return;
     }
     console.log("The 'ngMockE2E' module is declared as a dependency, so mocking teh thingz (seller-propoal things).");
-
-    // TODO BW dd. 2016-01-25: Make generic polyfill for nice ES6 stuff, that can be used anywhere (in run function of buyCoApp module?)
-    // Source:
-    // if (!String.prototype.startsWith) {
-    //    String.prototype.startsWith = function(searchString, position) {
-    //         position = position || 0;
-    //         return this.indexOf(searchString, position) === position;
-    //     };
-    // }
-    // END TODO
     
     var proposals: IProposal[];
     const url = apiUrl + "/proposal/";
@@ -38,7 +28,7 @@ function SellerProposalResourceMock(
         var uri = new URI(url);
         const category = uri.search(true).category;
         const partNumber = uri.search(true).partNumber;
-        const maximumPrice = uri.search(true).maximumPrice;
+        const maxPrice = uri.search(true).maxPrice;
         const minimumTotalAmount = uri.search(true).minimumTotalAmount;
         
         // Filter on the specified parameters
@@ -47,7 +37,7 @@ function SellerProposalResourceMock(
             let inFilter = 
                 (!category || category===item.subCategory) &&
                 (!partNumber || partnrTest.test(item.partNumber)) &&
-                (!maximumPrice || parseInt(maximumPrice)>=item.maxPrice) &&
+                (!maxPrice || parseInt(maxPrice)>=item.maxPrice) &&
                 (!minimumTotalAmount || parseInt(minimumTotalAmount)<item.totalAmount);
             return inFilter;
         });

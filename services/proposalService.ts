@@ -1,6 +1,7 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
+import proposalBackingModel = require('../models/proposalBackingModel');
 import offerModel = require('../offers/offerModel');
 import domain = require('domain');
 
@@ -174,21 +175,21 @@ export class ProposalService {
     /**
      * Get a single proposal by its contract address.
      */
-    getBackers(proposalId): Q.Promise<Array<proposalModel.IProposalBacking>> {
-        var deferred = Q.defer<Array<proposalModel.IProposalBacking>>();
+    getBackers(proposalId): Q.Promise<Array<proposalBackingModel.IProposalBacking>> {
+        var deferred = Q.defer<Array<proposalBackingModel.IProposalBacking>>();
 
         var t = this;
 
         // Get the proposal contract
         var proposalContract;
-        var getBackerDetailsPromises = new Array<Q.Promise<proposalModel.IProposalBacking>>();
+        var getBackerDetailsPromises = new Array<Q.Promise<proposalBackingModel.IProposalBacking>>();
 
         proposalContract = t.proposalContractDefinition.at(proposalId);
 
         var numBackers = proposalContract.backerIndex().toNumber();
 
         for (var i = 1; i <= numBackers; i++) {
-            var defer = Q.defer<proposalModel.IProposalBacking>();
+            var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
             getBackerDetailsPromises.push(defer.promise);
 
@@ -216,7 +217,7 @@ export class ProposalService {
         return deferred.promise;
     }
 
-    createGetBackerFunction(defer: Q.Deferred<proposalModel.IProposalBacking>, proposalContract, index: number) {
+    createGetBackerFunction(defer: Q.Deferred<proposalBackingModel.IProposalBacking>, proposalContract, index: number) {
         var t = this;
         return function () {
             proposalContract.backers(index, function (backerErr, backer) {
@@ -317,9 +318,10 @@ export class ProposalService {
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalModel.IProposalBacking> {
+    back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
 
+        var defer = Q.defer<proposalBackingModel.IProposalBacking>();
         var proposalContract = this.proposalContractDefinition.at(p.contractAddress);
 
         var backPromise = proposalContract.back(amount, { gas: 2500000 });
@@ -337,8 +339,8 @@ export class ProposalService {
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalModel.IProposalBacking> {
-        var defer = Q.defer<proposalModel.IProposalBacking>();
+    processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
+        var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
         var proposalContract = this.proposalContractDefinition.at(p.contractAddress);
 
