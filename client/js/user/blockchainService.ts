@@ -41,6 +41,17 @@ class BlockchainService {
         this.accounts.log = function (msg) { console.log(msg); };
 
         console.log("Number of accounts configured", this.accounts.length);
+
+        if (this.accounts.length == 0) {
+            // Always create an account to ensure the user has a unique one. And use that.
+        } else {
+            // Create a new account just for testing
+            //this.accounts.new();
+        }
+    }
+
+    getCurrentAccount(): string {
+        return this.accounts.get()["selected"];
     }
 
     getProposalContract(address: string): PromiseLike<any> {

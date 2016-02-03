@@ -26,7 +26,8 @@ class ProposalController {
         "$timeout",
         "$route",
         "$routeParams",
-        "identityService"];
+        "identityService",
+        "blockchainService"];
 
     constructor(
         private $scope: IProposalScope,
@@ -37,7 +38,8 @@ class ProposalController {
         private $timeout: ng.ITimeoutService,
         private $route: ng.route.IRouteService,
         private $routeParams: IProposalRouteParameters,
-        private identityService: IdentityService) {
+        private identityService: IdentityService,
+        private blockchainService: BlockchainService) {
 
         $scope.vm = this;
 
@@ -98,7 +100,10 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            t.$scope.errorMessage = error.error;
+            if (error.error)
+                t.$scope.errorMessage = error.error;
+            else
+                t.$scope.errorMessage = error;
 
             cb("Error getting proposal data", null);
         });
@@ -121,7 +126,10 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            t.$scope.errorMessage = error.error;
+            if (error.error)
+                t.$scope.errorMessage = error.error;
+            else
+                t.$scope.errorMessage = error;
 
             cb("Error getting backers data", null);
         });
@@ -145,7 +153,10 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            t.$scope.errorMessage = error.error;
+            if (error.error)
+                t.$scope.errorMessage = error.error;
+            else
+                t.$scope.errorMessage = error;
 
             cb("Error getting offers data", null);
         });
@@ -210,37 +221,65 @@ class ProposalController {
         t.$scope.errorMessage = undefined;
         t.$scope.successMessage = undefined;
 
-        this.$http({
-            method: 'POST',
-            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/back',
-            data: {
-                proposal: t.$scope.proposal,
-                amount: t.$scope.amount,
-                fromCard: t.$scope.fromCard
-            },
-            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-        }).success(function (resultData: any) {
-            t.$scope.processMessage = undefined;
-            t.$scope.transactionId = resultData.startPaymentTransactionId;
-            t.$scope.successMessage = "You successfully backed this proposal for " + t.$scope.amount +
-                " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
-            t.$timeout(() => {
-            }, 5000).then((promiseValue) => {
-                t.$scope.successMessage = undefined;
+        // Call the proposal contract from our own address.
+        // TODO: verify that an ethereum account for the user has been configured.
+        this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
+            proposalContract => {
+                var options = {
+                    gas: 2500000,
+                    from: t.blockchainService.getCurrentAccount()
+                };
 
-                // Redirect to the proposal view
-                t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
-            });
-        }).error(function (error) {
-            t.$scope.processMessage = undefined;
+                proposalContract.back(t.$scope.amount, options, function (err, transactionId) {
+                    if (err) {
+                        // WARNING: these error messages are not shown yet. Need t.$scope.$apply()?
+                        t.$scope.processMessage = undefined;
+                        t.$scope.errorMessage = err;
+                        return;
+                    }
 
-            // Handle error
-            console.log("Error confirming backing:");
-            console.log(error);
+                    // Now call the backend to process the rest (payment etc).
+                    t.$http({
+                        method: 'POST',
+                        url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/back',
+                        data: {
+                            // Pass our transaction ID to the server side for further processing.
+                            transactionId: transactionId,
+                            proposal: t.$scope.proposal,
+                            amount: t.$scope.amount,
+                            fromCard: t.$scope.fromCard
+                        },
+                        headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+                    }).success(function (resultData: any) {
+                        t.$scope.processMessage = undefined;
+                        t.$scope.transactionId = resultData.startPaymentTransactionId;
+                        t.$scope.successMessage = "You successfully backed this proposal for " + t.$scope.amount +
+                            " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
+                        t.$timeout(() => {
+                        }, 5000).then((promiseValue) => {
+                            t.$scope.successMessage = undefined;
 
-            // Show notification
-            t.$scope.errorMessage = error;
-        });
+                            // Redirect to the proposal view
+                            t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
+                        });
+                    }).error(function (error) {
+                        t.$scope.processMessage = undefined;
+
+                        // Handle error
+                        console.log("Error confirming backing:");
+                        console.log(error);
+
+                        // Show notification
+                        t.$scope.errorMessage = error;
+                    });
+
+                });
+            }, err => {
+                t.$scope.processMessage = undefined;
+                t.$scope.errorMessage = err;
+            }
+        );
+
     }
 
 
@@ -281,7 +320,10 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            t.$scope.errorMessage = error.error;
+            if(error.error)
+                t.$scope.errorMessage = error.error;
+            else
+                t.$scope.errorMessage = error;
         });
     }
 }
