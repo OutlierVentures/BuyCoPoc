@@ -23,7 +23,7 @@ class SellerProposalListController implements ISellerProposalListController {
     autoSearch: boolean;
     
     private emptyFilter: IProposalFilter = {
-        maximumPrice: null,
+        maxPrice: null,
         minimumTotalAmount: null,
         partNumber: null,
         mainCategory: null,
@@ -51,9 +51,10 @@ class SellerProposalListController implements ISellerProposalListController {
         
     public search() {
         this.isSearching = true;
+        var proposalFilter = this.isFilterSet ? this.proposalFilter : null;
         this.sellerProposalService.getProposals(
             this.$rootScope.userInfo.accessToken, 
-            this.proposalFilter
+            proposalFilter
          ).then((results) => {
              this.proposals = results;
          }).catch((err) => {

@@ -5,7 +5,7 @@ import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
 import upholdService = require('../../services/upholdService');
 
-import proposalModel = require('../../models/proposalModel');
+import proposalModel = require ('../../models/proposalModel');
 
 import _ = require('underscore');
 
@@ -22,7 +22,12 @@ export class ProposalController {
         var token = req.headers["accesstoken"];
 
         // Get filters from request
-        let proposalFilter = req.query;
+        let proposalFilter: proposalModel.IProposalFilter = req.query;
+        if (proposalFilter) {
+            if (proposalFilter.maxPrice) {
+                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
+            }
+        }
         
         serviceFactory.createCachedProposalService()
             .then(
@@ -45,7 +50,7 @@ export class ProposalController {
                     "error_location": "getting proposals"
                 });
                 return null;
-            })
+            });
     }
 
     getOne = (req: express.Request, res: express.Response) => {
@@ -77,7 +82,7 @@ export class ProposalController {
 
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
-        var proposalData = <proposalModel.IProposal>req.body;
+        var proposalData = <IProposal>req.body;
 
         // The category arrives as a string: [main] - [sub]
         // Example: "Electronics - Camera"

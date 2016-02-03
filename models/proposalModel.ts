@@ -34,8 +34,8 @@ export interface IProposalDocument extends mongoose.Document, IProposal {
 }
 
 export interface IProposalFilter {
-    maximumPrice?: number;
-    minimumTotalAmount?: number;
+    maxPrice?: number | Object;
+    minimumTotalAmount?: number | Object;
     partNumber?: string;
     mainCategory?: string;
     subCategory?: string;
