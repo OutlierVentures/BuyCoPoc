@@ -21,14 +21,18 @@ export class ProposalController {
     get = (req: express.Request, res: express.Response) => {
         var token = req.headers["accesstoken"];
 
-        // Get filters from request
+        // Determine the applicable filters from the request URL - if any.
+        // Example https://selfsigned.blockstars.io:4124/proposal/category/Books/Fantasy%20books?maxPrice=2&minimumTotalAmount=250
+        // Most filter parameters are taken from the URL Query (e.g. URL parameters) api/
         let proposalFilter: proposalModel.IProposalFilter = req.query;
-        if (proposalFilter) {
-            if (proposalFilter.maxPrice) {
-                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
-            }
-        }
+
+        // Only the maincategory and subcategory are in the URL part itself.
+        var mainCategory = req.params.mainCategory;
+        var subCategory = req.params.subCategory;
+        if (mainCategory) { proposalFilter.mainCategory = mainCategory; }
+        if (subCategory) { proposalFilter.subCategory = subCategory; }
         
+        // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()
             .then(
             function (cps) {

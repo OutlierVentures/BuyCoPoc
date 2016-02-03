@@ -52,6 +52,12 @@ export class CachedProposalService {
      * Gets all proposals that match the filter (or just all if no filter :).
      */
     get(proposalFilter: IProposalFilter): PromiseLike<IProposalDocument[]> {
+        // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+        if (proposalFilter) {
+            if (proposalFilter.maxPrice) {
+                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
+            }
+        }
         return Proposal.find(proposalFilter).exec();
     }
 
