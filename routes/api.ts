@@ -9,6 +9,7 @@ import sellerController = require('../api/seller/sellerController');
 import configController = require('../api/configuration/configurationController');
 import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
+import userAccountController = require('../api/user/userAccountController');
 
 /**
  * Configure the routes for all API functions on an Express app.
@@ -59,8 +60,14 @@ export function configure(app: express.Express) {
     apiRouter.route("/config/getversion").get(cc.getVersion);
     apiRouter.route("/config/ethereum/jsonRpcUrl").get(cc.getEthereumJsonRpcUrl);
 
+    // Smart contracts for client side blockchain interaction
     var contractCon = new contractController.ContractController();
     apiRouter.route("/contract/:contractName/abi").get(contractCon.getAbi);    
+
+    // User accounts
+    var uac = new userAccountController.UserAccountController();
+    apiRouter.route("/user/accounts").post(uac.saveBlockchainAccounts);
+    apiRouter.route("/user/accounts").get(uac.getBlockchainAccounts);
         
     // Migrations
     var mc = new migrationController.MigrationController();

@@ -5,6 +5,7 @@ import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
 import cachedProposalService = require('./cachedProposalService');
 import offerService = require('../offers/offerContractService');
+import userAccountService = require('../api/user/userAccountService');
 
 import Q = require('q');
 import { Promise } from "q";
@@ -61,6 +62,8 @@ export function createProposalService(): Promise<proposalService.ProposalService
     });
 }
 
+// TODO: refactor the similar services to an IService with a .initialize() and 
+// introduce a createService< IService > to DRY.
 
 export function createCachedProposalService(): Promise<cachedProposalService.CachedProposalService> {
     return Promise<cachedProposalService.CachedProposalService>((resolve, reject) => {
@@ -69,6 +72,19 @@ export function createCachedProposalService(): Promise<cachedProposalService.Cac
         cps.initialize()
             .then(() => {
                 resolve(cps);
+            }, initializeErr => {
+                reject(initializeErr);
+            });
+    });
+}
+
+export function createUserAccountService(): Promise<userAccountService.UserAccountService> {
+    return Promise<userAccountService.UserAccountService>((resolve, reject) => {
+        var uas = new userAccountService.UserAccountService();
+
+        uas.initialize()
+            .then(() => {
+                resolve(uas);
             }, initializeErr => {
                 reject(initializeErr);
             });
