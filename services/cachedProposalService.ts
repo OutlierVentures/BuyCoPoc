@@ -12,6 +12,8 @@ import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
 
+import _ = require('underscore');
+
 import Q = require('q');
 import { IPromise, Promise } from "q";
 
@@ -70,12 +72,21 @@ export class CachedProposalService {
             // Get all promises. Then for each of them, ensure it's stored in Mongo.
             this.proposalService.getAll()
                 .then((proposals) => {
-                    console.log("ensureMongoCache: got " + proposals.length + " proposals from blockchain. Ensuring cache for each of them.");
+                    console.log(`ensureMongoCache: got ${proposals.length} proposals from blockchain. Ensuring cache for each of them.`);
 
                     var proposalsPromises = new Array<Promise<IProposal>>();
 
-                    for (var i = 0; i < proposals.length; i++) {
+                    for (let i = 0; i < proposals.length; i++) {
                         var p = proposals[i];
+                        // Get backings 
+                        //this.proposalService.getBackers(p.contractAddress)
+                        //.then((proposalBackings) => {
+                        //    let sum = 0;
+                        //    _.each(proposalBackings, (backing) => { sum += backing.amount; });
+                        //    p.totalAmount = sum;
+                        //    p.nrOfBackings = proposalBackings.length;
+                        //    p.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+                        //});
                         proposalsPromises.push(this.ensureCacheProposal(p));
                     }
 
@@ -126,6 +137,10 @@ export class CachedProposalService {
 
                         currentProposal.maxPrice = p.maxPrice;
 
+                        currentProposal.nrOfBackings = p.nrOfBackings;
+                        currentProposal.nrOfBackers = p.nrOfBackers;
+                        currentProposal.totalAmount = p.totalAmount;
+
                         currentProposal.save((err, res) => {
                             if (err) saveDefer.reject(err);
                             else saveDefer.resolve(currentProposal);
@@ -147,7 +162,7 @@ export class CachedProposalService {
     }
 }
 
-class MongoCacheUpdateResult {
+export class MongoCacheUpdateResult {
     updatedObjects: number;
     createdObjects: number;
 }

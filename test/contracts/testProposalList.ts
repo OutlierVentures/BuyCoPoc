@@ -267,8 +267,7 @@ describe("ProposalRegistry", () => {
                         // because the contract is instantiated async.
                         console.log(Date() + " Got contract object at " + proposalAddress);
 
-
-                        var p: proposalModel.IProposal = {
+                        const p: proposalModel.IProposal = {
                             contractAddress : proposalAddress,
                             productName: proposal.productName(),
                             productDescription: proposal.productDescription(),
@@ -277,7 +276,7 @@ describe("ProposalRegistry", () => {
                             subCategory: proposal.subCategory(),
                             maxPrice: proposal.maxPrice().toNumber(),
                             endDate: proposal.endDate(),
-                            ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
+                            ultimateDeliveryDate: proposal.ultimateDeliveryDate()
                         };
 
                         //var p: proposalModel.IProposal = {
@@ -349,7 +348,7 @@ describe("ProposalRegistry", () => {
             var proposal = proposalContractDefinition.at(proposalAddress);
             console.log("After loading contract:" + Date.now());
 
-            var p: proposalModel.IProposal = {
+            const p: proposalModel.IProposal = {
                 contractAddress : proposalAddress,
                 productName: proposal.productName(),
                 productDescription: proposal.productDescription(),
@@ -358,7 +357,7 @@ describe("ProposalRegistry", () => {
                 subCategory: proposal.subCategory(),
                 maxPrice: proposal.maxPrice().toNumber(),
                 endDate: proposal.endDate(),
-                ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
+                ultimateDeliveryDate: proposal.ultimateDeliveryDate()
             };
 
             //var p: proposalModel.IProposal = {
