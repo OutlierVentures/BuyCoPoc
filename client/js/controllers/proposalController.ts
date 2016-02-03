@@ -226,9 +226,9 @@ class ProposalController {
         this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
             proposalContract => {
                 var options = {
-                    // Still unclear how much gas should really be used. 25000 works at this point.
+                    // Still unclear how much gas should really be used. 250000 works at this point.
                     // If too low, it will be shown in the UX.
-                    gas: 25000,
+                    gas: 250000,
                     from: t.blockchainService.getCurrentAccount()
                 };
 

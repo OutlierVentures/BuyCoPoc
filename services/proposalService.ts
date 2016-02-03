@@ -316,8 +316,8 @@ export class ProposalService {
 
     /**
      * Back an existing proposal in the blockchain.
-     * @param p the new proposal.
-     * @return The IProposal with the property "id" set to the contract address.
+     * @param p the proposal.
+     * @return a representation of the backing
      */
     back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
@@ -428,7 +428,6 @@ export class ProposalService {
                                     });
                             });
                     });
-
             }, function (err) {
                 defer.reject(err);
             });
