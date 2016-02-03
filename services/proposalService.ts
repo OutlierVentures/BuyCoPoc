@@ -3,6 +3,7 @@ import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import proposalBackingModel = require('../models/proposalBackingModel');
 import offerModel = require('../offers/offerModel');
+import domain = require('domain');
 
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
@@ -11,6 +12,7 @@ import configurationService = require('./configurationService');
 
 import cachedProposalService = require('../services/cachedProposalService');
 
+import { Promise } from 'q';
 import Q = require('q');
 
 interface IBigNumber {
@@ -97,6 +99,8 @@ export class ProposalService {
                 Q.all(getProperties)
                     .then(function () {
                         d.resolve(p);
+                    }, err => {
+                        d.reject(err);
                     });
             });
         };
@@ -185,7 +189,35 @@ export class ProposalService {
             var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
             getBackerDetailsPromises.push(defer.promise);
-            proposalContract.backers(i, function (backerErr, backer) {
+
+            // The getter for the backers can cause exceptions deep down in the belly
+            // of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
+            // We wrap it in a domain to prevent this from crashing the whole app.
+
+            var d = domain.create()
+            d.on('error', function (err) {
+                // Handle the error safely, reject the promise with the error message.
+                if (err.message) err = err.message;
+                defer.reject(err);
+            })
+
+            d.run(t.createGetBackerFunction(defer, proposalContract, i))
+        }
+
+        Q.all(getBackerDetailsPromises)
+            .then(function (allBackers) {
+                deferred.resolve(allBackers);
+            }, function (allBackersErr) {
+                deferred.reject(allBackersErr);
+            });
+
+        return deferred.promise;
+    }
+
+    createGetBackerFunction(defer: Q.Deferred<proposalBackingModel.IProposalBacking>, proposalContract, index: number) {
+        var t = this;
+        return function () {
+            proposalContract.backers(index, function (backerErr, backer) {
                 if (backerErr) {
                     defer.reject(backerErr);
                     return;
@@ -220,17 +252,8 @@ export class ProposalService {
                 });
             });
         }
-
-        Q.all(getBackerDetailsPromises)
-            .then(function (allBackers) {
-                deferred.resolve(allBackers);
-            }, function (allBackersErr) {
-                deferred.reject(allBackersErr);
-            });
-
-        return deferred.promise;
     }
-
+    
     /**
      * Create a new proposal in the blockchain.
      * @param p the new proposal.
@@ -266,6 +289,9 @@ export class ProposalService {
 
                 p.contractAddress = newProposalAddress;
 
+                // Normalize amount for display and caching
+                p.maxPrice = p.maxPrice / 100;
+
                 // Update cache for this proposal only
                 var cps = new cachedProposalService.CachedProposalService();
                 cps.initialize(this)
@@ -273,8 +299,6 @@ export class ProposalService {
                         return cps.ensureCacheProposal(p);
                     })
                     .then(res => {
-                        // Normalize amount for display, again
-                        p.maxPrice = p.maxPrice / 100;
                         defer.resolve(p);
                     }, err => {
                         defer.reject("Error while updating proposal cache: " + err);
@@ -289,23 +313,53 @@ export class ProposalService {
 
     /**
      * Back an existing proposal in the blockchain.
-     * @param p the new proposal.
-     * @return The IProposal with the property "id" set to the contract address.
+     * @param p the proposal.
+     * @return a representation of the backing
      */
     back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
 
         var defer = Q.defer<proposalBackingModel.IProposalBacking>();
-
         var proposalContract = this.proposalContractDefinition.at(p.contractAddress);
 
         var backPromise = proposalContract.back(amount, { gas: 2500000 });
 
-        // TODO: use different eth address for buyer once we support that.
-        var backingAddress = web3plus.web3.eth.coinbase;
+        return backPromise.then(txId => {
+            return this.processBacking(txId, p, amount, backingUser, fromCard);
+        });
+    }
 
-        backPromise.then(web3plus.promiseCommital)
-            .then(function (res) {
+    /**
+     * Process backing an existing proposal in the blockchain. The ID of the transaction to proposalContract.back()
+     * should be passed.
+     * 
+     * @param transactionId transaction ID of the call to proposalContract.back()
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
+        var defer = Q.defer<proposalBackingModel.IProposalBacking>();
+
+        var proposalContract = this.proposalContractDefinition.at(p.contractAddress);
+
+        var t = this;
+
+        web3plus.promiseCommital(transactionId)
+            .then(function (tx) {
+                // Get the from address from the transaction. If it is our global account or the account
+                // of an individual user, both will be set here.
+                var backingAddress = tx.from;
+
+                // Check whether the backer was actually added. Otherwise reject.
+                // WARNING: this way of getting the backing by index is not foolproof (like other
+                // places where this is done).
+                var backerFromContract = proposalContract.backers(proposalContract.backerIndex());
+
+                if (!(backerFromContract[0] == backingAddress && backerFromContract[1].toNumber() == amount)) {
+                    defer.reject("Backing could not be added to contract.");
+                    return;
+                }
+
                 // Save link to the backing in our database. Just save the address. In the contract itself
                 // we don't store user data (yet) for privacy reasons.
                 backingUser.backings.push({
@@ -371,7 +425,6 @@ export class ProposalService {
                                     });
                             });
                     });
-
             }, function (err) {
                 defer.reject(err);
             });

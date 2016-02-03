@@ -74,6 +74,10 @@ export class CachedProposalService {
                 .then((proposals) => {
                     console.log(`ensureMongoCache: got ${proposals.length} proposals from blockchain. Ensuring cache for each of them.`);
 
+                    // Delete all proposals from the cache which are not currently in the contract
+                    // (e.g. after clearing the blockchain during development)
+                    // TODO                    
+
                     var proposalsPromises = new Array<Promise<IProposal>>();
 
                     for (let i = 0; i < proposals.length; i++) {

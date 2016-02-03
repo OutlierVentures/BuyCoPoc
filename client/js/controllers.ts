@@ -5,6 +5,7 @@ interface ILoginScope extends ng.IScope {
     isAuthenticated(): boolean;
     login(): any;
     userInfo: IUser;
+    blockchainAccounts: IBlockchainAccountCollection;
     isGlobalAdmin: boolean;
 }
 
@@ -37,6 +38,8 @@ class LoginController {
         private identityService: IdentityService,
         private blockchainService: BlockchainService,
         private configurationService: ConfigurationService) {
+
+        var t = this;
 
         $scope.isAuthenticated = function (): boolean {
             return identityService.isAuthenticated();
@@ -113,19 +116,6 @@ class LoginController {
                 // Log on with it
                 identityService.logon(brip);
 
-                // Set up the web3 blockchain connection
-                // COULD DO: model this as an IIdentityProvider as well. Arguably it is a provider
-                // of an identity.
-                // Blockchain connection from client
-                configurationService.getEthereumJsonRpcUrl()
-                    .then(url=> {
-                        blockchainService.connect(url);
-                    }, err => {
-                        // TODO: handle error when connecting to blockchain.
-                        // Should also be handled in other places, e.g. before transacting (isConnected()?),
-                        // on user profile page.
-                    });
-
                 // Store in scope to show in view
                 $scope.userInfo = resultData.user;
             }).error(function (error) {
@@ -141,6 +131,12 @@ class LoginController {
                 $rootScope.loginErrorMessage = "There was an error processing your login. Please try again. Details: " + error.error.error;
             });
         }
+
+        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+
+        $rootScope.$on('blockchainConnected', e => {
+            t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+        });
 
     }
 }

@@ -28,14 +28,6 @@ class UserAccountController {
                 .then((version) => {
                     $scope.version = version;
                 });
-
-            // Blockchain node connection from client
-            if (!blockchainService.isConnected()) {
-                configurationService.getEthereumJsonRpcUrl()
-                    .then(url=> {
-                        blockchainService.connect(url);
-                    });
-            }
         });
     }
 }

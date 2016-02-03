@@ -21,13 +21,42 @@ export var userSchema = new mongoose.Schema({
     accessToken: String,
     backings: [{
         proposalAddress: String
-    }]
+    }],
+    blockchainAccounts: {
+        selected: String,
+        accounts: [{
+            address: String,
+            encrypted: Boolean,
+            locked: Boolean,
+            hash: String,
+            private: String,
+            public: String,
+            balance: Number
+        }]
+    }
 });
 
 export interface ICredentials {
     externalId: string
     accessToken: string
 }
+
+export interface IBlockchainAccount {
+    address: string,
+    encrypted: boolean,
+    locked: boolean,
+    hash: string,
+    private: string,
+    public: string,
+    // Balance in Ether. Computed on load.
+    balance: number,
+}
+
+export interface IBlockchainAccountCollection {
+    accounts: IBlockchainAccount[],
+    selected: string
+}
+
 
 export interface IUser extends mongoose.Document {
     name: string;
@@ -48,6 +77,8 @@ export interface IUser extends mongoose.Document {
      * BuyCos this user has backed
      */
     backings: [Backing];
+
+    blockchainAccounts: IBlockchainAccountCollection;
 }
 
 /**
@@ -81,7 +112,7 @@ export class UserRepository {
     /**
     * Get a promise by their accessToken - promise version. 
     */
-    public getUserByAccessToken2 (accessToken: string): Promise<IUser> {
+    public getUserByAccessToken2(accessToken: string): Promise<IUser> {
         var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
             User.findOne({ accessToken: accessToken }, (err: any, resultUser: IUser) => {
                 if (err) {
@@ -114,16 +145,16 @@ export class UserRepository {
      * @param user
      * @param cb
      */
-    public create(newUser: IUser): Promise<IUser> { 
+    public create(newUser: IUser): Promise<IUser> {
         var result = Promise<IUser>(
-        (resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
-            User.create(newUser, (err: any, resultUser: IUser) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(resultUser);
+            (resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
+                User.create(newUser, (err: any, resultUser: IUser) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(resultUser);
+                });
             });
-        });
         return result;
     };
 
@@ -134,14 +165,14 @@ export class UserRepository {
      */
     public find(cond: Object): Promise<IUser[]> {
         var result = Promise<IUser[]>(
-        (resolve: (users: IUser[]) => void, reject: (error: any) => void) => {
-            User.find(cond, (err: any, users: IUser[]) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(users);
+            (resolve: (users: IUser[]) => void, reject: (error: any) => void) => {
+                User.find(cond, (err: any, users: IUser[]) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(users);
+                });
             });
-        });
         return result;
     };
 
@@ -150,15 +181,15 @@ export class UserRepository {
      */
     public checkCredentials(cred: ICredentials): Promise<Boolean> {
         var result = Promise<Boolean>(
-        (resolve: (checksOut: Boolean) => void, reject: (error: any) => void) => {
-            this.getUserByExternalId(cred.externalId).then((user: IUser) => {
-                let credsValid = user.accessToken===cred.accessToken;
-                resolve(credsValid);
-            }).catch((err: any) => {
-                reject(err);
-            });
-        })
-        
+            (resolve: (checksOut: Boolean) => void, reject: (error: any) => void) => {
+                this.getUserByExternalId(cred.externalId).then((user: IUser) => {
+                    let credsValid = user.accessToken === cred.accessToken;
+                    resolve(credsValid);
+                }).catch((err: any) => {
+                    reject(err);
+                });
+            })
+
         return result;
     }
 }
