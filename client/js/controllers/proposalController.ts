@@ -217,7 +217,7 @@ class ProposalController {
         var t = this;
 
         // Confirm backing the currently loaded proposal.
-        t.$scope.processMessage = "Backing proposal...";
+        t.$scope.processMessage = "Backing BuyCo...";
         t.$scope.errorMessage = undefined;
         t.$scope.successMessage = undefined;
 
@@ -243,6 +243,8 @@ class ProposalController {
                         t.$scope.$apply();
                         return;
                     }
+
+                    t.$scope.processMessage = "Your request to join the BuyCo was submitted. Waiting for further processing...";
 
                     // Now call the backend to process the rest (payment etc).
                     t.$http({

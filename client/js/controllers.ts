@@ -5,6 +5,7 @@ interface ILoginScope extends ng.IScope {
     isAuthenticated(): boolean;
     login(): any;
     userInfo: IUser;
+    blockchainAccounts: IBlockchainAccountCollection;
     isGlobalAdmin: boolean;
 }
 
@@ -37,6 +38,8 @@ class LoginController {
         private identityService: IdentityService,
         private blockchainService: BlockchainService,
         private configurationService: ConfigurationService) {
+
+        var t = this;
 
         $scope.isAuthenticated = function (): boolean {
             return identityService.isAuthenticated();
@@ -128,6 +131,12 @@ class LoginController {
                 $rootScope.loginErrorMessage = "There was an error processing your login. Please try again. Details: " + error.error.error;
             });
         }
+
+        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+
+        $rootScope.$on('blockchainConnected', e => {
+            t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+        });
 
     }
 }

@@ -15,8 +15,9 @@ var DUMMY_PASSWORD = "12345678";
  * Wrapper for the connection to the blockchain node. Managing transactions and accounts.
  */
 class BlockchainService {
-    jsonRpcUrl: string;
-    accounts: any;
+    private jsonRpcUrl: string;
+    private accounts: any;
+    private savedAccounts: IBlockchainAccountCollection;
 
     $inject = ['$rootScope',
         '$http',
@@ -87,6 +88,11 @@ class BlockchainService {
         this.afterConnect();
     }
 
+    getAccounts() {
+        // Return the saved accounts because of the better data structure.
+        return this.savedAccounts;
+    }
+
     /**
      * Handle actions that should be executed after connecting to the blockchain node.
      */
@@ -105,6 +111,8 @@ class BlockchainService {
                     t.accounts.new(DUMMY_PASSWORD);
                     t.saveAccounts();
                 }
+                
+                t.$rootScope.$emit('blockchainConnected');                
             }, err => {
                 // On error, also ensure we have at least one account. This could be a new
                 // user without any accounts.
@@ -130,6 +138,7 @@ class BlockchainService {
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (col: IBlockchainAccountCollection) {
             if (col) {
+                t.savedAccounts = col;
                 var ethJsFormat = t.toEthereumJsAccountsFormat(col);
 
                 var accountsString = JSON.stringify(ethJsFormat);
@@ -170,6 +179,7 @@ class BlockchainService {
         }).success(function (user: IUser) {
             // The user result is enriched with the account balances. 
             // COULD DO: save this and show it somewhere.
+            t.savedAccounts = user.blockchainAccounts;
             defer.resolve(true);
         }).error(function (error) {
             // TODO: handle error
@@ -246,8 +256,7 @@ class BlockchainService {
 
 
     newAccount() {
-        // TODO
-        // Call ethereumjs-accounts
+        // TODO: Create a new account on demand.
     }
 
     isConnected(): boolean {

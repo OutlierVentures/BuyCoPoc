@@ -292,6 +292,9 @@ export class ProposalService {
 
                 p.contractAddress = newProposalAddress;
 
+                // Normalize amount for display and caching
+                p.maxPrice = p.maxPrice / 100;
+
                 // Update cache for this proposal only
                 var cps = new cachedProposalService.CachedProposalService();
                 cps.initialize(this)
@@ -299,8 +302,6 @@ export class ProposalService {
                         return cps.ensureCacheProposal(p);
                     })
                     .then(res => {
-                        // Normalize amount for display, again
-                        p.maxPrice = p.maxPrice / 100;
                         defer.resolve(p);
                     }, err => {
                         defer.reject("Error while updating proposal cache: " + err);
@@ -348,10 +349,19 @@ export class ProposalService {
 
         web3plus.promiseCommital(transactionId)
             .then(function (tx) {
-
                 // Get the from address from the transaction. If it is our global account or the account
                 // of an individual user, both will be set here.
                 var backingAddress = tx.from;
+
+                // Check whether the backer was actually added. Otherwise reject.
+                // WARNING: this way of getting the backing by index is not foolproof (like other
+                // places where this is done).
+                var backerFromContract = proposalContract.backers(proposalContract.backerIndex());
+
+                if (!(backerFromContract[0] == backingAddress && backerFromContract[1].toNumber() == amount)) {
+                    defer.reject("Backing could not be added to contract.");
+                    return;
+                }
 
                 // Save link to the backing in our database. Just save the address. In the contract itself
                 // we don't store user data (yet) for privacy reasons.
