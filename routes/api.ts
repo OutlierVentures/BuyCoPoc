@@ -68,7 +68,7 @@ export function configure(app: express.Express) {
     apiRouter.route("/migration/test/seed").post(mc.seedTestData);
 
     // Cache
-    var cacheCon = new cacheController.CacheController()
+    var cacheCon = new cacheController.CacheController();
     apiRouter.route("/data/cache/update").post(cacheCon.update);
 
     // Catch non-existing api calls.
