@@ -79,7 +79,7 @@ describe("ProposalController", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposalId)
                     .expect('Content-Type', /json/)
-                    .expect(200, err => console.error(err))
+                    .expect(200)
                     .expect(function (res) {
                         var proposal = <proposalModel.IProposal>res.body;
                 
