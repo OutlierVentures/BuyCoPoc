@@ -7,7 +7,8 @@ angular.module("buyCoApp", [
     "ngSanitize",
     "angularMoment",
     "mgcrea.ngStrap",
-    "buyCoApp.services"
+    "buyCoApp.services",
+    "timer"
 ]);
 
 // TODO BW Get settings from server.

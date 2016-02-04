@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <base href="/" />
@@ -12,7 +12,7 @@
     <div ng-app="buyCoApp">
 
             <div id="app">
-                <header class="navbar navbar-default" ng-show="!isGlobalAdmin">
+                <header class="navbar navbar-default" ng-show="!isGlobalAdmin" ng-cloak>
                     <div class="container">
                         <div class="navbar-header">
                             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -50,7 +50,7 @@
                     </div>
                 </header>
 
-                <div class="submenu">
+                <div class="submenu" ng-cloak>
                     <div class="container">
                         <ul class="nav navbar-nav">
                             <li data-match-route="/">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <!-- Login screen, only shown when not logged in. -->
-                <div class="container">
+                <div class="container" ng-cloak>
                     <div class="page-wrapper" ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
                     <div class="page-wrapper ng-hide" ng-show="loginErrorMessage">
                         <div class="panel panel-warning">
@@ -82,7 +82,7 @@
                 </div>
                 <!-- When not logged in, the whole wrapper is hidden. We use the property $rootScope.isLoggedIn
                 which is set to true after a succesful login.-->
-                <div id="wrapper" ng-show="isLoggedIn || isPublicPage()">
+                <div id="wrapper" ng-show="isLoggedIn || isPublicPage()" ng-cloak>
                     <!-- Navigation. The navbar view includes the NavigationController. -->
                     <!--                <nav ng-include="'views/navbar.html'"></nav>-->
                     <div id="page-wrapper" class="page-wrapper">
@@ -124,11 +124,14 @@
     <script src="vendors/angular-messages/angular-messages.js"></script>
     <script src="vendors/angular-mocks/angular-mocks.js"></script>
     <script src="vendors/moment/moment.js"></script>
+    <script src="vendors/momentjs/moment.js"></script>
     <script src="vendors/angular-moment/angular-moment.js"></script>
     <script src="vendors/angular-route/angular-route.js"></script>
     <script src="vendors/angular-sanitize/angular-sanitize.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.tpl.js"></script>
+    <script src="vendors/humanize-duration/humanize-duration.js"></script>
+    <script src="vendors/angular-timer/dist/angular-timer.js"></script>
     <script src="vendors/bignumber.js/bignumber.js"></script>
     <script src="vendors/bootstrap/dist/js/bootstrap.js"></script>
     <script src="vendors/underscore/underscore.js"></script>
@@ -165,6 +168,7 @@
     <script src="js/sellers/seller-resource.mock.js"></script>
     <script src="js/sellers/seller.js"></script>
     <script src="js/sellers/seller.service.js"></script>
+    <script src="js/sellers/userResourceMock.js"></script>
     <script src="js/user/blockchainService.js"></script>
     <script src="js/user/userAccountController.js"></script>
     <!-- endinjector -->

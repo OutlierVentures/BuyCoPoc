@@ -15,11 +15,44 @@ interface IDocument {
     _id: string;
 }
 
+interface IBlockchainAccount {
+    address: string,
+    encrypted: boolean,
+    locked: boolean,
+    hash: string,
+    private: string,
+    public: string,
+    // Balance in Ether. Computed on load.
+    balance: number,
+}
+
+interface IBlockchainAccountCollection {
+    accounts: IBlockchainAccount[],
+    selected: string
+}
+
+
 interface IUser extends IDocument {
     name: string;
+    /**
+     * For users primarily defined by an external authenticator, the User ID. E.g. Uphold user name.
+     */
     externalId: string;
-    email: string;
+
+    /**
+     * Current OAuth access token for the user at the external authenticator.
+     * TODO: refactor to a subtype, incorporate expiration date.
+     */
     accessToken: string;
+
+    email: string;
+    
+    /**
+     * BuyCos this user has backed
+     */
+    //backings: [Backing];
+
+    blockchainAccounts: IBlockchainAccountCollection;
 }
 
 interface ICredentials {

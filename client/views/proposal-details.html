@@ -14,7 +14,9 @@
         </span><br><br>
         <span class="small">
             End date: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}" class="text-muted"></span>
-        </span><br><br>
+        </span>
+        <h1 class="large" ng-cloak ng-show="proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
+        <br><br>
         <span class="small">
             Ultimate delivery date: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}" class="text-muted"></span>
         </span><br><br>

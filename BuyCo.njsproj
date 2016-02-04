@@ -35,6 +35,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="client\accounts-manager.html" />
     <Content Include="client\js\categories\main-category-details.html" />
     <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
@@ -58,6 +59,8 @@
     <TypeScriptCompile Include="api\data\cacheController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="api\user\userAccountService.ts" />
+    <TypeScriptCompile Include="api\user\userAccountController.ts" />
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
@@ -410,6 +413,7 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
+    <Folder Include="api\user\" />
     <Folder Include="api\seller\" />
     <Folder Include="api\configuration\" />
     <Folder Include="api\contract\" />

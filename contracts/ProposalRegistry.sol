@@ -213,15 +213,15 @@ contract Proposal {
 
         Backing b = backers[backerIndexByAddress[backerAddress]];
         if (paymentType == 1) {
-            // Start payment
-            b.startPaymentTransactionID = transactionID;
-            b.startPaymentAmount = amount;
-        }
-        else if (paymentType == 2) {
             // End payment
-            // TODO: validate that start payment has been registered
             b.pledgePaymentTransactionID = transactionID;
             b.pledgePaymentAmount = amount;
+        }
+        else if (paymentType == 2) {
+            // Start payment
+            // TODO: validate that pledge payment has been registered
+            b.startPaymentTransactionID = transactionID;
+            b.startPaymentAmount = amount;
         }
         else if (paymentType == 3) {
             // End payment
