@@ -1,0 +1,472 @@
+// -----------------------------------------------------
+
+@web-font-path: "https://fonts.googleapis.com/css?family=Roboto:400,700";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
+
+.transition (@transition) {
+  -webkit-transition: @transition;  
+  -moz-transition:    @transition;
+  -ms-transition:     @transition; 
+  -o-transition:      @transition;  
+}
+
+// Navbar =====================================================================
+header {
+  &.navbar {
+    margin-bottom: 0;
+  }
+}
+.navbar {
+  &-inverse {
+
+    .badge {
+      background-color: #fff;
+      color: @brand-primary;
+    }
+  }
+
+}
+
+footer {
+  .navbar {
+    margin-bottom: 0;
+  }
+}
+
+// Buttons ====================================================================
+
+.btn {
+  font-family: @headings-font-family;
+}
+
+// Typography =================================================================
+
+body {
+  font-weight: 200;
+}
+
+// Tables =====================================================================
+
+th {
+  color: @headings-color;
+}
+
+// Forms ======================================================================
+
+legend {
+  color: @headings-color;
+}
+
+label {
+  font-weight: normal;
+}
+
+.has-warning {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &.radio label,
+  &.checkbox label,
+  &.radio-inline label,
+  &.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-danger;
+  }
+
+  .form-control,
+  .form-control:focus {
+    border-color: @brand-danger;
+  }
+}
+
+.has-error {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &.radio label,
+  &.checkbox label,
+  &.radio-inline label,
+  &.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-primary;
+  }
+
+  .form-control,
+  .form-control:focus {
+    border-color: @brand-primary;
+  }
+}
+
+.has-success {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &.radio label,
+  &.checkbox label,
+  &.radio-inline label,
+  &.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-success;
+  }
+
+  .form-control,
+  .form-control:focus {
+    border-color: @brand-success;
+  }
+}
+
+.form-control {
+  border-width: 2px;
+  -webkit-box-shadow: none!important;
+  -moz-box-shadow:    none!important;
+  box-shadow:         none!important;
+}
+.form-control:focus {
+  outline: none!important;
+  -webkit-box-shadow: none!important;
+  -moz-box-shadow:    none!important;
+  box-shadow:         none!important;
+}
+
+.radio,
+.radio-inline,
+.checkbox,
+.checkbox-inline {
+  label {
+    padding-left: 25px;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    margin-left: -25px;
+  }
+}
+
+input[type="radio"],
+.radio input[type="radio"],
+.radio-inline input[type="radio"] {
+  position: relative;
+  margin-top: 6px;
+  margin-right: 4px;
+  vertical-align: top;
+  border: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    .transition(240ms);
+  }
+
+  &:before {
+    position: absolute;
+    left: 0;
+    top: -1px;
+    background-color: @brand-success;
+    .scale(0);
+  }
+
+  &:after {
+    position: relative;
+    top: -1px;
+    border: 2px solid #959ba8;
+  }
+
+  &:checked:before {
+    .scale(0.5);
+  }
+
+  &:disabled:checked:before {
+    background-color: @gray-light;
+  }
+
+  &:checked:after {
+    border-color: @brand-success;
+  }
+
+  &:disabled:after,
+  &:disabled:checked:after {
+    border-color: @gray-light;
+  }
+}
+
+input[type="checkbox"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  position: relative;
+  border: none;
+  margin-bottom: -3px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus:after {
+    border-color: @brand-success;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-top: -2px;
+    margin-right: 5px;
+    border: 2px solid #959ba8;
+    border-radius: 2px;
+    .transition(240ms);
+  }
+
+  &:checked:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 6px;
+    display: table;
+    width: 6px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-top-width: 0;
+    border-left-width: 0;
+    .rotate(45deg);
+  }
+
+  &:checked:after {
+    background-color: @brand-success;
+    border-color: @brand-success;
+  }
+
+  &:disabled:after {
+    border-color: @gray-light;
+  }
+
+  &:disabled:checked:after {
+    background-color: @gray-light;
+    border-color: transparent;
+  }
+}
+
+
+// Navs =======================================================================
+
+.pager {
+  a {
+    color: @headings-color;
+  }
+
+  a:hover,
+  .active > a, {
+    border-color: @brand-primary;
+    color: #fff;
+  }
+
+  .disabled > a {
+    border-color: @pager-border;
+  }
+}
+
+.submenu {
+  color: #fff;
+  background: url(../images/slider-pattern.png);
+  .nav>li>a {
+    color: #fff;
+    border-bottom: 3px solid transparent;
+    padding-left: 0;
+    padding-right: 0;
+    margin-right: 40px;
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: transparent;
+      border-bottom: 3px solid #fff;
+    }
+
+    @media (max-width: 768px) {
+      text-align: center;
+      margin-right: 0;
+      &:hover,
+      &:active,
+      &:focus {
+        border-bottom-color: transparent;
+      }
+    }
+  }
+}
+
+// Indicators =================================================================
+
+// Progress bars ==============================================================
+
+// Containers =================================================================
+
+.page-wrapper {
+  padding: 40px 0;
+}
+
+.well {
+  outline: none!important;
+  -webkit-box-shadow: none!important;
+  -moz-box-shadow:    none!important;
+  box-shadow:         none!important;
+}
+
+.navbar {
+  .username {
+    &:active,
+    &:hover {
+      color: @brand-primary!important;
+    }
+    font-weight: 600;
+    font-size: 13px;
+    img {
+      margin-right: 10px;
+    }
+  }
+  
+}
+
+.page-heading {
+  margin-top: 0;
+  padding-bottom: 20px;
+  /*border-bottom: 1px solid lighten(@gray-light, 7%);
+  margin-bottom: 30px;*/
+}
+
+.panel {
+  overflow: hidden;
+}
+.panel-link:hover {
+  cursor: pointer!important;
+  position: relative;
+  &:after {
+    display: block;
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background-color: @brand-primary;
+  }
+}
+
+// Layout =====================================================================
+
+#app {
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+  min-height: 100vh;
+  
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+#wrapper {
+  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1;         /* OLD - Firefox 19- */
+  -webkit-flex: 1;          /* Chrome */
+  -ms-flex: 1;              /* IE 10 */
+  flex: 1;                  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+@media only screen and (max-width: 768px) {
+    #wrapper {
+        width: 100%;
+    }
+}
+
+.category {
+  overflow: hidden!important;
+  position: relative;
+  cursor: pointer!important;
+  display: block;
+  height: 300px;
+  color: #fff;
+  background-color: #000;
+  padding: 100px 40px;
+  margin-bottom: @grid-gutter-width;
+  -webkit-font-smoothing: antialiased;
+  border-radius: 3px;
+
+  .transition(padding 0.2s ease-out);
+
+  span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    font-weight: 700;
+    .transition(opacity 0.2s ease-out);
+  }
+  span.abs {
+    opacity: 1;
+    display: block;
+    position: absolute;
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.6;
+    min-width: 100%;
+    .transition(opacity 0.2s ease-out);
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #fff;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    text-decoration: none;
+
+    span {
+      opacity: 1;
+    }
+
+    img {
+      opacity: 0.3;
+    }
+  }
+
+}
+
+.info {
+  .fa {
+    font-size: 36px;
+    color: @brand-primary;
+  }
+}

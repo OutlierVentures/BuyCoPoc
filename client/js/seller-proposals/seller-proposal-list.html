@@ -1,5 +1,5 @@
 ﻿<div class="container">
-    <h2>Buying proposals</h2>
+    <h2 class="page-heading">Buying proposals</h2>
     <ov-message message="vm.message" message-type="vm.messageType" has-validation-error="vm.form.$invalid">
         <div ng-messages="vm.form.minimumTotalAmount.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.minimumTotalAmount.$invalid">
             <div ng-message="">'Minimum total amount' must be a number</div>
@@ -8,15 +8,10 @@
             <div ng-message="number">'Maximum price' must be a number</div>
         </div>
     </ov-message>
-    <div class="row" ng-show="!vm.proposals">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading"><h3>Loading...</h3></div>
-                <div class="panel-body">
-                    <p>Loading the latest proposal data...</p>
-                </div>
-            </div>
-        </div>
+    <div class="text-center info" ng-show="!vm.proposals">
+        <img src="/images/ajax-loader.gif">
+        <h3>Loading</h3>
+        <p>Getting the latest proposal data...</p>
     </div>
     <div class="row" ng-cloak ng-show="vm.proposals">
         <form name="vm.form" novalidate>
@@ -55,7 +50,7 @@
             <div class="col-md-1 form-group">
                  <label for="filterCategory">Filter</label>
                  <a class="btn btn-primary" ng-click="vm.search()" ng-show="!vm.isSearching" ng-disabled="!vm.filterChanged">
-                    <span class="glyphicon glyphicon-search"></span>
+                    <span class="fa fa-search"></span>
                 </a>
                 <a class="btn btn-primary" ng-cloak ng-show="vm.isSearching" ng-disabled="true">
                     <span class="glyphicon glyphicon-refresh glyphicon-spin" aria-hidden="true"></span>

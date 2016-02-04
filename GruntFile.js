@@ -36,6 +36,13 @@ module.exports = function(grunt) {
 				options : {
 					spawn : false // makes the watch task faster
 				}
+			},
+			less : {
+				files: ['client/less/**/*.less'],
+				tasks: ['less:development'],
+				options : {
+					spawn : false // makes the watch task faster
+				}
 			}
 		},
 		watchBackend : {
