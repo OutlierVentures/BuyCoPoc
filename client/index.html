@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <base href="/" />
@@ -10,104 +10,104 @@
 </head>
 <body>
     <div ng-app="buyCoApp">
-
-            <div id="app">
-                <header class="navbar navbar-default" ng-show="!isGlobalAdmin">
-                    <div class="container">
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn">
-                                <img src="images/logo.png">
-                            </a>
-                            <a class="navbar-brand" href="/" ng-cloak ng-hide="isLoggedIn">
-                                <img src="images/logo.png">
-                            </a>
-                        </div>
-                        <div class="navbar-collapse collapse" ng-controller="UserAccountController">
-                            <ul class="nav navbar-nav" ng-cloak ng-show="!isLoggedIn">
-                                <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
-                            </ul>
-                            <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
-                                <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
-                                <!--<li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>-->
-                                
-                                <!-- <li data-match-route="/seller-proposals/list"><a href="/seller-proposal/list">Seller proposals</a></li> -->
-                            </ul>
-                            <!-- <form class="navbar-form navbar-left">
-                                <input type="text" class="form-control" placeholder="Search">
-                            </form> -->
-                            <ul class="nav navbar-nav navbar-right" ng-show="isLoggedIn">
-                                <li data-match-route="/user/login"><a href="/user/login" class="username"><img src="/images/avatar.png" class="avatar">{{ userInfo.name }}</a></li>
-                            </ul>
-                            <ul class="nav navbar-nav navbar-right hidden-xs">
-                                <li class="version navbar-text small" ng-hide="!version">v{{ version }}-alpha</li>
-                            </ul>
-                        </div>
-                    </div>
-                </header>
-
-                <div class="submenu">
-                    <div class="container">
-                        <ul class="nav navbar-nav">
-                            <li data-match-route="/">
-                                <a href="/">Product Categories</a>
-                            </li>
-                            <li data-match-route="/seller-proposals/list">
-                                <a href="seller-proposal/list">Seller Proposals</a>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li>
-                                <p class="navbar-btn" style="margin-right: 15px;">
-                                    <a href="/proposal/new" class="btn btn-default"><i class="fa fa-pencil"></i>&nbsp;&nbsp;&nbsp;Create Proposal</a>
-                                </p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- Login screen, only shown when not logged in. -->
+        <div id="app">
+            <header class="navbar navbar-default" ng-show="!isGlobalAdmin" ng-cloak>
                 <div class="container">
-                    <div class="page-wrapper" ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
-                    <div class="page-wrapper ng-hide" ng-show="loginErrorMessage">
-                        <div class="panel panel-warning">
-                            <div class="panel-heading">Oops</div>
-                            <div class="panel-body">{{loginErrorMessage}}</div>
-                        </div>
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn">
+                            <img src="images/logo.png">
+                        </a>
+                        <a class="navbar-brand" href="/" ng-cloak ng-hide="isLoggedIn">
+                            <img src="images/logo.png">
+                        </a>
                     </div>
-                    <div class="page-wrapper" ng-include="'views/login-processing.html'" ng-show="isProcessingLogin"></div>
-                </div>
-                <!-- When not logged in, the whole wrapper is hidden. We use the property $rootScope.isLoggedIn
-                which is set to true after a succesful login.-->
-                <div id="wrapper" ng-show="isLoggedIn || isPublicPage()">
-                    <!-- Navigation. The navbar view includes the NavigationController. -->
-                    <!--                <nav ng-include="'views/navbar.html'"></nav>-->
-                    <div id="page-wrapper" class="page-wrapper">
-                        <!-- Main view. The view for the current ngRoute will be shown here. -->
-                        <div ng-view></div>
+                    <div class="navbar-collapse collapse" ng-controller="UserAccountController">
+                        <ul class="nav navbar-nav" ng-cloak ng-show="!isLoggedIn">
+                            <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
+                        </ul>
+                        <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
+                            <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
+                            <!--<li data-match-route="/proposal/list"><a href="/proposal/list">Proposals</a></li>-->
+                            <!-- <li data-match-route="/seller-proposals/list"><a href="/seller-proposal/list">Seller proposals</a></li> -->
+                        </ul>
+                        <!-- <form class="navbar-form navbar-left">
+                            <input type="text" class="form-control" placeholder="Search">
+                        </form> -->
+                        <ul class="nav navbar-nav navbar-right" ng-show="isLoggedIn">
+                            <li data-match-route="/user/login"><a href="/user/login" class="username"><img src="/images/avatar.png" class="avatar">{{ userInfo.name }}</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right hidden-xs">
+                            <li class="version navbar-text small" ng-hide="!version">v{{ version }}-alpha</li>
+                        </ul>
                     </div>
-                    <!-- /#page-wrapper -->
                 </div>
-                <footer class="footer">
-                    <nav class="navbar navbar-default">
-                      <div class="container">
+            </header>
+            <div class="submenu" ng-cloak>
+                <div class="container">
+                    <ul class="nav navbar-nav">
+                        <li data-match-route="/">
+                            <a href="/">Product Categories</a>
+                        </li>
+                        <li data-match-route="/seller-proposals/list">
+                            <a href="seller-proposal/list">Seller Proposals</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <p class="navbar-btn" style="margin-right: 15px;">
+                                <a href="/proposal/new" class="btn btn-default"><i class="fa fa-pencil"></i>&nbsp;&nbsp;&nbsp;Create Proposal</a>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Login screen, only shown when not logged in. -->
+            <div class="container" ng-cloak>
+                <div class="page-wrapper" ng-include="'views/login.html'" ng-controller="LoginController" ng-hide="isLoggedIn || isProcessingLogin || isPublicPage()"></div>
+                <div class="page-wrapper ng-hide" ng-show="loginErrorMessage">
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">Oops</div>
+                        <div class="panel-body">{{loginErrorMessage}}</div>
+                    </div>
+                </div>
+                <div class="page-wrapper" ng-include="'views/login-processing.html'" ng-show="isProcessingLogin"></div>
+            </div>
+            <!-- When not logged in, the whole wrapper is hidden. We use the property $rootScope.isLoggedIn
+            which is set to true after a succesful login.-->
+            <div id="wrapper" ng-show="isLoggedIn || isPublicPage()" ng-cloak>
+                <!-- Navigation. The navbar view includes the NavigationController. -->
+                <!--                <nav ng-include="'views/navbar.html'"></nav>-->
+                <div id="page-wrapper" class="page-wrapper">
+                    <!-- Main view. The view for the current ngRoute will be shown here. -->
+                    <div ng-view></div>
+                </div>
+                <!-- /#page-wrapper -->
+            </div>
+            <footer class="footer">
+                <nav class="navbar navbar-default">
+                    <div class="container">
                         <div class="navbar-header">
-                          <a class="navbar-brand" href="/"><img src="images/logo-gray.png"></a>
+                            <a class="navbar-brand" href="/"><img src="images/logo-gray.png"></a>
                         </div>
                         <ul class="nav navbar-nav navbar-right">
                             <li><p class="navbar-text small">This is a proof of concept implementation. Please read the <a href="http://www.buyco.io/proofofconcept" target="_blank">disclaimer</a>.</p></li>
-                            <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
-                             src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a>
+                            <li>
+                                <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+                                    <img alt="This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." style="border-width:0;"
+                                         src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
+                                </a>
                             </li>
                         </ul>
-                      </div>
-                    </nav>
-                </footer><!-- /.footer -->
-                <!-- /#wrapper -->
-            </div>
+                    </div>
+                </nav>
+            </footer><!-- /.footer -->
+            <!-- /#wrapper -->
+        </div>
     </div>
     <!--START from bower-->
     <!-- jQuery -->
@@ -117,7 +117,6 @@
     <script src="vendors/angular/angular.js"></script>
     <script src="vendors/angular-resource/angular-resource.js"></script>
     <script src="vendors/async/lib/async.js"></script>
-
     <!--END from bower-->
     <!-- TODO BW dd. 2015-12-30: Allow minification for perf/prod build, see f.i.: http://stackoverflow.com/questions/28860846/can-grunt-wiredep-wire-minify-version-in-html-file
     <!-- bower:js -->
