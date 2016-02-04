@@ -111,36 +111,33 @@ export class ProposalService {
      * TODO: include filters by category, amount etc. Should be done at
      * contract side to prevent many JSON RPC calls at scale.
      */
-    getAll(): Q.Promise<Array<proposalModel.IProposal>> {
-        var deferred = Q.defer<Array<proposalModel.IProposal>>();
+    getAll() {
+        return Q.Promise<Array<proposalModel.IProposal>>(
+        (resolve, reject) => {
+            var t = this;
 
-        var t = this;
+            // Get the details of each proposal in separate promises.
+            // Each of those requires one or more JSON RPC calls to the blockchain node.
+            var proposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
 
-        // Get the details of each proposal in separate promises. Each of those requires
-        // one or more JSON RPC calls to the blockchain node.
-        var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
+            var numProposals = t.registryContract.proposalIndex().toNumber();
 
+            for (let i = 1; i <= numProposals; i++) {
+                const defer = Q.defer<proposalModel.IProposal>();
+                proposalDetailsPromises.push(defer.promise);
 
-        var numProposals = t.registryContract.proposalIndex().toNumber();
+                // Call the getter asynchronously by passing a callback.
+                t.registryContract.proposals(i, t.buildGetProposalCallback(defer));
+            }
 
-        for (var i = 1; i <= numProposals; i++) {
-            var defer = Q.defer<proposalModel.IProposal>();
-
-            getProposalDetailsPromises.push(defer.promise);
-
-            // Call the getter asynchronously by passing a callback.
-            t.registryContract.proposals(i, t.buildGetProposalCallback(defer));
-        }
-
-        Q.all(getProposalDetailsPromises)
-            .then(function (allProposals) {
-                deferred.resolve(allProposals);
-            })
-            .catch(function (allProposalsErr) {
-                deferred.reject(allProposalsErr);
-            });
-
-        return deferred.promise;
+            Q.all(proposalDetailsPromises)
+                .then((allProposals) => {
+                    resolve(allProposals);
+                })
+                .catch((allProposalsErr) => {
+                    reject(allProposalsErr);
+                });
+        });
     }
 
     /**
@@ -173,7 +170,7 @@ export class ProposalService {
     }
 
     /**
-     * Get a single proposal by its contract address.
+     * Get the proposalBackings for the given proposal.
      */
     getBackers(proposalId): Q.Promise<Array<proposalBackingModel.IProposalBacking>> {
         var deferred = Q.defer<Array<proposalBackingModel.IProposalBacking>>();

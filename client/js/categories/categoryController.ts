@@ -59,6 +59,7 @@ class CategoryController {
         }).success(function (mainCategories: any) {
             // Store in scope to show in view
             t.$scope.categories = mainCategories;
+            
         }).error(function (error) {
             // Handle error
             cb(error, null);
