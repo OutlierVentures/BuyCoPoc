@@ -59,4 +59,4 @@ export interface IProposalBackingDocument extends mongoose.Document, IProposalBa
 /**
  * Cached version of a proposal backing.
  */
-export var ProposalBacking = mongoose.model<IProposalBackingDocument>("Proposals", proposalBackingSchema);
+export var ProposalBacking = mongoose.model<IProposalBackingDocument>("ProposalBackings", proposalBackingSchema);

@@ -12,6 +12,8 @@ import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
 
+import _ = require('underscore');
+
 import Q = require('q');
 import { IPromise, Promise } from "q";
 
@@ -52,6 +54,12 @@ export class CachedProposalService {
      * Gets all proposals that match the filter (or just all if no filter :).
      */
     get(proposalFilter: IProposalFilter): PromiseLike<IProposalDocument[]> {
+        // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+        if (proposalFilter) {
+            if (proposalFilter.maxPrice) {
+                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
+            }
+        }
         return Proposal.find(proposalFilter).exec();
     }
 
@@ -64,7 +72,7 @@ export class CachedProposalService {
             // Get all promises. Then for each of them, ensure it's stored in Mongo.
             this.proposalService.getAll()
                 .then((proposals) => {
-                    console.log("ensureMongoCache: got " + proposals.length + " proposals from blockchain. Ensuring cache for each of them.");
+                    console.log(`ensureMongoCache: got ${proposals.length} proposals from blockchain. Ensuring cache for each of them.`);
 
                     // Delete all proposals from the cache which are not currently in the contract
                     // (e.g. after clearing the blockchain during development)
@@ -72,8 +80,17 @@ export class CachedProposalService {
 
                     var proposalsPromises = new Array<Promise<IProposal>>();
 
-                    for (var i = 0; i < proposals.length; i++) {
+                    for (let i = 0; i < proposals.length; i++) {
                         var p = proposals[i];
+                        // Get backings 
+                        //this.proposalService.getBackers(p.contractAddress)
+                        //.then((proposalBackings) => {
+                        //    let sum = 0;
+                        //    _.each(proposalBackings, (backing) => { sum += backing.amount; });
+                        //    p.totalAmount = sum;
+                        //    p.nrOfBackings = proposalBackings.length;
+                        //    p.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+                        //});
                         proposalsPromises.push(this.ensureCacheProposal(p));
                     }
 
@@ -124,6 +141,10 @@ export class CachedProposalService {
 
                         currentProposal.maxPrice = p.maxPrice;
 
+                        currentProposal.nrOfBackings = p.nrOfBackings;
+                        currentProposal.nrOfBackers = p.nrOfBackers;
+                        currentProposal.totalAmount = p.totalAmount;
+
                         currentProposal.save((err, res) => {
                             if (err) saveDefer.reject(err);
                             else saveDefer.resolve(currentProposal);
@@ -145,7 +166,7 @@ export class CachedProposalService {
     }
 }
 
-class MongoCacheUpdateResult {
+export class MongoCacheUpdateResult {
     updatedObjects: number;
     createdObjects: number;
 }

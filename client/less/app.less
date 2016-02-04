@@ -1,3 +1,7 @@
+@import "../vendors/bootstrap/less/bootstrap.less";
+@import "variables.less";
+@import "theme.less";
+
 // Allow FOUC effect with angular stuff;
 // Source: https://docs.angularjs.org/api/ng/directive/ngCloak
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -6,10 +10,14 @@
 
 /* Quick fix for navbar overlapping content. */
 #app {
-    padding: 40px 0;
+    /*padding: @navbar-height 0;*/
 }
 
-navbar-header {
+.navbar-brand>img {
+    width: 110px;
+}
+
+.navbar-header {
     .version {
         font-size: 10px;
         text-align: right;
