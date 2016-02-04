@@ -59,11 +59,6 @@ contract Proposal {
     string public productSku;
 
     /**
-     * Description of the indivisible unit size. E.g. "box of 12 cans".
-     */
-    string public productUnitSize;
-
-    /**
      * The product category in plain text. Future vevrsions might contain a more
      * advanced taxonomy of categories.
      */
@@ -165,23 +160,18 @@ contract Proposal {
      */
     Offer public acceptedOffer;
 
-    function Proposal(string pn,
+    function Proposal(string pn, string pd,
+        //string ps,
         string mc, string sc, uint mp, string ed, string udd) {
         productName = pn;
+        productDescription = pd;
+        //productSku = ps;
         mainCategory = mc;
         subCategory = sc;
         maxPrice = mp;
         endDate = ed;
         ultimateDeliveryDate = udd;
     }
-
-    function setDetails(string pd, string ps, string pus) {
-        // TODO: validate that the sender is the proposal owner.
-        productDescription = pd;
-        productSku = ps;
-        productUnitSize = pus;
-    }
-
 
     /**
      * Back the proposal, i.e. pledge to buy a certain amount.
@@ -342,12 +332,14 @@ contract ProposalRegistry {
     mapping (uint=>Proposal) public proposals;
     uint public proposalIndex;
 
-    function addProposal(string productName,
+    function addProposal(string productName, string description,
+        //string productSku,
         string productCategory, string productSubCategory,
         uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
         proposalIndex++;
 
-        p = new Proposal(productName,
+        p = new Proposal(productName, description,
+            //productSku,
             productCategory, productSubCategory,
             maxPrice, endDate, ultimateDeliveryDate);
         proposals[proposalIndex] = p;
