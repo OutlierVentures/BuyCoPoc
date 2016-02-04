@@ -51,29 +51,28 @@ describe("ProposalRegistry list", () => {
                 var name3 = "Peru Ciriaco Quispe";
                 var price3 = 189456;
 
-                registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
-                registryContract.addProposal(name2, "Food and drink", "Coffee", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                serviceFactory.getContractService()
+                    .then(cs => {
+                        contractService = cs;
 
-                registryContract.addProposal(name3, "Food and drink", "Coffee", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
-                    .then(web3plus.promiseCommital)
-                    .then(function (tx) {
-                        var firstProposalAddress = registryContract.proposals(1);
+                        registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                        registryContract.addProposal(name2, "Food and drink", "Coffee", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
-                        return contractService.getProposalContractAt(firstProposalAddress);
-                    })
-                    .then(pc=> {
-                        firstProposal = pc;
+                        registryContract.addProposal(name3, "Food and drink", "Coffee", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
+                            .then(web3plus.promiseCommital)
+                            .then(function (tx) {
+                                var firstProposalAddress = registryContract.proposals(1);
 
-                        serviceFactory.getContractService()
-                            .then(cs => {
-                                contractService = cs;
+                                return contractService.getProposalContractAt(firstProposalAddress);
+                            })
+                            .then(pc=> {
+                                firstProposal = pc;
                                 done();
-                            }, err => done(err));
-                    })
-                    .catch(function (proposalErr) {
-                        done(proposalErr)
-                    });
-
+                            })
+                            .catch(function (proposalErr) {
+                                done(proposalErr)
+                            });
+                    }, err => done(err));
             },
             testRegistryName);
 
