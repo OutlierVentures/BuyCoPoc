@@ -203,6 +203,7 @@ models/*.js
 controllers/*.js
 services/*.js
 routes/*.js
+contracts/*.js
 lib/*.js
 test/**/*.js
 offers/*.js

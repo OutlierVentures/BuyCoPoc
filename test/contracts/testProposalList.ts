@@ -1,21 +1,28 @@
 ﻿import assert = require('assert');
 import web3config = require('./web3config');
 import fs = require('fs');
-import Q = require('q');
+
 import proposalModel = require('../../models/proposalModel');
+
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import contractService = require('../../services/contractService');
+import serviceFactory = require('../../services/serviceFactory');
+
+import Q = require('q');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
-describe("ProposalRegistry", () => {
+describe("ProposalRegistry list", () => {
     /**
      * The Solidity web3 contract.
      */
-    var registryContract;
+    var registryContract: contractInterfaces.IProposalRegistryContract;
 
-    var proposalContractDefinition;
+    var firstProposal: contractInterfaces.IProposalContract;
 
-    var firstProposal;
+    var contractService: contractService.ContractService;
+
 
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
@@ -34,16 +41,8 @@ describe("ProposalRegistry", () => {
             "ProposalRegistry",
             true,
             function (err, res) {
-                if (err) {
-                    done(err);
-                    return;
-                }
-
                 timeAfterDeployment = Date.now();
                 registryContract = res;
-
-                // Save the sub contract definitions to variables for easy access.
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
 
                 var name1 = "Ethiopia Adado Coop";
                 var price1 = 10299;
@@ -52,22 +51,32 @@ describe("ProposalRegistry", () => {
                 var name3 = "Peru Ciriaco Quispe";
                 var price3 = 189456;
 
-                registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
-                registryContract.addProposal(name2, "A very special product", "Food and drink", "Coffee", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                registryContract.addProposal(name2, "Food and drink", "Coffee", price2, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
-                registryContract.addProposal(name3, "A very special product", "Food and drink", "Coffee", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
+                registryContract.addProposal(name3, "Food and drink", "Coffee", price3, "2016-03-01", "2016-05-01", { gas: 2500000 })
                     .then(web3plus.promiseCommital)
                     .then(function (tx) {
                         var firstProposalAddress = registryContract.proposals(1);
-                        firstProposal = registryContract.allContractTypes.Proposal.contractDefinition.at(firstProposalAddress);
 
-                        done();
+                        return contractService.getProposalContractAt(firstProposalAddress);
+                    })
+                    .then(pc=> {
+                        firstProposal = pc;
+
+                        serviceFactory.getContractService()
+                            .then(cs => {
+                                contractService = cs;
+                                done();
+                            }, err => done(err));
                     })
                     .catch(function (proposalErr) {
                         done(proposalErr)
                     });
+
             },
             testRegistryName);
+
     });
 
     it("should add proposals and then return the list asynchronously using promises", function (done) {
@@ -219,8 +228,10 @@ describe("ProposalRegistry", () => {
             }
         }
 
+        var firstProposalAny = <any>firstProposal;
+
         for (var j = 0; j < numTimes; j++) {
-            firstProposal.productName(getPropertyCallback);
+            firstProposalAny.productName(getPropertyCallback);
         }
     });
 
@@ -257,6 +268,7 @@ describe("ProposalRegistry", () => {
                         return;
                     }
 
+                    // Keep using contractDefinition.at() here because we're testing the contract libraries.
                     proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
                         // Surprisingly, the proposals are processed / almost / synchronously.
                         // These console.logs appear about every 2 seconds and the whole thing 
@@ -268,7 +280,7 @@ describe("ProposalRegistry", () => {
                         console.log(Date() + " Got contract object at " + proposalAddress);
 
                         const p: proposalModel.IProposal = {
-                            contractAddress : proposalAddress,
+                            contractAddress: proposalAddress,
                             productName: proposal.productName(),
                             productDescription: proposal.productDescription(),
                             //productSku: proposal.productSku(),
@@ -331,6 +343,8 @@ describe("ProposalRegistry", () => {
 
         var allProposals = new Array<proposalModel.IProposal>();
 
+        // Keep directly using contractDefinition.at() here instead of contractService,
+        // because we're testing the contract libraries on a low level.
         var proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
 
         var numProposals = registryContract.proposalIndex().toNumber();
@@ -349,7 +363,7 @@ describe("ProposalRegistry", () => {
             console.log("After loading contract:" + Date.now());
 
             const p: proposalModel.IProposal = {
-                contractAddress : proposalAddress,
+                contractAddress: proposalAddress,
                 productName: proposal.productName(),
                 productDescription: proposal.productDescription(),
                 //productSku: proposal.productSku(),

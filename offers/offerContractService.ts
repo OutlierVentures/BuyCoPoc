@@ -6,11 +6,11 @@ import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import tools = require('../lib/tools');
 import configurationService = require('../services/configurationService');
-import Q = require('q');
+import contractService = require('../services/contractService');
 
-interface IBigNumber {
-    toNumber(): number
-}
+import contractInterfaces = require('../contracts/contractInterfaces');
+
+import Q = require('q');
 
 /**
  * Service for dealing with offers to buying proposals on the blockchain. All functions
@@ -18,45 +18,26 @@ interface IBigNumber {
  */
 export class OfferContractService {
     config = new configurationService.ConfigurationService().getConfiguration();
-    
-    /**
-     * The main proposal registry contract.
-     */
-    registryContract;
-    
-    /**
-     * Contract definition for the Proposal sub contract.
-     */
-    proposalContractDefinition;
-
-    /**
-     * Contract definition for the Offer sub contract.
-     */
-    offerContractDefinition;
+    contractService: contractService.ContractService;
 
     constructor() {
     }
 
     /**
-     * Initialize the service by loading the registry contract.
+     * Initialize the service.
      */
     initialize(): Q.Promise<void> {
         var defer = Q.defer<void>();
         var t = this;
-        web3plus.loadContractFromFile('ProposalRegistry.sol',
-            'ProposalRegistry', this.config.ethereum.contracts.proposalRegistry, true, function (loadContractError, con) {
-                if (loadContractError) {
-                    defer.reject(loadContractError);
-                    return;
-                }
-                t.registryContract = con;
-                t.proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
-                t.offerContractDefinition = t.registryContract.allContractTypes.Offer.contractDefinition;
-                
-                // Even though the defer is of type void, TypeScript wants a parameter passed
-                // to compile.
+
+        serviceFactory.getContractService()
+            .then(cs=> {
+                t.contractService = cs;
                 defer.resolve(null);
+            }, err => {
+                defer.reject(err);
             });
+
 
         return defer.promise;
     }
@@ -76,28 +57,32 @@ export class OfferContractService {
                 return;
             }
 
-            t.offerContractDefinition.at(offerAddress, function (offerContrErr, offer) {
-                console.log(Date() + " Got contract object at " + offerAddress);
+            serviceFactory.getContractService()
+                .then(cs=> {
+                    return cs.getOfferContractAt(offerAddress);
+                })
+                .then(offer=> {
+                    console.log(Date() + " Got contract object at " + offerAddress);
 
-                var getProperties = new Array<Q.Promise<void>>();
+                    var getProperties = new Array<Q.Promise<void>>();
 
-                var o = <offerModel.IOffer>{};
+                    var o = <offerModel.IOffer>{};
 
-                // We get each of the properties of the offer async, all with a separate promise.
-                // This leads to unreadable code, but it's the only known way of delivering
-                // reasonable performance. See testProposalList.ts for more info.
+                    // We get each of the properties of the offer async, all with a separate promise.
+                    // This leads to unreadable code, but it's the only known way of delivering
+                    // reasonable performance. See testProposalList.ts for more info.
                         
-                o.id = offerAddress;
+                    o.id = offerAddress;
 
-                getProperties.push(Q.denodeify<string>(offer.sellerAddress)().then(function (addr) { o.sellerAddress = addr; }));
-                getProperties.push(Q.denodeify<IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
-                getProperties.push(Q.denodeify<IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
+                    getProperties.push(Q.denodeify<string>(offer.sellerAddress)().then(function (addr) { o.sellerAddress = addr; }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
 
-                Q.all(getProperties)
-                    .then(function () {
-                        d.resolve(o);
-                    });
-            });
+                    Q.all(getProperties)
+                        .then(function () {
+                            d.resolve(o);
+                        });
+                });
         };
     }
 
@@ -181,24 +166,26 @@ export class OfferContractService {
         // Normalize amount for contract
         o.price = o.price * 100;
 
-        var proposalContract = t.proposalContractDefinition.at(proposalId);
+        t.contractService.getProposalContractAt(proposalId)
+            .then(proposalContract => {
 
-        proposalContract.offer(o.price, o.minimumAmount, { gas: 2500000 })
-            .then(web3plus.promiseCommital)
-            .then(function createOfferResult(tx) {
-                // TODO: get the offer by a unique identifier.
-                // TODO: ensure that the offer was actually created. defer.reject if not.
-                // This can happen for various reasons, both technical and functional (i.e. price too high)
-                var offerIndex = proposalContract.offerIndex().toNumber();
-                var newOfferAddress = proposalContract.offers(offerIndex);
+                proposalContract.offer(o.price, o.minimumAmount, { gas: 2500000 })
+                    .then(web3plus.promiseCommital)
+                    .then(function createOfferResult(tx) {
+                        // TODO: get the offer by a unique identifier.
+                        // TODO: ensure that the offer was actually created. defer.reject if not.
+                        // This can happen for various reasons, both technical and functional (i.e. price too high)
+                        var offerIndex = proposalContract.offerIndex().toNumber();
+                        var newOfferAddress = proposalContract.offers(offerIndex);
 
-                o.id = newOfferAddress;
+                        o.id = newOfferAddress;
 
-                // Normalize amount for display, again
-                o.price = o.price / 100;
-                defer.resolve(o);
-            }, function getProposalErr(err) {
-                defer.reject(err);
+                        // Normalize amount for display, again
+                        o.price = o.price / 100;
+                        defer.resolve(o);
+                    }, function getProposalErr(err) {
+                        defer.reject(err);
+                    });
             });
 
         return defer.promise;

@@ -2,16 +2,20 @@
 import web3config = require('./web3config');
 import fs = require('fs');
 
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import contractService = require('../../services/contractService');
+import serviceFactory = require('../../services/serviceFactory');
+
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
-describe("ProposalRegistry", () => {
+describe("ProposalRegistry backing", () => {
     /**
      * The Solidity web3 contract.
      */
-    var registryContract;
+    var registryContract: contractInterfaces.IProposalRegistryContract;
 
-    var proposalContractDefinition;
+    var contractService: contractService.ContractService;
 
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
@@ -33,10 +37,11 @@ describe("ProposalRegistry", () => {
                 timeAfterDeployment = Date.now();
                 registryContract = res;
 
-                // Save the sub contract definitions to variables for easy access.
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
-
-                done(err);
+                serviceFactory.getContractService()
+                    .then(cs => {
+                        contractService = cs;
+                        done();
+                    }, err => done(err));
             },
             testRegistryName);
     });
@@ -53,14 +58,17 @@ describe("ProposalRegistry", () => {
         // also that address.
         var backerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
@@ -130,14 +138,17 @@ describe("ProposalRegistry", () => {
         // also that address.
         var backerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 var backPromise = proposalContract.back(amount1, { gas: 2500000 });
                 return backPromise;
@@ -200,14 +211,17 @@ describe("ProposalRegistry", () => {
         // also that address.
         var backerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 var backPromise = proposalContract.back(amount1, { gas: 2500000 });
                 return backPromise;
@@ -229,13 +243,16 @@ describe("ProposalRegistry", () => {
                 assert.equal(newBacker[2], txID32, "Transaction ID of 32 chars is registered correctly");
                 assert.equal(newBacker[3].toNumber(), paymentAmount1, "Amount for setPaid with transaction ID of 32 chars is registered correctly");
 
-                return registryContract.addProposal(name1, "A very special product, 2", "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                return registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(2);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 var backPromise = proposalContract.back(amount1, { gas: 2500000 });
                 return backPromise;
