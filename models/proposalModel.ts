@@ -7,7 +7,8 @@ export var proposalSchema = new mongoose.Schema({
     contractAddress: String,
     productName: String,
     productDescription: String,
-    //productSku: String,
+    productSku: String,
+    productUnitSize: String,
     mainCategory: String,
     subCategory: String,
     maxPrice: Number,
@@ -22,7 +23,8 @@ export interface IProposal {
     contractAddress: string;
     productName: string;
     productDescription: string;
-    //productSku: string;
+    productSku: string;
+    productUnitSize: string;
     mainCategory: string;
     subCategory: string;
     maxPrice: number;

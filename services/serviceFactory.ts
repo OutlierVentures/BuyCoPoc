@@ -1,6 +1,7 @@
 ﻿import upholdService = require('./upholdService');
 import stubUpholdService = require('./stubUpholdService');
 import configurationService = require('./configurationService');
+import contractService = require('./contractService');
 
 import proposalService = require('./proposalService');
 import cachedProposalService = require('./cachedProposalService');
@@ -78,6 +79,27 @@ export function createCachedProposalService(): Promise<cachedProposalService.Cac
     });
 }
 
+var cachedContractService: contractService.ContractService;
+
+export function getContractService(): Promise<contractService.ContractService> {        
+    return Promise<contractService.ContractService>((resolve, reject) => {
+        if (cachedContractService) {
+            resolve(cachedContractService);
+            return;
+        }
+
+        cachedContractService = new contractService.ContractService();
+
+        cachedContractService.initialize(getConfiguration())
+            .then(() => {
+                resolve(cachedContractService);
+            }, initializeErr => {
+                reject(initializeErr);
+            });
+    });
+}
+
+
 export function createUserAccountService(): Promise<userAccountService.UserAccountService> {
     return Promise<userAccountService.UserAccountService>((resolve, reject) => {
         var uas = new userAccountService.UserAccountService();
@@ -90,6 +112,8 @@ export function createUserAccountService(): Promise<userAccountService.UserAccou
             });
     });
 }
+
+
 
 export function createOfferContractService(): Q.Promise<offerService.OfferContractService> {
     var defer = Q.defer<offerService.OfferContractService>();

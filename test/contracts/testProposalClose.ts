@@ -2,17 +2,20 @@
 import web3config = require('./web3config');
 import fs = require('fs');
 
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import contractService = require('../../services/contractService');
+import serviceFactory = require('../../services/serviceFactory');
+
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
-describe("ProposalRegistry", () => {
+describe("ProposalRegistry closing", () => {
     /**
      * The Solidity web3 contract.
      */
-    var registryContract;
+    var registryContract: contractInterfaces.IProposalRegistryContract;
 
-    var proposalContractDefinition;
-    var offerContractDefinition;
+    var contractService: contractService.ContractService;
 
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
@@ -34,11 +37,11 @@ describe("ProposalRegistry", () => {
                 timeAfterDeployment = Date.now();
                 registryContract = res;
 
-                // Save the sub contract definitions to variables for easy access.
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
-                offerContractDefinition = registryContract.allContractTypes.Offer.contractDefinition;
-
-                done(err);
+                serviceFactory.getContractService()
+                    .then(cs => {
+                        contractService = cs;
+                        done();
+                    }, err => done(err));
             },
             testRegistryName);
     });
@@ -62,12 +65,15 @@ describe("ProposalRegistry", () => {
 
         var proposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
                 return proposalContract.back(askAmount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
@@ -111,12 +117,15 @@ describe("ProposalRegistry", () => {
 
         var proposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
                 return proposalContract.back(askAmount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
@@ -134,8 +143,9 @@ describe("ProposalRegistry", () => {
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
                 var acceptedOfferAddress = proposalContract.acceptedOffer();
-                var acceptedOffer = offerContractDefinition.at(acceptedOfferAddress);
-
+                return contractService.getOfferContractAt(acceptedOfferAddress);
+            })
+            .then(acceptedOffer => {
                 // Offer address should be unchanged.
                 assert.equal(acceptedOffer.sellerAddress(), sellerAddress1);
 
