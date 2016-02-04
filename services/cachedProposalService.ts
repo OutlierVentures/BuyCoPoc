@@ -136,6 +136,9 @@ export class CachedProposalService {
                         currentProposal.mainCategory = p.mainCategory;
                         currentProposal.subCategory = p.subCategory;
 
+                        currentProposal.productSku = p.productSku;
+                        currentProposal.productUnitSize = p.productUnitSize;
+
                         currentProposal.endDate = p.endDate;
                         currentProposal.ultimateDeliveryDate = p.ultimateDeliveryDate;
 

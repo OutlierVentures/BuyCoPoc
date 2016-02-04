@@ -86,11 +86,12 @@ export class ProposalService {
                     // These could be written more compactly as both the property of proposal and of
                     // p are named identical.
                     // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
-                    // The calls would then be: addPropertyGetter(getProperties, proposal, p, "productName")
+                    // The calls would then be: addPropertyGetter<string>(getProperties, proposal, p, "productName")
                     // Drawback: properties of IProposal wouldn't be typesafe any more.
                     getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                     getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
-                    //getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
+                    getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
+                    getProperties.push(Q.denodeify<string>(proposal.productUnitSize)().then(function (unitSize) { p.productUnitSize = unitSize; }));
                     getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
                     getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
@@ -282,7 +283,7 @@ export class ProposalService {
         this.registryContract.addProposal(p.productName,
             p.mainCategory, p.subCategory,
             p.maxPrice,
-            p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 999999999 })
+            p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {
                 // At this point we have no unique reference to the proposal we
@@ -310,8 +311,9 @@ export class ProposalService {
                 return t.contractService.getProposalContractAt(newProposalAddress);
             })
             .then(proposalContract => {               
-                // TODO: fill sku and unit
-                return proposalContract.setDetails(p.productDescription, "", "");
+                // Fill additional properties. This is a separate method because of 
+                // Solidity limitations ("stack too deep").
+                return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize);
             })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {

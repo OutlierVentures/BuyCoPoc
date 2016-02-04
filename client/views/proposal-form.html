@@ -39,22 +39,34 @@
                                             <optgroup label="Shoes">
                                                 <option value="Shoes - Running shoes">Running shoes</option>
                                             </optgroup>
-                                        </select>                                  
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Product description</label>
                                         <p class="help-block">
                                             Please provide a unique description of the product.
                                         </p>
-                                        <input class="form-control" type="text" ng-model="proposal.productDescription" required>
+                                        <textarea class="form-control" type="text" ng-model="proposal.productDescription" required></textarea>
                                     </div>
-                                    <!--<div class="form-group">
+                                    <div class="form-group">
                                         <label>SKU</label>
                                         <p class="help-block">
                                             What is the unique product identification number?
                                         </p>
                                         <input class="form-control" type="text" ng-model="proposal.productSku" required>
-                                    </div>-->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Unit size</label>
+                                        <p class="help-block">
+                                            What is the indivisible unit size? Examples:
+                                            <ul>
+                                                <li>1 unit</li>
+                                                <li>1 box with 12 cans</li>
+                                                <li>1 bottle of 2.5 liters</li>
+                                            </ul>
+                                        </p>
+                                        <input class="form-control" type="text" ng-model="proposal.productUnitSize" required>
+                                    </div>
                                     <div class="form-group">
                                         <label>Maximum price</label>
                                         <p class="help-block">

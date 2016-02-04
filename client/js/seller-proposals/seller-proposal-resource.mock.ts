@@ -27,16 +27,16 @@ function SellerProposalResourceMock(
         // Get the filter parameters from the URL - if any.
         var uri = new URI(url);
         const category = uri.search(true).category;
-        const partNumber = uri.search(true).partNumber;
+        const sku = uri.search(true).partNumber;
         const maxPrice = uri.search(true).maxPrice;
         const minimumTotalAmount = uri.search(true).minimumTotalAmount;
         
         // Filter on the specified parameters
         const results: IProposal[] = _.filter(proposals, (item: IProposal) => {
-            let partnrTest = new RegExp(partNumber);
+            let partnrTest = new RegExp(sku);
             let inFilter = 
                 (!category || category===item.subCategory) &&
-                (!partNumber || partnrTest.test(item.partNumber)) &&
+                (!sku || partnrTest.test(item.productSku)) &&
                 (!maxPrice || parseInt(maxPrice)>=item.maxPrice) &&
                 (!minimumTotalAmount || parseInt(minimumTotalAmount)<item.totalAmount);
             return inFilter;

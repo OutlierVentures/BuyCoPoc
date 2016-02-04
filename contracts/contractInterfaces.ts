@@ -59,7 +59,7 @@ export interface IProposalContract extends IWeb3Contract {
     productName(): string;
     productDescription(): string;
     productSku(): string;
-    productUnitSpecification(): string;
+    productUnitSize(): string;
     mainCategory(): string;
     subCategory(): string;
     maxPrice(): IBigNumber;
