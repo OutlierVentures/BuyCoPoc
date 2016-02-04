@@ -1,20 +1,24 @@
-﻿import {Promise} from 'q';
+﻿/*** ADAPTED COPY FROM contractInterfaces.ts FROM BACKEND ***/
+// Adaptations:
+// - Remove 'export' as this is not a module
+// - Replace Promise returns by callbacks, as the contracts on the front end are
+//   not (yet) promiseified.
 
-export interface IBigNumber {
+interface IBigNumber {
     toNumber(): number
 }
 
-export interface IWeb3TransactionOptions {
+interface IWeb3TransactionOptions {
     gas?: number;
     to?: string;
     from?: string;
 }
 
-export interface IWeb3Contract {
+interface IWeb3Contract {
     address: string;
 }
 
-export interface IWeb3TransactionCallback {
+interface IWeb3TransactionCallback {
     (error: any, transactionId: string);
 }
 
@@ -28,14 +32,14 @@ export interface IWeb3TransactionCallback {
 // make them return a Promise. If not, they take a callback, which is not reflected in 
 // these interfaces.
 
-export interface IProposalRegistryContract extends IWeb3Contract {
+interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
     addProposal(productName: string,
         productCategory: string,
         productSubCategory: string,
         maxPrice: number,
         endDate: string,
-        ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
+        ultimateDeliveryDate: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
     proposals(index: number | IBigNumber, callback?): string;
     proposalIndex(): IBigNumber;
@@ -43,15 +47,15 @@ export interface IProposalRegistryContract extends IWeb3Contract {
     name(): string;
 }
 
-export interface IProposalContract extends IWeb3Contract {
+interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string,
         productSku: string,
-        productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
+        productUnitSpecification: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    back(amount: number, options?: IWeb3TransactionOptions): Promise<string>;
-    offer(price: number, minimumAmount: number, options?: IWeb3TransactionOptions): Promise<string>;
+    back(amount: number, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    offer(price: number, minimumAmount: number, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    setPaid(backingAddress: string, paymentType: number, transactionId: string, amount: number): Promise<string>;
+    setPaid(backingAddress: string, paymentType: number, transactionId: string, amount: number, callback?: IWeb3TransactionCallback);
 
     offers(index: number | IBigNumber, callback?): string;
     offerIndex(): IBigNumber;
@@ -71,7 +75,7 @@ export interface IProposalContract extends IWeb3Contract {
     ultimateDeliveryDate(): string;
 }
 
-export interface IOfferContract extends IWeb3Contract {
+interface IOfferContract extends IWeb3Contract {
     sellerAddress(): string;
     price(): IBigNumber;
     minimumAmount(): IBigNumber;

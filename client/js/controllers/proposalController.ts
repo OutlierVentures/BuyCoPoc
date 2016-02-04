@@ -225,7 +225,7 @@ class ProposalController {
         // TODO: verify that an ethereum account for the user has been configured.
         this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
             proposalContract => {
-                var options = {
+                var options: IWeb3TransactionOptions = {
                     // Still unclear how much gas should really be used. 250000 works at this point.
                     // If too low, it will be shown in the UX.
                     gas: 250000,
@@ -328,7 +328,7 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            if(error.error)
+            if (error.error)
                 t.$scope.errorMessage = error.error;
             else
                 t.$scope.errorMessage = error;
