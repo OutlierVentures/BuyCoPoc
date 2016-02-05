@@ -60,8 +60,12 @@ export class CachedProposalService {
         // Field names are contained as strings and hence not typesafe. Not sure 
         // if there is a way to access field names typesafe (something like query.maxPrice.lte(10))
         if (proposalFilter) {
+            if (proposalFilter.minPrice) {
+                // Sellers are interested in a higher price. Test "greater than or equal"
+                query = query.gte("maxPrice", proposalFilter.minPrice + 0);
+            }
             if (proposalFilter.maxPrice) {
-                // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+                // Buyers are interested in a lower price. Test "less than or equal"
                 query = query.lte("maxPrice", proposalFilter.maxPrice + 0);
             }
             if (proposalFilter.partNumber) {
