@@ -277,6 +277,10 @@ export class ProposalService {
             anyP.endDate = "";
         if (!p.ultimateDeliveryDate)
             anyP.ultimateDeliveryDate = "";
+        // Calling contract methods with `undefined` for string variables leads to errors.
+        if (!p.productDescription) p.productDescription = "";
+        if (!p.productSku) p.productSku = "";
+        if (!p.productUnitSize) p.productUnitSize = "";
 
         var proposalIndexBefore = t.registryContract.proposalIndex().toNumber();
 
@@ -313,7 +317,7 @@ export class ProposalService {
             .then(proposalContract => {               
                 // Fill additional properties. This is a separate method because of 
                 // Solidity limitations ("stack too deep").
-                return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize);
+                return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {

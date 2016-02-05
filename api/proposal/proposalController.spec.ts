@@ -12,6 +12,9 @@ import proposalModel = require('../../models/proposalModel');
 import proposalBackingModel = require('../../models/proposalBackingModel');
 import categoryModel = require('../../models/categoryModel');
 import userModel = require('../../models/userModel');
+
+import serviceFactory = require('../../services/serviceFactory');
+
 import _ = require('underscore');
 
 var web3plus = web3config.web3plus;
@@ -98,10 +101,13 @@ describe("ProposalController", () => {
         var newProposalData = {
             "productName": "A testing product",
             "productDescription": "From the unit tests",
-            //"productSku": "SKU123",
+            "productSku": "SKU123",
+            "productUnitSize": "1 unit",
             "category": "Electronics - Camera",
             "maxPrice": 0.02,
         };
+
+        var newProposal: proposalModel.IProposal;
 
         request(theApp)
             .post('/api/proposal')
@@ -109,17 +115,38 @@ describe("ProposalController", () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .expect(function (res) {
-                var newProposal = <proposalModel.IProposal>res.body;
+                newProposal = <proposalModel.IProposal>res.body;
                 
                 // Assert stuff on the result
                 assert.notEqual(newProposal.contractAddress, "0x", "New proposal has an ID");
                 assert.equal(newProposal.endDate, "", "New proposal has an empty string as end date");
-                //assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
+                assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
+                assert.equal(newProposal.productUnitSize, "1 unit", "New proposal has correct unit size");
                 assert.equal(newProposal.mainCategory, "Electronics", "New proposal has correct main category");
                 assert.equal(newProposal.subCategory, "Camera", "New proposal has correct sub category");
             })
             .end(function (err, res) {
-                done(err);
+                if (err) {
+                    done(err);
+                    return;
+                }
+
+                // Get the proposal from the contract directly to verify that it was indeed stored correctly.
+                serviceFactory.getContractService()
+                    .then(cs=> {
+                        return cs.getProposalContractAt(newProposal.contractAddress);
+                    })
+                    .then(proposalFromContract => {
+                        assert.equal(proposalFromContract.productName(), newProposal.productName, "contract has correct productName");
+                        assert.equal(proposalFromContract.productSku(), newProposal.productSku, "contract has correct productSku");
+                        assert.equal(proposalFromContract.productUnitSize(), newProposal.productUnitSize, "contract has correct productUnitSize");
+                        assert.equal(proposalFromContract.productDescription(), newProposal.productDescription, "contract has correct productDescription");
+                        assert.equal(proposalFromContract.mainCategory(), newProposal.mainCategory, "contract has correct mainCategory");
+                        assert.equal(proposalFromContract.subCategory(), newProposal.subCategory, "contract has correct subCategory");
+
+                        done();
+                    }, err => done(err));
+
             });
     });
 

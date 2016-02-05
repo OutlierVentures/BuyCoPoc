@@ -10,21 +10,23 @@
         <p class="text-muted">{{proposal.productDescription}}</p>
         <p class="text-muted" ng-show="proposal.productSku">SKU: {{proposal.productSku}}</p>
         <p class="text-muted" ng-show="proposal.productUnitSize">Unit size: {{proposal.productUnitSize}}</p>
+
         <span class="small">
             Maximum price: <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}} GBP</span>
-        </span><br><br>
+        </span><br>
         <span class="small">
-            End date: <span am-time-ago="proposal.endDate" title="{{proposal.endDate}}" class="text-muted"></span>
-        </span>
+            End date: <span class="text-muted">{{proposal.endDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
+        </span><br>
+        <span class="small">
+            Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
+        </span><br>
+        <h4>Time left to get your orders in:</h4>
         <h1 class="large" ng-cloak ng-show="proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
         <br><br>
-        <span class="small">
-            Ultimate delivery date: <span am-time-ago="proposal.ultimateDeliveryDate" title="{{ proposal.ultimateDeliveryDate }}" class="text-muted"></span>
-        </span><br><br>
         <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.contractAddress}}</span></span>
         <form role="form" name="proposalForm" novalidate>
             <a href="/proposal/{{proposal.contractAddress}}/back" class="btn btn-primary">
-                Back this BuyCo
+                Buy together
             </a>
         </form>
     </div>

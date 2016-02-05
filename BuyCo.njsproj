@@ -65,6 +65,7 @@
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
     <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
+    <TypeScriptCompile Include="client\js\common\contractInterfaces.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.directive.ts" />
     <TypeScriptCompile Include="client\js\common\proposal-detail.directive.ts" />
