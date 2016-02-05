@@ -48,9 +48,10 @@ export interface IProposalContract extends IWeb3Contract {
         productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
 
     back(amount: number, options?: IWeb3TransactionOptions): Promise<string>;
+
     offer(price: number, minimumAmount: number, options?: IWeb3TransactionOptions): Promise<string>;
 
-    setPaid(backingAddress: string, paymentType: number, transactionId: string, amount: number, options?: IWeb3TransactionOptions): Promise<string>;
+    setPaid(backingIndex: number, paymentType: number, transactionId: string, amount: number, options?: IWeb3TransactionOptions): Promise<string>;
 
     offers(index: number | IBigNumber, callback?): string;
     offerIndex(): IBigNumber;
@@ -58,6 +59,7 @@ export interface IProposalContract extends IWeb3Contract {
     backers(index: number | IBigNumber, callback?): any[];
     backerIndex(): IBigNumber;
     backerIndexByAddress(address: string): IBigNumber;
+    getTotalBackedAmount(): IBigNumber;
 
     pledgePaymentPercentage(): IBigNumber;
     startPaymentPercentage(): IBigNumber;

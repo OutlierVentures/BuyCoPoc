@@ -109,8 +109,12 @@ contract Proposal {
 
         /*
          * Transaction ID of the pledge payment (before closing a deal).
+         * Transaction ID's currently are always 32 bytes. Therefore we
+         * could change them to bytes32. That would allow string compare.
+         * However there's no current need and it would require some code
+         * changes. So sticking with string for now.
          */
-        bytes32 pledgePaymentTransactionID;
+        string pledgePaymentTransactionID;
 
         /*
          * Amount of the pledge payment.
@@ -120,7 +124,7 @@ contract Proposal {
         /*
          * Transaction ID of the initial payment (at moment of backing).
          */
-        bytes32 startPaymentTransactionID;
+        string startPaymentTransactionID;
 
         /*
          * Amount of initial payment.
@@ -130,7 +134,7 @@ contract Proposal {
         /*
          * Transaction ID of the final payment (after deliery).
          */
-        bytes32 endPaymentTransactionID;
+        string endPaymentTransactionID;
 
         /*
          * Amount of the final payment.
@@ -143,11 +147,6 @@ contract Proposal {
      */
     mapping(uint => Backing) public backers;
     uint public backerIndex;
-
-    /*
-     * Index to help access the backer mapping.
-     */
-    mapping(address => uint) public backerIndexByAddress;
 
     /*
      * Prospective buyers backing this proposal.
@@ -239,20 +238,30 @@ contract Proposal {
 
     /*
      * Register a payment for a backer.
-     * @param backerAddress the backer that paid
+     * @param backerIndex the backer index
      * @param paymentType 1=pledge, 2=start, 3=end
      * @param transactionID the external transaction ID of the payment
      * @param amount the payment amount
      */
-    function setPaid(address backerAddress, uint paymentType, bytes32 transactionID, int amount) {
+    function setPaid(uint backerIndex, uint paymentType, string transactionID, int amount) {
         // TODO: check whether tx.origin is proposal creator? Or admin? Or the backer?
         // --> admin, according to current insights. Hence the creator of the registry.
 
         // Validate this is an existing backer.
-        if(backerIndexByAddress[backerAddress] == 0)
+        // Ideally we would want to verify this from the original backer address.
+        // The backer could send a transaction claiming they paid a certain backing
+        // (checking the address), and then the registry administrator can confirm
+        // this, also checking that the tx ID corresponds to a tx of the right amount
+        // that has been sent to the right address.
+        // So then this would be split into:
+        // - claimPaid(uint backerIndex, uint paymentType, string transactionID, int amount)
+        //   -> to be called by the backer
+        // - confirmPaid(uint backerIndex, uint paymentType, string transactionID, int amount)
+        //   -> to be called by the registry admin. Or in future cases, by a set of oracles.
+        // - or denyPaid(uint backerIndex, uint paymentType), to be called by the admin/oracles,
+        //   leading to a reversion. Could also be used to correct incorrect calls.
+        if(backerIndex == 0)
             return;
-
-        uint backerIndex = backerIndexByAddress[backerAddress];
 
         Backing b = backers[backerIndex];
 
@@ -270,7 +279,7 @@ contract Proposal {
             // Start payment
 
             // Validate pledge payment
-            if(b.startPaymentTransactionID == "")
+            if(b.pledgePaymentAmount == 0)
                 return;
 
             if(amount != int(getStartPaymentAmount(backerIndex)))
@@ -287,7 +296,7 @@ contract Proposal {
                 return;
 
             // Validate that start payment was registered
-            if(b.startPaymentTransactionID=="")
+            if(b.startPaymentAmount == 0)
                 return;
 
             // Validate correct amount

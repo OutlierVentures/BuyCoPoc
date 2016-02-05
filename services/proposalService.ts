@@ -390,7 +390,7 @@ export class ProposalService {
             .then(function (tx) {
                 // Get the from address from the transaction. If it is our global account or the account
                 // of an individual user, both will be set here.
-                var backingAddress = tx.from;
+                var backingAddress: string = tx.from;
 
                 // Check whether the backer was actually added. Otherwise reject.
                 // WARNING: this way of getting the backing by index is not foolproof (like other
@@ -442,7 +442,7 @@ export class ProposalService {
 
                                         // Store transaction with backing after it's finished
                                         // paymentType 1 = initial payment
-                                        proposalContract.setPaid(backingAddress, 1, tools.guidRemoveDashes(committedTransaction.id),
+                                        proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
                                             paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
