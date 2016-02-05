@@ -76,7 +76,7 @@ contract Proposal {
     string public subCategory;
 
     /**
-     *
+     * Maximum price the buyers are willing to pay.
      */
     uint public maxPrice;
 
@@ -192,15 +192,10 @@ contract Proposal {
         if(am == 0)
             return;
 
-        if(backerIndexByAddress[tx.origin] > 0 ){
-            // Existing backer. Update the amount.
-            backers[backerIndexByAddress[tx.origin]].amount = am;
-            return;
-        }
+        // No checks on multiple backings per buyer. Buyers can buy more later (not less).
 
         backerIndex++;
 
-        backerIndexByAddress[tx.origin] = backerIndex;
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
     }
@@ -287,19 +282,9 @@ contract Proposal {
         return amount;
     }
 
-    /**
-     * Attempt to close the proposal if the closing conditions are met:
-     * - the end date has been reached (this can not be checked yet)
-     * - a valid offer has been made
-     */
-    function close(){
-        // TODO: check whether endDate has passed. The only time source that
-        // the contract has access to is the block number. This is not a
-        // dependable time, especially not on a private chain.
-
-        uint lowestPrice = maxPrice;
-        Offer bestOffer;
+    function getBestOffer() constant returns (uint bestOfferIndex) {
         uint totalBackedAmount = getTotalBackedAmount();
+        uint lowestPrice = maxPrice;
 
         // Find the matching offer with the best price.
         for (uint i = 1; i <= offerIndex; i++)
@@ -309,16 +294,28 @@ contract Proposal {
             if (o.price() <= lowestPrice && o.minimumAmount() <= totalBackedAmount)
             {
                 // This is a better offer than previously found.
-                bestOffer = o;
-                lowestPrice = bestOffer.price();
+                bestOfferIndex = i;
             }
         }
+    }
+
+    /**
+     * Attempt to close the proposal if the closing conditions are met:
+     * - the end date has been reached (this can not be checked yet)
+     * - a valid offer has been made
+     */
+    function close() {
+        // TODO: check whether endDate has passed. The only time source that
+        // the contract has access to is the block number. This is not a
+        // dependable time, especially not on a private chain.
+
+        uint bestOfferIndex = getBestOffer();
 
         // Did we find a valid offer?
-        if (bestOffer.price() > 0) {
-            acceptedOffer = bestOffer;
-            isClosed = true;
-        }
+        if (bestOfferIndex == 0) return;
+
+        acceptedOffer = offers[bestOfferIndex];
+        isClosed = true;
     }
 }
 
