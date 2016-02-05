@@ -126,19 +126,19 @@ describe("ProposalRegistry backing", () => {
         this.timeout(180000);
 
         var name1 = "Ethiopia Adado Coop";
-        var price1 = 10293;
-        var amount1 = 13;
+        var price1 = 11035;
+        var amount1 = 105;
 
-        var txID1 = "tx" + Math.round(Math.random() * 1000000);
-
-        // Amount: 40% up front
-        var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
+        var pledgePaymentTxId = "tx" + Math.round(Math.random() * 1000000);
+        var startPaymentTxId = "tx" + Math.round(Math.random() * 1000000);
 
         // Currently all transactions are sent from a single address. Hence the "backer" is
         // also that address.
         var backerAddress1 = web3.eth.coinbase;
 
         var proposalContract: contractInterfaces.IProposalContract;
+        var pledgePaymentAmount: number;
+        var startPaymentAmount: number;
 
         registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
@@ -161,18 +161,31 @@ describe("ProposalRegistry backing", () => {
                 assert.equal(newBacker[1].toNumber(), amount1);
 
                 // Register a pledge payment for this backer
-                return proposalContract.setPaid(backerAddress1, 1, txID1, paymentAmount1);
+                pledgePaymentAmount = proposalContract.getPledgePaymentAmount(1).toNumber();
+                return proposalContract.setPaid(backerAddress1, 1, pledgePaymentTxId, pledgePaymentAmount);
             })
             .then(web3plus.promiseCommital)
             .then(function testGetBacker(tx) {
-                var newBacker = proposalContract.backers(1);
+                var backer = proposalContract.backers(1);
 
                 // Backer address should be unchanged.
-                assert.equal(newBacker[0], backerAddress1, "Backer address is unchanged");
+                assert.equal(backer[0], backerAddress1, "Backer address is unchanged");
 
-                assert.equal(newBacker[2], txID1, "Transaction ID is registered correctly");
-                var registeredAmount = newBacker[3].toNumber();
-                assert.equal(registeredAmount, paymentAmount1, "Amount is registered correctly");
+                assert.equal(backer[2], pledgePaymentTxId, "Pledge transaction ID is registered correctly");
+                var registeredAmount = backer[3].toNumber();
+                assert.equal(registeredAmount, pledgePaymentAmount, "Pledge payment amount is registered correctly");
+
+                // Register a start payment for this backer
+                startPaymentAmount = proposalContract.getStartPaymentAmount(1).toNumber();
+                return proposalContract.setPaid(backerAddress1, 2, startPaymentTxId, startPaymentAmount);
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var backer = proposalContract.backers(1);
+
+                assert.equal(backer[4], startPaymentTxId, "Start payment transaction ID is registered correctly");
+                var registeredAmount = backer[5].toNumber();
+                assert.equal(registeredAmount, startPaymentAmount, "Start payment amount is registered correctly");
 
                 done();
             })
@@ -204,8 +217,7 @@ describe("ProposalRegistry backing", () => {
         // A string of 33 characters
         var txID33 = "012345678901234567890123456789123";
 
-        // Amount: 40% up front
-        var paymentAmount1 = Math.round(price1 * amount1 * 0.4);
+        var paymentAmount1: number;
 
         // Currently all transactions are sent from a single address. Hence the "backer" is
         // also that address.
@@ -234,7 +246,8 @@ describe("ProposalRegistry backing", () => {
                 assert.equal(newBacker[1].toNumber(), amount1);
 
                 // Register a payment for this backer
-                return proposalContract.setPaid(backerAddress1, 1, txID32, paymentAmount1);
+                paymentAmount1 = proposalContract.getPledgePaymentAmount(1).toNumber();
+                return proposalContract.setPaid(backerAddress1, 1, txID32, paymentAmount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetBacker(tx) {

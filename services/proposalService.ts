@@ -380,6 +380,7 @@ export class ProposalService {
         var proposalContract: contractInterfaces.IProposalContract;
 
         var t = this;
+        var newBackerIndex: number;
 
         t.contractService.getProposalContractAt(p.contractAddress)
             .then(pr=> {
@@ -394,7 +395,8 @@ export class ProposalService {
                 // Check whether the backer was actually added. Otherwise reject.
                 // WARNING: this way of getting the backing by index is not foolproof (like other
                 // places where this is done).
-                var backerFromContract = proposalContract.backers(proposalContract.backerIndex());
+                newBackerIndex = proposalContract.backerIndex().toNumber();
+                var backerFromContract = proposalContract.backers(newBackerIndex);
 
                 if (!(backerFromContract[0] == backingAddress && backerFromContract[1].toNumber() == amount)) {
                     defer.reject("Backing could not be added to contract.");
@@ -418,7 +420,7 @@ export class ProposalService {
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
 
                         // TODO: move percentage to contract payment terms
-                        var paymentPercentage = 0.5;
+                        var paymentPercentage = proposalContract.getPledgePaymentAmount(newBackerIndex).toNumber();
 
                         // Amounts are specified in cents, hence / 100.
                         var paymentAmount = Math.round(amount * proposalContract.maxPrice().toNumber() * paymentPercentage) / 100;

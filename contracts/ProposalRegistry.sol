@@ -91,6 +91,10 @@ contract Proposal {
      */
     string public ultimateDeliveryDate;
 
+    // COULD DO: make it a contract of its own, so it can have functions. However
+    // the getXXXamount functions still need to live in the Proposal because it
+    // has the percentages. Unless we give the Backing contract a reference of
+    // course...
     struct Backing {
         /*
          * Blockchain address of the buyer
@@ -100,12 +104,13 @@ contract Proposal {
         /*
          * Amount of products the buyer has committed to buy.s
          */
+        // TODO: rename to "count". "amount" is reserved for amounts of money.
         uint amount;
 
         /*
          * Transaction ID of the pledge payment (before closing a deal).
          */
-        string pledgePaymentTransactionID;
+        bytes32 pledgePaymentTransactionID;
 
         /*
          * Amount of the pledge payment.
@@ -115,7 +120,7 @@ contract Proposal {
         /*
          * Transaction ID of the initial payment (at moment of backing).
          */
-        string startPaymentTransactionID;
+        bytes32 startPaymentTransactionID;
 
         /*
          * Amount of initial payment.
@@ -125,12 +130,12 @@ contract Proposal {
         /*
          * Transaction ID of the final payment (after deliery).
          */
-        string endPaymentTransactionID;
+        bytes32 endPaymentTransactionID;
 
         /*
          * Amount of the final payment.
          */
-        uint endPaymentAmount;
+        int endPaymentAmount;
     }
 
     /*
@@ -182,6 +187,39 @@ contract Proposal {
         productUnitSize = pus;
     }
 
+    // Payment schedule, currently fixed.
+    uint public pledgePaymentPercentage = 5;
+    uint public startPaymentPercentage = 45;
+    // End payment percentage: there's no such thing. The end payment is the rest.
+    // In case of an offer below pledge + start, it can even be a reimbursement.
+
+    function getBestPrice() constant returns (uint price) {
+        uint bestOfferIndex = getBestOfferIndex();
+
+        // Is there a best offer?
+        if(bestOfferIndex == 0)
+            return;
+
+        price = offers[bestOfferIndex].price();
+    }
+
+    function getPledgePaymentAmount(uint backerIndex) constant returns (uint amount) {
+        amount = backers[backerIndex].amount * pledgePaymentPercentage * maxPrice / 100;
+    }
+
+    function getStartPaymentAmount(uint backerIndex) constant returns (uint amount) {
+        amount = backers[backerIndex].amount * startPaymentPercentage * maxPrice / 100;
+    }
+
+    function getEndPaymentAmount(uint backerIndex) constant returns (int amount) {
+        // The end payment amount is "the rest".
+        // In case of an offer below pledge + start, it can even be a reimbursement, hence
+        // a negative amount.
+        amount = int(backers[backerIndex].amount)
+            * (int(getBestPrice())
+            - int(getPledgePaymentAmount(backerIndex))
+            - int(getStartPaymentAmount(backerIndex)));
+    }
 
     /*
      * Back the proposal, i.e. pledge to buy a certain amount.
@@ -193,7 +231,6 @@ contract Proposal {
             return;
 
         // No checks on multiple backings per buyer. Buyers can buy more later (not less).
-
         backerIndex++;
 
         backers[backerIndex].amount = am;
@@ -207,30 +244,61 @@ contract Proposal {
      * @param transactionID the external transaction ID of the payment
      * @param amount the payment amount
      */
-    function setPaid(address backerAddress, uint paymentType, string transactionID, uint amount) {
+    function setPaid(address backerAddress, uint paymentType, bytes32 transactionID, int amount) {
         // TODO: check whether tx.origin is proposal creator? Or admin? Or the backer?
-        // TODO: check whether the amount is correct according to payment
-        // schedule
+        // --> admin, according to current insights. Hence the creator of the registry.
 
         // Validate this is an existing backer.
         if(backerIndexByAddress[backerAddress] == 0)
             return;
 
-        Backing b = backers[backerIndexByAddress[backerAddress]];
+        uint backerIndex = backerIndexByAddress[backerAddress];
+
+        Backing b = backers[backerIndex];
+
+        // TEST
+        b.startPaymentTransactionID = transactionID;
+
+        return;
+
         if (paymentType == 1) {
-            // End payment
+            // Pledge payment
+
+            // Validate correct amount
+            /*if(amount != int(getPledgePaymentAmount(backerIndex)))
+                return;*/
+
             b.pledgePaymentTransactionID = transactionID;
-            b.pledgePaymentAmount = amount;
+            b.pledgePaymentAmount = uint(amount);
         }
         else if (paymentType == 2) {
             // Start payment
-            // TODO: validate that pledge payment has been registered
+
+            // Validate pledge payment
+            if(b.startPaymentTransactionID == "")
+                return;
+
+            if(amount != int(getStartPaymentAmount(backerIndex)))
+                return;
+
             b.startPaymentTransactionID = transactionID;
-            b.startPaymentAmount = amount;
+            b.startPaymentAmount = uint(amount);
         }
         else if (paymentType == 3) {
             // End payment
-            // TODO: validate that start payment has been registered
+
+            // Validate that the BuyCo was closed
+            if(!isClosed)
+                return;
+
+            // Validate that start payment was registered
+            if(b.startPaymentTransactionID=="")
+                return;
+
+            // Validate correct amount
+            if(amount != getEndPaymentAmount(backerIndex))
+                return;
+
             b.endPaymentTransactionID = transactionID;
             b.endPaymentAmount = amount;
         }
@@ -244,6 +312,7 @@ contract Proposal {
         if(price == 0) return;
         if(price > maxPrice) return;
         if(minimumAmount == 0) return;
+        if(isClosed) return;
 
         // Check for an existing offer of this seller
         if(offerIndexByAddress[tx.origin] > 0) {
@@ -282,7 +351,7 @@ contract Proposal {
         return amount;
     }
 
-    function getBestOffer() constant returns (uint bestOfferIndex) {
+    function getBestOfferIndex() constant returns (uint bestOfferIndex) {
         uint totalBackedAmount = getTotalBackedAmount();
         uint lowestPrice = maxPrice;
 
@@ -309,7 +378,7 @@ contract Proposal {
         // the contract has access to is the block number. This is not a
         // dependable time, especially not on a private chain.
 
-        uint bestOfferIndex = getBestOffer();
+        uint bestOfferIndex = getBestOfferIndex();
 
         // Did we find a valid offer?
         if (bestOfferIndex == 0) return;
