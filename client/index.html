@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <base href="/" />
@@ -7,6 +7,9 @@
     <title>BuyCo Proof of Concept</title>
     <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="dist/app.css" rel="stylesheet">
+    <!-- bower:css -->
+    <link rel="stylesheet" href="vendors/angular-socialshare/angular-socialshare.css" />
+    <!-- endbower -->
 </head>
 <body>
     <div ng-app="buyCoApp">
@@ -109,29 +112,29 @@
                 <!-- /#wrapper -->
             </div>
     </div>
-    <!--START from bower-->
-    <!-- jQuery -->
-    <script src="vendors/jquery/jquery.js"></script>
-    <!-- Bootstrap Core JavaScript -->
-    <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="vendors/angular/angular.js"></script>
-    <script src="vendors/angular-resource/angular-resource.js"></script>
-    <script src="vendors/async/lib/async.js"></script>
 
+    <!-- START external scripts -->
+    <script src="https://platform.twitter.com/widgets.js"></script>
     <!--END from bower-->
+
     <!-- TODO BW dd. 2015-12-30: Allow minification for perf/prod build, see f.i.: http://stackoverflow.com/questions/28860846/can-grunt-wiredep-wire-minify-version-in-html-file
     <!-- bower:js -->
+    <script src="vendors/jquery/jquery.js"></script>
+    <script src="vendors/angular/angular.js"></script>
     <script src="vendors/angular-messages/angular-messages.js"></script>
     <script src="vendors/angular-mocks/angular-mocks.js"></script>
     <script src="vendors/moment/moment.js"></script>
     <script src="vendors/momentjs/moment.js"></script>
     <script src="vendors/angular-moment/angular-moment.js"></script>
+    <script src="vendors/angular-resource/angular-resource.js"></script>
     <script src="vendors/angular-route/angular-route.js"></script>
     <script src="vendors/angular-sanitize/angular-sanitize.js"></script>
+    <script src="vendors/angular-socialshare/angular-socialshare.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.js"></script>
     <script src="vendors/angular-strap/dist/angular-strap.tpl.js"></script>
     <script src="vendors/humanize-duration/humanize-duration.js"></script>
     <script src="vendors/angular-timer/dist/angular-timer.js"></script>
+    <script src="vendors/async/lib/async.js"></script>
     <script src="vendors/bignumber.js/bignumber.js"></script>
     <script src="vendors/bootstrap/dist/js/bootstrap.js"></script>
     <script src="vendors/underscore/underscore.js"></script>

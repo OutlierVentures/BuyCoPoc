@@ -21,6 +21,13 @@ export class CategoryService {
     }
 
     /**
+     * Get all categories including subcategories.
+     */
+    getAllCategories(): PromiseLike<IMainCategory[]> {
+        return this.getCategoryData();
+    }
+
+    /**
      * Get all main categories.
      */
     getMainCategories(): PromiseLike<IMainCategory[]> {
@@ -66,7 +73,9 @@ export class CategoryService {
      */
     private readCategoryData(): Promise<IMainCategory[]> {
         return Promise<IMainCategory[]>((resolve, reject) => {
-            fs.readFile("./data/data.json", 'utf8', (err, categoryDataString) => {
+            var fullPath = path.resolve(path.dirname(__filename), "data/data.json");
+
+            fs.readFile(fullPath, 'utf8', (err, categoryDataString) => {
                 if (err) reject(err);
 
                 // Prepare and parse the JSON data
