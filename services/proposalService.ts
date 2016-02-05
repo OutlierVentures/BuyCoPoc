@@ -327,7 +327,7 @@ export class ProposalService {
 
                 // Update cache for this proposal only
                 var cps = new cachedProposalService.CachedProposalService();
-                cps.initialize(this)
+                cps.initialize(t)
                     .then(res => {
                         return cps.ensureCacheProposal(p);
                     })
