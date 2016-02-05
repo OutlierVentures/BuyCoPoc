@@ -1,18 +1,18 @@
-/**
+/*
  * Offer to respond to a proposal.
  */
 contract Offer {
-    /**
+    /*
      * The seller who made this offer.
      */
     address public sellerAddress;
 
-    /**
+    /*
      * Price offered at the minimum amount.
      */
     uint public price;
 
-    /**
+    /*
      * Minimum amount of products to be bought.
      */
     uint public minimumAmount;
@@ -39,128 +39,128 @@ contract Offer {
 }
 
 
-/**
+/*
  * A sungle buying proposal.
  */
 contract Proposal {
-    /**
+    /*
      * Name of the product to be bought.
      */
     string public productName;
 
-    /**
+    /*
      * A description of the product that is unambiguous to all the stakeholders.
      */
     string public productDescription;
 
-    /**
+    /*
      * The SKU (unique identification number) of the product.
      */
     string public productSku;
 
-    /**
+    /*
      * Description of the indivisible unit size. E.g. "box of 12 cans".
      */
     string public productUnitSize;
 
-    /**
+    /*
      * The product category in plain text. Future vevrsions might contain a more
      * advanced taxonomy of categories.
      */
     string public mainCategory;
 
-    /**
+    /*
      * The product category in plain text. Future vevrsions might contain a more
      * advanced taxonomy of categories.
      */
     string public subCategory;
 
-    /**
+    /*
      * Maximum price the buyers are willing to pay.
      */
     uint public maxPrice;
 
-    /**
+    /*
      * Date after which this proposal is terminated. It can be terminated by
      * accepting a valid offer, or
      */
     string public endDate;
 
-    /**
+    /*
      * Ultimate date when the products should be delivered to the buyers.
      */
     string public ultimateDeliveryDate;
 
     struct Backing {
-        /**
+        /*
          * Blockchain address of the buyer
          */
         address buyerAddress;
 
-        /**
+        /*
          * Amount of products the buyer has committed to buy.s
          */
         uint amount;
 
-        /**
+        /*
          * Transaction ID of the pledge payment (before closing a deal).
          */
         string pledgePaymentTransactionID;
 
-        /**
+        /*
          * Amount of the pledge payment.
          */
         uint pledgePaymentAmount;
 
-        /**
+        /*
          * Transaction ID of the initial payment (at moment of backing).
          */
         string startPaymentTransactionID;
 
-        /**
+        /*
          * Amount of initial payment.
          */
         uint startPaymentAmount;
 
-        /**
+        /*
          * Transaction ID of the final payment (after deliery).
          */
         string endPaymentTransactionID;
 
-        /**
+        /*
          * Amount of the final payment.
          */
         uint endPaymentAmount;
     }
 
-    /**
+    /*
      * Prospective buyers backing this proposal.
      */
     mapping(uint => Backing) public backers;
     uint public backerIndex;
 
-    /**
+    /*
      * Index to help access the backer mapping.
      */
     mapping(address => uint) public backerIndexByAddress;
 
-    /**
+    /*
      * Prospective buyers backing this proposal.
      */
     mapping(uint => Offer) public offers;
     uint public offerIndex;
 
-    /**
+    /*
      * Index to help access the backer mapping.
      */
     mapping(address => uint) public offerIndexByAddress;
 
-    /**
+    /*
      * Returns whether the proposal has been closed.
      */
     bool public isClosed;
 
-    /**
+    /*
      * The offer that has been accepted.
      */
     Offer public acceptedOffer;
@@ -183,7 +183,7 @@ contract Proposal {
     }
 
 
-    /**
+    /*
      * Back the proposal, i.e. pledge to buy a certain amount.
      */
     function back(uint am) {
@@ -200,7 +200,7 @@ contract Proposal {
         backers[backerIndex].buyerAddress = tx.origin;
     }
 
-    /**
+    /*
      * Register a payment for a backer.
      * @param backerAddress the backer that paid
      * @param paymentType 1=pledge, 2=start, 3=end
@@ -236,7 +236,7 @@ contract Proposal {
         }
     }
 
-    /**
+    /*
      * Make an offer
      */
     function offer(uint price, uint minimumAmount) returns (Offer o){
@@ -264,7 +264,7 @@ contract Proposal {
         return o;
     }
 
-    /**
+    /*
      * Cancel the offer of a seller if the proposal is still open.
      */
     function cancelOffer(){
@@ -299,7 +299,7 @@ contract Proposal {
         }
     }
 
-    /**
+    /*
      * Attempt to close the proposal if the closing conditions are met:
      * - the end date has been reached (this can not be checked yet)
      * - a valid offer has been made
@@ -319,12 +319,12 @@ contract Proposal {
     }
 }
 
-/**
+/*
  * Central registry for buyng proposals. This contract is deployed once. The
  * contract instance corresponds to one BuyCo service.
  */
 contract ProposalRegistry {
-    /**
+    /*
      * Name of the registry, e.g. "BuyCo"
      */
     string public name;
@@ -333,7 +333,7 @@ contract ProposalRegistry {
         name = n;
     }
 
-    /**
+    /*
      * All current and historical proposals.
      */
     mapping (uint=>Proposal) public proposals;
