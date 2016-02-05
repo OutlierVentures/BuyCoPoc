@@ -36,7 +36,6 @@ export interface IProposalRegistryContract extends IWeb3Contract {
         maxPrice: number,
         endDate: string,
         ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
-    addProposal(proposal: IProposal): Promise<string>;
     proposals(index: number | IBigNumber, callback?): string;
     proposalIndex(): IBigNumber;
 
