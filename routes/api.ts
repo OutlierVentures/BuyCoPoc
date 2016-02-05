@@ -77,6 +77,7 @@ export function configure(app: express.Express) {
     // Cache
     var cacheCon = new cacheController.CacheController();
     apiRouter.route("/data/cache/update").post(cacheCon.update);
+    apiRouter.route("/data/cache/refresh").post(cacheCon.fullRefresh);
 
     // Catch non-existing api calls.
     apiRouter.route("*").all(function (req, res) {

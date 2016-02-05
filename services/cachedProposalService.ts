@@ -54,13 +54,40 @@ export class CachedProposalService {
      * Gets all proposals that match the filter (or just all if no filter :).
      */
     get(proposalFilter: IProposalFilter): PromiseLike<IProposalDocument[]> {
-        // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+        var query = Proposal.find({});
+
+        // Apply filters to the mongo query. Use the typed methods of mongoose.
+        // Field names are contained as strings and hence not typesafe. Not sure 
+        // if there is a way to access field names typesafe (something like query.maxPrice.lte(10))
         if (proposalFilter) {
             if (proposalFilter.maxPrice) {
-                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
+                // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+                query = query.lte("maxPrice", proposalFilter.maxPrice + 0);
             }
+            if (proposalFilter.partNumber) {
+                // Use a case insensitive regex to get a case insensitive "contains".
+                query = query.where("productSku", RegExp(proposalFilter.partNumber, "i"));
+            }
+            if (proposalFilter.minimumTotalAmount) {
+                query = query.gte("totalAmount", proposalFilter.minimumTotalAmount);
+            }
+            if (proposalFilter.mainCategory) query = query.where("mainCategory", proposalFilter.mainCategory);
+            if (proposalFilter.subCategory) query = query.where("subCategory", proposalFilter.subCategory);
+
         }
-        return Proposal.find(proposalFilter).exec();
+
+        return query.exec();
+    }
+
+    /**
+     * Clear the proposals cache in Mongo.
+     */
+    clearMongoCache(): IPromise<boolean> {
+        return Promise<boolean>((resolve, reject) => {
+            Proposal.find({}).remove().exec()
+                .then(proposals => resolve(true),
+                err=> reject(err));
+        });
     }
 
     /**
@@ -71,7 +98,6 @@ export class CachedProposalService {
 
             // Get all promises. Then for each of them, ensure it's stored in Mongo.
             this.proposalService.getAll()
-                .then(this.addProposalBackingTotals)
                 .then((proposals) => {
                     console.log(`ensureMongoCache: got ${proposals.length} proposals from blockchain. Ensuring cache for each of them.`);
 
@@ -84,33 +110,33 @@ export class CachedProposalService {
                     }
 
                     Q.all(proposalsPromises)
-                    .then(allProposals => {
-                        // TODO: actually keep track of updated and created records (pass the info 
-                        // in each of the proposals).
-                        var result: MongoCacheUpdateResult = {
-                            createdObjects: allProposals.length,
-                            updatedObjects: 0
-                        };
+                        .then(allProposals => {
+                            // TODO: actually keep track of updated and created records (pass the info 
+                            // in each of the proposals).
+                            var result: MongoCacheUpdateResult = {
+                                createdObjects: allProposals.length,
+                                updatedObjects: 0
+                            };
 
-                        resolve(result);
-                    }, err => {
-                        reject(err);
-                    });
+                            resolve(result);
+                        }, err => {
+                            reject(err);
+                        });
                 });
         });
     }
 
-    private addProposalBackingTotals(proposals: Array<IProposal>): Promise<Array<IProposal>> {
+    private addProposalBackingTotals(proposal: IProposal): Promise<IProposal> {
         // console.log(`addProposalBackingTotals: got ${proposals.length} proposals from blockchain to add backing totals to.`);
 
-        return Q.all<IProposal>(proposals.map((proposal) => {
-            return Q.Promise<IProposal>((resolve, reject) => {
-                try {
-                    //console.log('proposal.contractAddress: ');
-                    //console.log(proposal.contractAddress);
-                    return this.proposalService.getBackers(proposal.contractAddress)
+        var t = this;
+        return Q.Promise<IProposal>((resolve, reject) => {
+            try {
+                //console.log('proposal.contractAddress: ');
+                //console.log(proposal.contractAddress);
+                return t.proposalService.getBackers(proposal.contractAddress)
                     .then((proposalBackings) => {
-                        console.log(`addProposalBackingTotals: got ${proposals.length} proposalbackings for proposal ${proposal.contractAddress}.`);
+                        console.log(`addProposalBackingTotals: got ${proposalBackings.length} proposalbackings for proposal ${proposal.contractAddress}.`);
                         console.log('proposal.contractAddress: ');
                         console.log(proposal.contractAddress);
                         let sum = 0;
@@ -122,11 +148,10 @@ export class CachedProposalService {
                     }).catch((err) => {
                         reject(err);
                     });
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        }));
+            } catch (err) {
+                reject(err);
+            }
+        });
 
         //return Q.all<IProposal>(proposals.map((proposal) => {
         //    //console.log('proposal: ');
@@ -161,8 +186,14 @@ export class CachedProposalService {
      * @param p
      */
     ensureCacheProposal(p: IProposal): Promise<IProposal> {
+        var t = this;
         return Promise<IProposal>((resolve, reject) => {
-            Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec()
+            // Add backing stats
+            t.addProposalBackingTotals(p)
+                .then(p => {
+                    // Try to find record from MongoDB
+                    return Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec();
+                })
                 .then((currentProposal) => {
                     // TODO: refactor this to a separate method too
                     var saveDefer = Q.defer<IProposal>();
