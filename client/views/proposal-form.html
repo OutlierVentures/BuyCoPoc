@@ -26,18 +26,9 @@
                                         <p class="help-block">
                                             Choose a category for the product.
                                         </p>
-                                        <select class="form-control" ng-model="proposal.category" required>
-                                            <optgroup label="Electronics">
-                                                <option value="Electronics - Camera">Camera</option>
-                                            </optgroup>
-                                            <optgroup label="Food and drink">
-                                                <option value="Food and drink - Coffee">Coffee</option>
-                                            </optgroup>
-                                            <optgroup label="Books">
-                                                <option value="Books - Fantasy books">Fantasy books</option>
-                                            </optgroup>
-                                            <optgroup label="Shoes">
-                                                <option value="Shoes - Running shoes">Running shoes</option>
+                                        <select class="form-control" ng-model="_proposal.category" required>
+                                            <optgroup ng-repeat="mainCat in allCategories track by mainCat.name" label="{{mainCat.name}}">
+                                                <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value="{{mainCat.name}} - {{subCat.name}}">{{subCat.name}}</option>
                                             </optgroup>
                                         </select>
                                     </div>
@@ -88,7 +79,7 @@
                                         </p>
                                         <input class="form-control" type="text" ng-model="proposal.ultimateDeliveryDate" required>
                                     </div>
-                                    <button name="saveButton" ng-click="vm.create()" ng-disabled="proposalForm.$invalid" class="btn btn-primary">
+                                    <button name="saveButton" ng-click="vm.processCreate()" ng-disabled="proposalForm.$invalid" class="btn btn-primary">
                                         Create my proposal
                                     </button>
                                 </fieldset>
