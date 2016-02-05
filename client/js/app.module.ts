@@ -8,7 +8,8 @@ angular.module("buyCoApp", [
     "angularMoment",
     "mgcrea.ngStrap",
     "buyCoApp.services",
-    "timer"
+    "timer",
+    "djds4rce.angular-socialshare"
 ]);
 
 // TODO BW Get settings from server.

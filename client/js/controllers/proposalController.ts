@@ -10,6 +10,7 @@
     errorMessage: string;
     successMessage: string;
     transactionId: string;
+    pageUrl: string;
 }
 
 interface IProposalRouteParameters extends ng.route.IRouteParamsService {
@@ -84,6 +85,8 @@ class ProposalController {
 
     private getProposalData(proposalId: string, cb: any) {
         var t = this;
+
+        t.$scope.pageUrl = t.$location.absUrl();
 
         // Get Proposal data
         this.$http({
@@ -164,7 +167,7 @@ class ProposalController {
     }
 
     view(proposalId: string) {
-        var t = this;
+        var t = this;        
 
         t.getProposalData(proposalId, function (err, res) {
             // The getter already sets scope variables. Nothing to do here.
