@@ -3,6 +3,7 @@ import userModel = require('../models/userModel');
 import configModel = require('../models/configModel');
 import serviceFactory = require('../services/serviceFactory');
 import contractService = require('../services/contractService');
+import fs = require('fs');
 
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import contractInterfaces = require('../contracts/contractInterfaces');
@@ -71,7 +72,7 @@ export class MigrationController {
                 res.status(500).json(
                     {
                         "status": "Error",
-                        "error": err,
+                        "error": err
                     });
             });
     }
@@ -93,6 +94,12 @@ export class MigrationController {
                 var deferAddTestData = Q.defer<string>();
                 var promises = new Array<Q.Promise<string>>();
                 promises.push(deferAddTestData.promise);
+
+                //var proposals = JSON.parse(fs.readFileSync('../client/data/proposals.json', 'utf8'));
+                // proposals.forEach(proposal
+                
+                contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
+                    4, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
                 return contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
                     4, "2016-03-01", "2016-05-01", { gas: 2500000 });
