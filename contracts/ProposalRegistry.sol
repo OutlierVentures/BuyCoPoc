@@ -256,17 +256,12 @@ contract Proposal {
 
         Backing b = backers[backerIndex];
 
-        // TEST
-        b.startPaymentTransactionID = transactionID;
-
-        return;
-
         if (paymentType == 1) {
             // Pledge payment
 
             // Validate correct amount
-            /*if(amount != int(getPledgePaymentAmount(backerIndex)))
-                return;*/
+            if(amount != int(getPledgePaymentAmount(backerIndex)))
+                return;
 
             b.pledgePaymentTransactionID = transactionID;
             b.pledgePaymentAmount = uint(amount);
