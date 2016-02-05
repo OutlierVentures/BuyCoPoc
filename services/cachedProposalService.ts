@@ -71,45 +71,90 @@ export class CachedProposalService {
 
             // Get all promises. Then for each of them, ensure it's stored in Mongo.
             this.proposalService.getAll()
+                .then(this.addProposalBackingTotals)
                 .then((proposals) => {
                     console.log(`ensureMongoCache: got ${proposals.length} proposals from blockchain. Ensuring cache for each of them.`);
 
                     // Delete all proposals from the cache which are not currently in the contract
                     // (e.g. after clearing the blockchain during development)
-                    // TODO                    
-
                     var proposalsPromises = new Array<Promise<IProposal>>();
-
                     for (let i = 0; i < proposals.length; i++) {
                         var p = proposals[i];
-                        // Get backings 
-                        //this.proposalService.getBackers(p.contractAddress)
-                        //.then((proposalBackings) => {
-                        //    let sum = 0;
-                        //    _.each(proposalBackings, (backing) => { sum += backing.amount; });
-                        //    p.totalAmount = sum;
-                        //    p.nrOfBackings = proposalBackings.length;
-                        //    p.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
-                        //});
                         proposalsPromises.push(this.ensureCacheProposal(p));
                     }
 
                     Q.all(proposalsPromises)
-                        .then(allProposals => {
-                            // TODO: actually keep track of updated and created records (pass the info 
-                            // in each of the proposals).
-                            var result: MongoCacheUpdateResult = {
-                                createdObjects: allProposals.length,
-                                updatedObjects: 0
-                            };
+                    .then(allProposals => {
+                        // TODO: actually keep track of updated and created records (pass the info 
+                        // in each of the proposals).
+                        var result: MongoCacheUpdateResult = {
+                            createdObjects: allProposals.length,
+                            updatedObjects: 0
+                        };
 
-                            resolve(result);
-                        }, err => {
-                            reject(err);
-                        });
+                        resolve(result);
+                    }, err => {
+                        reject(err);
+                    });
                 });
         });
     }
+
+    private addProposalBackingTotals(proposals: Array<IProposal>): Promise<Array<IProposal>> {
+        // console.log(`addProposalBackingTotals: got ${proposals.length} proposals from blockchain to add backing totals to.`);
+
+        return Q.all<IProposal>(proposals.map((proposal) => {
+            return Q.Promise<IProposal>((resolve, reject) => {
+                try {
+                    //console.log('proposal.contractAddress: ');
+                    //console.log(proposal.contractAddress);
+                    return this.proposalService.getBackers(proposal.contractAddress)
+                    .then((proposalBackings) => {
+                        console.log(`addProposalBackingTotals: got ${proposals.length} proposalbackings for proposal ${proposal.contractAddress}.`);
+                        console.log('proposal.contractAddress: ');
+                        console.log(proposal.contractAddress);
+                        let sum = 0;
+                        _.each(proposalBackings, (backing) => { sum += backing.amount; });
+                        proposal.totalAmount = sum;
+                        proposal.nrOfBackings = proposalBackings.length;
+                        proposal.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+                        resolve(proposal);
+                    }).catch((err) => {
+                        reject(err);
+                    });
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }));
+
+        //return Q.all<IProposal>(proposals.map((proposal) => {
+        //    //console.log('proposal: ');
+        //    //console.log(proposal);
+        //    return Q.Promise<IProposal>((resolve, reject) => {
+        //        console.log('proposal.contractAddress: ');
+        //        console.log(proposal.contractAddress);
+        //        this.proposalService.getBackers(proposal.contractAddress)
+        //        .then((proposalBackings) => {
+        //            console.log(`addProposalBackingTotals: got ${proposals.length} proposalbackings for proposal ${proposal.contractAddress}.`);
+        //            console.log('proposal.contractAddress: ');
+        //            console.log(proposal.contractAddress);
+        //            let sum = 0;
+        //            _.each(proposalBackings, (backing) => { sum += backing.amount; });
+        //            proposal.totalAmount = sum;
+        //            proposal.nrOfBackings = proposalBackings.length;
+        //            proposal.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+        //            resolve(proposal);
+        //        });
+        //    });
+        //}));
+        
+        // Simple form of Promise:
+        //return Promise<Array<IProposal>>((resolve, reject) => {
+        //    resolve(proposals);
+        //});
+    };
+
 
     /**
      * Ensure that this proposal is present and up to date in the Mongo cache.
