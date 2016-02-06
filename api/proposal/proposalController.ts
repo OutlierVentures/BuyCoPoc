@@ -88,6 +88,8 @@ export class ProposalController {
         //var token = req.header("AccessToken");
         var proposalData = <IProposal>req.body;
 
+        // TODO: furter validation.
+
         // The category arrives as a string: [main] - [sub]
         // Example: "Electronics - Camera"
         var categoryString: string = req.body.category;

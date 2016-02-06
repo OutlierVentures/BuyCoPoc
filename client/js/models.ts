@@ -186,6 +186,16 @@ interface IProposalBacking {
     /**
      * Transaction ID of the initial payment (at moment of backing).
      */
+    pledgePaymentTransactionId: string;
+
+    /**
+     * Amount of initial payment.
+     */
+    pledgePaymentAmount: number;
+
+    /**
+     * Transaction ID of the initial payment (at moment of backing).
+     */
     startPaymentTransactionId: string;
 
     /**

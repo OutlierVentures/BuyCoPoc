@@ -229,26 +229,36 @@ export class ProposalService {
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
-                var startTx: string;
+                var pledgeTx: string;
                 if (backer[2] && backer[2].length == 32)
-                    startTx = tools.guidAddDashes(backer[2])
+                    pledgeTx = tools.guidAddDashes(backer[2])
+
+                var pledgePaymentAmount: number;
+                if (backer[3])
+                    pledgePaymentAmount = backer[3].toNumber();
+
+                var startTx: string;
+                if (backer[4] && backer[4].length == 32)
+                    startTx = tools.guidAddDashes(backer[4])
 
                 var startPaymentAmount: number;
-                if (backer[3])
-                    startPaymentAmount = backer[3].toNumber();
+                if (backer[5])
+                    startPaymentAmount = backer[5].toNumber();
 
                 var endTx: string;
-                if (backer[4] && backer[4].length == 32)
-                    endTx = tools.guidAddDashes(backer[4])
+                if (backer[6] && backer[6].length == 32)
+                    endTx = tools.guidAddDashes(backer[6])
 
                 var endPaymentAmount: number;
-                if (backer[5])
-                    endPaymentAmount = backer[5].toNumber();
+                if (backer[7])
+                    endPaymentAmount = backer[7].toNumber();
 
                 defer.resolve({
                     address: backerAddress,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
+                    pledgePaymentTransactionId: pledgeTx,
+                    pledgePaymentAmount: pledgePaymentAmount,
                     startPaymentTransactionId: startTx,
                     startPaymentAmount: startPaymentAmount,
                     endPaymentTransactionId: endTx,
@@ -419,11 +429,8 @@ export class ProposalService {
                         // Do payment and store it
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
 
-                        // TODO: move percentage to contract payment terms
-                        var paymentPercentage = proposalContract.getPledgePaymentAmount(newBackerIndex).toNumber();
-
                         // Amounts are specified in cents, hence / 100.
-                        var paymentAmount = Math.round(amount * proposalContract.maxPrice().toNumber() * paymentPercentage) / 100;
+                        var paymentAmount = proposalContract.getPledgePaymentAmount(newBackerIndex).toNumber() / 100;
                         
                         // Create transaction
                         upholdService.createTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress,
@@ -447,7 +454,7 @@ export class ProposalService {
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
                                                 // Test correct storage
-                                                var backing = proposalContract.backers(proposalContract.backerIndexByAddress(backingAddress));
+                                                var backing = proposalContract.backers(newBackerIndex);
                                                 if (!backing[2]) {
                                                     defer.reject("Error saving transaction ID");
                                                     return;
@@ -457,8 +464,10 @@ export class ProposalService {
                                                     address: backingAddress,
                                                     amount: amount,
                                                     userId: backingUser.id,
-                                                    startPaymentTransactionId: committedTransaction.id,
-                                                    startPaymentAmount: paymentAmount,
+                                                    pledgePaymentTransactionId: committedTransaction.id,
+                                                    pledgePaymentAmount: paymentAmount,
+                                                    startPaymentTransactionId: undefined,
+                                                    startPaymentAmount: undefined,
                                                     endPaymentTransactionId: undefined,
                                                     endPaymentAmount: undefined,
                                                 });

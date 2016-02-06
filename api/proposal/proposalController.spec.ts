@@ -104,7 +104,7 @@ describe("ProposalController", () => {
             "productSku": "SKU123",
             "productUnitSize": "1 unit",
             "category": "Electronics - Camera",
-            "maxPrice": 0.02,
+            "maxPrice": 0.10,
         };
 
         var newProposal: proposalModel.IProposal;
@@ -234,7 +234,7 @@ describe("ProposalController", () => {
                         "productName": "A testing product", "productDescription": "From the unit tests",
                         //"productSku": "SKU123",
                         "category": "Electronics - Camera",
-                        "maxPrice": 0.02,
+                        "maxPrice": 0.10,
                         "endDate": "2016-12-01",
                         "ultimateDeliveryDate": "2017-12-01",
                     })

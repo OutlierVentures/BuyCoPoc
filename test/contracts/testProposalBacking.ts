@@ -96,22 +96,22 @@ describe("ProposalRegistry backing", () => {
             })
             .then(web3plus.promiseCommital)
             .then(function testGetBacker(tx) {
-                var newBacker = proposalContract.backers(1);
+                var latestBacker = proposalContract.backers(9);
 
                 var backerIndex = proposalContract.backerIndex().toNumber();
 
                 assert.equal(backerIndex, 9);
 
                 // Backer address should be unchanged.
-                assert.equal(newBacker[0], backerAddress1);
+                assert.equal(latestBacker[0], backerAddress1);
 
-                var newestBackerAmount = newBacker[9].toNumber();
+                var latestBackerAmount = latestBacker[1].toNumber();
 
                 // Because there is no guarantee for the sequence in which transaction are processed,
                 // we don't know for sure what the current amount should be. We do however know that it 
                 // should be between 1 and 8. Usually it will be 8.
-                assert.ok(newestBackerAmount <= 8, "Amount for latest backer is 8 at the most");
-                assert.ok(newestBackerAmount >= 1, "Amount for latest backer is 1 at the least");
+                assert.ok(latestBackerAmount <= 8, "Amount for latest backer is 8 at the most");
+                assert.ok(latestBackerAmount >= 1, "Amount for latest backer is 1 at the least");
 
                 done();
             })
@@ -185,40 +185,6 @@ describe("ProposalRegistry backing", () => {
                 assert.equal(backer[4], startPaymentTxId, "Start payment transaction ID is registered correctly");
                 var registeredAmount = backer[5].toNumber();
                 assert.equal(registeredAmount, startPaymentAmount, "Start payment amount is registered correctly");
-
-                done();
-            })
-            .catch((reason) => {
-                done(reason);
-            });
-    });
-
-
-    it("should set a test variable", function (done) {
-        // It can take quite a while til transactions are processed.
-        this.timeout(180000);
-
-        var name1 = "Ethiopia Adado Coop";
-        var askPrice1 = 10100;
-
-        var proposalContract: contractInterfaces.IProposalContract;
-        var proposalContractAny;
-
-        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
-            .then(web3plus.promiseCommital)
-            .then(function testGetProposal(tx) {
-                var newProposalAddress = registryContract.proposals(1);
-
-                return contractService.getProposalContractAt(newProposalAddress);
-            })
-            .then(pc=> {
-                proposalContract = pc;
-                proposalContractAny = pc;
-                return proposalContractAny.setTest("ha");
-            })
-            .then(web3plus.promiseCommital)
-            .then(function testGetTotalBackedAmount(tx) {
-                assert.equal(web3plus.web3.toAscii(proposalContractAny.testVar()).trim(), "ha", "Test variable was set correctly");
 
                 done();
             })

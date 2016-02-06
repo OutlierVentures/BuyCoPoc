@@ -204,10 +204,14 @@ contract Proposal {
 
     function getPledgePaymentAmount(uint backerIndex) constant returns (uint amount) {
         amount = backers[backerIndex].amount * pledgePaymentPercentage * maxPrice / 100;
+        // For very low prices: force a very low amount. Settled in end payment.
+        if (amount == 0) amount = 1;
     }
 
     function getStartPaymentAmount(uint backerIndex) constant returns (uint amount) {
         amount = backers[backerIndex].amount * startPaymentPercentage * maxPrice / 100;
+        // For very low prices: force a very low amount. Settled in end payment.
+        if (amount == 0) amount = 1;
     }
 
     function getEndPaymentAmount(uint backerIndex) constant returns (int amount) {

@@ -58,7 +58,6 @@ export interface IProposalContract extends IWeb3Contract {
 
     backers(index: number | IBigNumber, callback?): any[];
     backerIndex(): IBigNumber;
-    backerIndexByAddress(address: string): IBigNumber;
     getTotalBackedAmount(): IBigNumber;
 
     pledgePaymentPercentage(): IBigNumber;
