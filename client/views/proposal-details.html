@@ -12,7 +12,7 @@
         <p class="text-muted" ng-show="proposal.productUnitSize">Unit size: {{proposal.productUnitSize}}</p>
 
         <span class="small">
-            Maximum price: <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}} GBP</span>
+            Maximum price the buyers are willing to pay: <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}} GBP</span>
         </span><br>
         <span class="small">
             End date: <span class="text-muted">{{proposal.endDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
@@ -29,10 +29,23 @@
         <p><a twitter data-lang="en" data-count='horizontal' data-url='{{pageUrl}}' data-size="medium" data-text='Join me to buy {{proposal.productName}} together using @buycoio!'></a></p>
         <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.contractAddress}}</span></span>
         <form role="form" name="proposalForm" novalidate>
+            <!-- TODO: only show buy to buyers and offer to sellers -->
             <a href="/proposal/{{proposal.contractAddress}}/back" class="btn btn-primary">
                 Buy together
             </a>
+            <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/offer/new">
+                Make an offer
+            </a>
         </form>
+    </div>
+    <div class="panel panel-default">
+        <!-- TODO: show only to the manager of the BuyCo -->
+        <div class="panel-heading">
+            Management options
+        </div>
+        <div class="panel-body">
+            <p>You are the manager of this BuyCo.</p>
+        </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -49,10 +62,34 @@
                 <p href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">
                     Address <code>{{backer.address}}</code><span ng-show="backer.startPaymentTransactionId"> (<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see initial payment</a>)</span>:
                     <span class="pull-right text-muted">{{backer.amount}} unit(s)</span>
+                    <!--TODO: show Buttons below only after deal has been closed, and only to the
+                        specific backer. They lead to a simple form reporting on the quality on the
+                        delivery of these goods as yes/no.-->
+                    <a href="/proposal/{{proposal.contractAddress}}/delivery" class="btn btn-primary">
+                        I've received my goods
+                    </a>
+                    <a href="/proposal/{{proposal.contractAddress}}/delivery" class="btn btn-danger">
+                        I didn't receive the goods in good order
+                    </a>
                 </p>
             </div>
         </div>
     </div>
+    <div class="panel panel-default">
+        <!-- TODO: fill data -->
+        <div class="panel-heading">
+            Payment status
+        </div>
+        <div class="panel-body">
+            <ul>
+                <li>N out of M backers have completed the pledge payment</li>
+                <li>N out of M backers have completed the start payment</li>
+                <li>N out of M backers have completed the final payment</li>
+                <li>Total amount in escrow: GBP xx.xx</li>
+            </ul>
+        </div>
+    </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">
             Offers
@@ -69,7 +106,9 @@
         <div class="panel-body" ng-show="offers.length > 0">
             <div class="list-group">
                 <p href="#" ng-repeat="offer in offers track by offer.id" class="list-group-item">
-                    Address <code>{{offer.sellerAddress}}</code> offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
+                    <!-- TODO: fill in real seller name -->
+                    Johnson &amp; Co (<code>{{offer.sellerAddress}}</code>) offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
+                    <span class="small"><strong>this is the accepted offer</strong></span>
                 </p>
             </div>
         </div>

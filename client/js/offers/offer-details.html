@@ -15,6 +15,27 @@
         </span><br><br>
     </div>
     <div class="panel panel-default">
+        <!-- TODO: show only to the winning offer -->
+        <div class="panel-heading">
+            Accepted
+        </div>
+        <div class="panel-body">
+            <p>Congratulations, your offer has been accepted!</p>
+            <h2>Payment details</h2>
+            <div class="list-group">
+                <p class="list-group-item">
+                    <!-- TODO: fill correct tx IDs and amounts -->
+                    Start payment of GBP xxx.xx paid on 2016-01-15 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                </p>
+                <p class="list-group-item">
+                    <!-- TODO: fill correct tx IDs and amounts -->
+                    End payment of GBP xxx.xx paid on 2016-01-28 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                </p>
+
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
         <div class="panel-heading">
             <h2>Seller</h2>
         </div>
