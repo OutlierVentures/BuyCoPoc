@@ -105,10 +105,13 @@
         </div>
         <div class="panel-body" ng-show="offers.length > 0">
             <div class="list-group">
-                <p href="#" ng-repeat="offer in offers track by offer.id" class="list-group-item">
+                <p ng-repeat="offer in offers track by offer.id" class="list-group-item">
                     <!-- TODO: fill in real seller name -->
                     Johnson &amp; Co (<code>{{offer.sellerAddress}}</code>) offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
                     <span class="small"><strong>this is the accepted offer</strong></span>
+                    <a href="/proposal/{{proposal.contractAddress}}/offer/{{offer.id}}" class="btn btn-primary">
+                        See the offer
+                    </a>
                 </p>
             </div>
         </div>
