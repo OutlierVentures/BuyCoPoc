@@ -44,6 +44,11 @@ contract Offer {
  */
 contract Proposal {
     /*
+     * Reference to the registry that this proposal is part of, to check the owner.
+     */
+    ProposalRegistry public registry;
+
+    /*
      * Name of the product to be bought.
      */
     string public productName;
@@ -140,6 +145,18 @@ contract Proposal {
          * Amount of the final payment.
          */
         int endPaymentAmount;
+
+        /*
+         * Indicates whether the delivery has been reported by the backer.
+         */
+        bool isDeliveryReported;
+
+        /*
+         * Indicates whether the delivery is correct according to the backer.
+         * Any further details about the nature of what is or isn't correct
+         * are discussed outside of the contract.
+         */
+        bool isDeliveryCorrect;
     }
 
     /*
@@ -169,18 +186,24 @@ contract Proposal {
      */
     Offer public acceptedOffer;
 
-    function Proposal(string pn,
-        string mc, string sc, uint mp, string ed, string udd) {
+    address public owner;
+
+    function Proposal(string pn, string mc, string sc, uint mp, string ed, string udd) {
         productName = pn;
         mainCategory = mc;
         subCategory = sc;
         maxPrice = mp;
         endDate = ed;
         ultimateDeliveryDate = udd;
+
+        owner = tx.origin;
+        registry = ProposalRegistry(msg.sender);
     }
 
     function setDetails(string pd, string ps, string pus) {
-        // TODO: validate that the sender is the proposal owner.
+        // Only to be called by the proposal owner.
+        if(tx.origin != owner) return;
+
         productDescription = pd;
         productSku = ps;
         productUnitSize = pus;
@@ -218,8 +241,11 @@ contract Proposal {
         // The end payment amount is "the rest".
         // In case of an offer below pledge + start, it can even be a reimbursement, hence
         // a negative amount.
+        // We can only compute this once there is an accepted offer. However when
+        // there is none, the end payment will be minus the currently paid amount,
+        // hence a full reimbursement.
         amount = int(backers[backerIndex].amount)
-            * (int(getBestPrice())
+            * (int(acceptedOffer.price())
             - int(getPledgePaymentAmount(backerIndex))
             - int(getStartPaymentAmount(backerIndex)));
     }
@@ -228,10 +254,10 @@ contract Proposal {
      * Back the proposal, i.e. pledge to buy a certain amount.
      */
     function back(uint am) {
-        // TODO: check that the proposal hasn't been closed. Use newer Solidity
-        // functions with precorditions in signature?
-        if(am == 0)
-            return;
+        if(am == 0) return;
+
+        // No backing after closing.
+        if(isClosed) return;
 
         // No checks on multiple backings per buyer. Buyers can buy more later (not less).
         backerIndex++;
@@ -248,8 +274,8 @@ contract Proposal {
      * @param amount the payment amount
      */
     function setPaid(uint backerIndex, uint paymentType, string transactionID, int amount) {
-        // TODO: check whether tx.origin is proposal creator? Or admin? Or the backer?
-        // --> admin, according to current insights. Hence the creator of the registry.
+        // The registry owner is the trusted party to confirm payments.
+        if(tx.origin != registry.owner()) return;
 
         // Validate this is an existing backer.
         // Ideally we would want to verify this from the original backer address.
@@ -264,8 +290,7 @@ contract Proposal {
         //   -> to be called by the registry admin. Or in future cases, by a set of oracles.
         // - or denyPaid(uint backerIndex, uint paymentType), to be called by the admin/oracles,
         //   leading to a reversion. Could also be used to correct incorrect calls.
-        if(backerIndex == 0)
-            return;
+        if(backerIndex == 0) return;
 
         Backing b = backers[backerIndex];
 
@@ -382,17 +407,158 @@ contract Proposal {
      * - a valid offer has been made
      */
     function close() {
+        // To be called by the registry owner.
+        if(tx.origin != registry.owner()) return;
+
         // TODO: check whether endDate has passed. The only time source that
         // the contract has access to is the block number. This is not a
-        // dependable time, especially not on a private chain.
+        // dependable time, especially not on a private chain. Once we have
+        // some sort of solution for this, the proposal should be closed even
+        // if no valid offer was found.
 
+        // COULD DO: there might be backers who haven't completed payment. And
+        // even without those, we might still have a deal. We should remove the
+        // backers that haven't paid at this point, and then do matching.
+
+        // Get the best offer.
         uint bestOfferIndex = getBestOfferIndex();
 
         // Did we find a valid offer?
         if (bestOfferIndex == 0) return;
 
+        // Ensure that all start payments hae been registered.
+
         acceptedOffer = offers[bestOfferIndex];
         isClosed = true;
+    }
+
+    /*
+     * Returns whether all the start (and pledge) payments have been received
+     * from the backers.
+     */
+    function isStartPaymentComplete() public returns (bool isComplete) {
+        for (uint i = 1; i <= backerIndex; i++)
+        {
+            if(backers[i].startPaymentAmount == 0) return;
+        }
+        isComplete = true;
+    }
+
+    /*
+     * Returns whether all the payments have been received from the backers.
+     */
+    function isPaymentComplete() public returns (bool isComplete) {
+        for (uint i = 1; i <= backerIndex; i++)
+        {
+            if(backers[i].endPaymentAmount == 0) return;
+        }
+        isComplete = true;
+    }
+
+    /*
+     * Report on the delivery of the goods. To be called by the backer.
+     */
+    function reportDelivery(uint backerIndex, bool isCorrect) {
+        Backing b = backers[backerIndex];
+
+        // To be called by the backer.
+        if(b.buyerAddress != tx.origin) return;
+
+        // A delivery reported as correct cannot beb unreported.
+        if(b.isDeliveryReported && b.isDeliveryCorrect) return;
+
+        b.isDeliveryReported = true;
+        b.isDeliveryCorrect = isCorrect;
+    }
+
+    /*
+     * The minimum percentage of deliveries reported as correct (calculated by
+     * product count) to consider the delivery complete and ready for final
+     * payout.
+     */
+    uint public minimumReportedCorrectDeliveryPercentage = 50;
+
+    function getMinimumCorrectDeliveryCount() constant returns (uint count) {
+        count = minimumReportedCorrectDeliveryPercentage * getTotalBackedAmount() / 100;
+    }
+
+    /*
+     * Returns the total count of products that have been reported as correctly
+     * delivered.
+     */
+    function getCorrectDeliveryCount() constant returns (uint count) {
+        for (uint i = 1; i <= backerIndex; i++)
+        {
+            if(backers[i].isDeliveryCorrect)
+                count += backers[i].amount;
+        }
+    }
+
+    /*
+     * Returns whether delivery is complete according to the agreed upon
+     * treshold.
+     */
+    function isDeliveryComplete() constant returns (bool isComplete) {
+        isComplete = getCorrectDeliveryCount() >= getMinimumCorrectDeliveryCount();
+    }
+
+    // Payments to the seller
+    uint public startPayoutAmount;
+    string public startPayoutTransactionID;
+    uint public endPayoutAmount;
+    string public endPayoutTransactionID;
+
+    /*
+     * Returns whether the start payout to the seller may be done.
+     */
+    function isReadyForStartPayout() constant returns (bool isReady) {
+        isReady = isClosed && isStartPaymentComplete();
+    }
+
+    /*
+     * Returns whether the start payout to the seller may be done.
+     */
+    function isReadyForEndPayout() constant returns (bool isReady) {
+        isReady = isClosed && isPaymentComplete() && isDeliveryComplete();
+    }
+
+
+    function getStartPayoutAmount() constant returns (uint amount) {
+        amount = acceptedOffer.price() * getTotalBackedAmount()
+            * (pledgePaymentPercentage + startPaymentPercentage) / 100;
+    }
+
+    function getEndPayoutAmount() constant returns (uint amount) {
+        amount = acceptedOffer.price() * getTotalBackedAmount()
+            - getStartPayoutAmount();
+    }
+
+    /*
+     * Confirm that the start payout sum has been paid to the accepted seller.
+     */
+    function registerStartPayout(string txId, uint amount) {
+        // Payments are confirmed by the registry owner.
+        if(tx.origin != registry.owner()) return;
+
+        if(!isReadyForStartPayout()) return;
+        if(amount != getStartPayoutAmount()) return;
+
+        startPayoutAmount = amount;
+        startPayoutTransactionID =  txId;
+    }
+
+    /*
+     * Confirm thath the end payout sum has been paid to the accepted seller.
+     */
+    function registerEndPayout(string txId, uint amount) {
+        // Payments are confirmed by the registry owner.
+        if(tx.origin != registry.owner()) return;
+
+        if(!isReadyForEndPayout()) return;
+        if(amount != getEndPayoutAmount()) return;
+
+        endPayoutAmount = amount;
+        endPayoutTransactionID =  txId;
     }
 }
 
@@ -406,8 +572,14 @@ contract ProposalRegistry {
      */
     string public name;
 
+    /*
+     * The owner of the registry, e.g. BuyCo Ltd
+     */
+    address public owner;
+
     function ProposalRegistry(string n){
         name = n;
+        owner = tx.origin;
     }
 
     /*
@@ -416,9 +588,7 @@ contract ProposalRegistry {
     mapping (uint=>Proposal) public proposals;
     uint public proposalIndex;
 
-    function addProposal(string productName,
-        string productCategory, string productSubCategory,
-        uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
+    function addProposal(string productName, string productCategory, string productSubCategory, uint maxPrice, string endDate, string ultimateDeliveryDate) returns (Proposal p) {
         proposalIndex++;
 
         p = new Proposal(productName,

@@ -136,18 +136,20 @@ describe("ProposalRegistry closing", () => {
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
-                var tot = proposalContract.getTotalBackedAmount().toNumber();
-
                 return proposalContract.close({ gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
                 var acceptedOfferAddress = proposalContract.acceptedOffer();
+
+                assert.ok(proposalContract.isClosed());
+                assert.notEqual(acceptedOfferAddress, "0x0000000000000000000000000000000000000000", "Accepted offer is not empty");
+
                 return contractService.getOfferContractAt(acceptedOfferAddress);
             })
             .then(acceptedOffer => {
                 // Offer address should be unchanged.
-                assert.equal(acceptedOffer.sellerAddress(), sellerAddress1);
+                assert.equal(acceptedOffer.sellerAddress(), sellerAddress1, "Seller address is registered correctly");
 
                 var acceptedPrice = acceptedOffer.price().toNumber();
                 var acceptedAmount = acceptedOffer.minimumAmount().toNumber();
