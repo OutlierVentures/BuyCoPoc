@@ -9,7 +9,7 @@ import web3config = require('../contracts/web3config');
 import server = require('../../server');
 
 import proposalModel = require('../../models/proposalModel');
-import offerModel = require('../../offers/offerModel');
+import offerModel = require('../../models/offerModel');
 import userModel = require('../../models/userModel');
 import _ = require('underscore');
 

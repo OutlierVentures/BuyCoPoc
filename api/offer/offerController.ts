@@ -1,15 +1,15 @@
 ﻿import express = require("express");
-import { UserRepository } from "../models/userModel";
+import { UserRepository } from "../../models/userModel";
 
-import configModel = require('../models/configModel');
-import serviceFactory = require('../services/serviceFactory');
-import proposalService = require('../services/proposalService');
-import upholdService = require('../services/upholdService');
+import configModel = require('../../models/configModel');
+import serviceFactory = require('../../services/serviceFactory');
+import proposalService = require('../../services/proposalService');
+import upholdService = require('../../services/upholdService');
 
-import proposalModel = require('../models/proposalModel');
-import offerModel = require('../offers/offerModel');
+import proposalModel = require('../../models/proposalModel');
+import offerModel = require('../../models/offerModel');
 
-import web3plus = require('../node_modules/web3plus/lib/web3plus');
+import web3plus = require('../../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
 
 var userRepo = new UserRepository();

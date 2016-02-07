@@ -4,7 +4,7 @@ import userModel = require('../models/userModel');
 
 import { IProposal, Proposal, IProposalDocument, IProposalFilter } from '../models/proposalModel';
 import {IMainCategory, ISubCategory} from '../models/categoryModel';
-import offerModel = require('../offers/offerModel');
+import offerModel = require('../models/offerModel');
 
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');

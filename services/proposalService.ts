@@ -4,7 +4,7 @@ import domain = require('domain');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import proposalBackingModel = require('../models/proposalBackingModel');
-import offerModel = require('../offers/offerModel');
+import offerModel = require('../models/offerModel');
 import contractInterfaces = require('../contracts/contractInterfaces');
 
 import serviceFactory = require('../services/serviceFactory');
