@@ -9,7 +9,7 @@ import serviceFactory = require('../../services/serviceFactory');
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
-describe("ProposalRegistry closing", () => {
+describe("ProposalRegistry deliveries", () => {
     /**
      * The Solidity web3 contract.
      */
@@ -26,15 +26,12 @@ describe("ProposalRegistry closing", () => {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
-        timeBeforeDeployment = Date.now();
-
         web3config.createWeb3();
 
         web3plus.deployContractFromFile("ProposalRegistry.sol",
             "ProposalRegistry",
             true,
             function (err, res) {
-                timeAfterDeployment = Date.now();
                 registryContract = res;
 
                 serviceFactory.getContractService()
@@ -46,18 +43,13 @@ describe("ProposalRegistry closing", () => {
             testRegistryName);
     });
 
-    it("should not close a proposal if requirements aren't met", function (done) {
+    it("should not register a delivery if there is no accepted offer", function (done) {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
-        var name1 = "Ethiopia Adado Coop";
+        var name1 = "A testing product";
         var askPrice1 = 10100;
         var askAmount1 = 550;
-
-        // The seller wants a higher price than the buyers are willing to pay. This offer should
-        // not be accepted.
-        var sellPrice1 = 20000;
-        var sellAmount1 = 500;
 
         // Currently all transactions are sent from a single address. Hence the "backer" is
         // also that address.
@@ -78,21 +70,19 @@ describe("ProposalRegistry closing", () => {
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
+                var minDeliveryCount = proposalContract.getMinimumCorrectDeliveryCount().toNumber();
 
-                // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
-            })
-            .then(web3plus.promiseCommital)
-            .then(function testCloseProposal(tx) {
+                assert.equal(minDeliveryCount, askAmount1 * 0.5, "Minimum required delivery reports");
+                assert.ok(!proposalContract.isDeliveryComplete(), "Not enough deliveries have been reported to release the final payment");
 
-                return proposalContract.close({ gas: 2500000 });
+                return proposalContract.reportDelivery(1, true);
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
-                var acceptedOfferAddress = proposalContract.acceptedOffer();               
+                var deliveryCount = proposalContract.getCorrectDeliveryCount().toNumber();
 
-                // The offer should not have been accepted.
-                assert.equal(acceptedOfferAddress, "0x0000000000000000000000000000000000000000");
+                assert.equal(deliveryCount, 0, "No deliveries reported");
+                assert.ok(!proposalContract.isDeliveryComplete(), "Not enough deliveries have been reported to release the final payment");
 
                 done();
             })
@@ -101,13 +91,15 @@ describe("ProposalRegistry closing", () => {
             });
     });
 
-    it("should close a proposal if requirements are met", function (done) {
+    it("should register a delivery when there is an accepted offer", function (done) {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
 
         var name1 = "Ethiopia Adado Coop";
         var askPrice1 = 10100;
         var askAmount1 = 550;
+        var askAmount2 = 100;
+
         var sellPrice1 = 10000;
         var sellAmount1 = 500;
 
@@ -117,7 +109,6 @@ describe("ProposalRegistry closing", () => {
 
         var proposalContract: contractInterfaces.IProposalContract;
 
-
         registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
@@ -127,16 +118,23 @@ describe("ProposalRegistry closing", () => {
             })
             .then(pc=> {
                 proposalContract = pc;
+
+                // First backer
                 return proposalContract.back(askAmount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
-
+                // Second backer
+                return proposalContract.back(askAmount2, { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetTotalBackedAmount(tx) {
                 // Make an offer
                 return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
+                // Close the proposal
                 return proposalContract.close({ gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
@@ -146,16 +144,16 @@ describe("ProposalRegistry closing", () => {
                 assert.ok(proposalContract.isClosed());
                 assert.notEqual(acceptedOfferAddress, "0x0000000000000000000000000000000000000000", "Accepted offer is not empty");
 
-                return contractService.getOfferContractAt(acceptedOfferAddress);
+                assert.ok(!proposalContract.isDeliveryComplete(), "Not enough deliveries have been reported to release the final payment");
+
+                return proposalContract.reportDelivery(1, true);
             })
-            .then(acceptedOffer => {
-                // Offer address should be unchanged.
-                assert.equal(acceptedOffer.sellerAddress(), sellerAddress1, "Seller address is registered correctly");
+            .then(web3plus.promiseCommital)
+            .then(function testGetLatestOffer(tx) {
+                var deliveryCount = proposalContract.getCorrectDeliveryCount().toNumber();
 
-                var acceptedPrice = acceptedOffer.price().toNumber();
-                var acceptedAmount = acceptedOffer.minimumAmount().toNumber();
-
-                assert.equal(acceptedPrice, sellPrice1);
+                assert.equal(deliveryCount, askAmount1, "Delivery was reported");
+                assert.ok(proposalContract.isDeliveryComplete(), "Enough deliveries have been reported to release the final payment");
 
                 done();
             })

@@ -106,7 +106,8 @@ describe("ProposalRegistry", () => {
         var name2 = "FTO Guatemala Huehuetenango";
         var price2 = 2990000;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
+
 
         registryContract.addProposal(name1, "Food and drink", "Coffee", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)

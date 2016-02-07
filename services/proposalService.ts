@@ -180,7 +180,7 @@ export class ProposalService {
         var t = this;
 
         // Get the proposal contract
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
         var getBackerDetailsPromises = new Array<Q.Promise<proposalBackingModel.IProposalBacking>>();
 
         t.contractService.getProposalContractAt(proposalId)

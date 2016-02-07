@@ -461,6 +461,9 @@ contract Proposal {
     function reportDelivery(uint backerIndex, bool isCorrect) {
         Backing b = backers[backerIndex];
 
+        // There has to be an accepted offer to report any delivery.
+        if(address(acceptedOffer) == 0x0) return;
+
         // To be called by the backer.
         if(b.buyerAddress != tx.origin) return;
 
