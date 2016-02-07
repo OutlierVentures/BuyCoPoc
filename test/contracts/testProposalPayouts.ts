@@ -5,6 +5,7 @@ import fs = require('fs');
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
 import serviceFactory = require('../../services/serviceFactory');
+import tools = require('../../lib/tools');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
@@ -86,12 +87,12 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isStartPaymentComplete(), "Start payment not complete");
 
                 // Set first pledge paid
-                return proposalContract.setPaid(1, 1, "tx12345", askAmount1 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), askAmount1 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Set second pledge paid
-                return proposalContract.setPaid(2, 1, "tx145465", askAmount2 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(2, 1, tools.newGuid(true), askAmount2 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -114,7 +115,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isStartPaymentComplete(), "Start payment not complete");
 
                 // Set first start paid
-                return proposalContract.setPaid(1, 2, "tx489489", askAmount1 * askPrice * proposalContract.startPaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(1, 2, tools.newGuid(true), askAmount1 * askPrice * proposalContract.startPaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -123,7 +124,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isStartPaymentComplete(), "Start payment not complete");
 
                 // Set second start paid
-                return proposalContract.setPaid(2, 2, "tx849489", askAmount2 * askPrice * proposalContract.startPaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(2, 2, tools.newGuid(true), askAmount2 * askPrice * proposalContract.startPaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -182,12 +183,12 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isStartPaymentComplete(), "Start payment not complete");
 
                 // Set first pledge paid
-                return proposalContract.setPaid(1, 1, "tx12345", askAmount1 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), askAmount1 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Set second pledge paid
-                return proposalContract.setPaid(2, 1, "tx145465", askAmount2 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
+                return proposalContract.setPaid(2, 1, tools.newGuid(true), askAmount2 * askPrice * proposalContract.pledgePaymentPercentage().toNumber() / 100, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -212,7 +213,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.equal(proposalContract.getStartPaymentAmount(1).toNumber(), askAmount1 * askPrice * proposalContract.startPaymentPercentage().toNumber() / 100, "Start payment amount");
 
                 // Set first start paid
-                return proposalContract.setPaid(1, 2, "tx489489", proposalContract.getStartPaymentAmount(1), { gas: 2500000 });
+                return proposalContract.setPaid(1, 2, tools.newGuid(true), proposalContract.getStartPaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -221,7 +222,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isStartPaymentComplete(), "Start payment not complete");
 
                 // Set second start paid
-                return proposalContract.setPaid(2, 2, "tx849489", proposalContract.getStartPaymentAmount(2), { gas: 2500000 });
+                return proposalContract.setPaid(2, 2, tools.newGuid(true), proposalContract.getStartPaymentAmount(2), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -236,7 +237,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.equal(proposalContract.startPayoutAmount().toNumber(), 0, "Start payout amount paid");
 
                 // Register start payment
-                return proposalContract.registerStartPayout("tx980234", proposalContract.getStartPayoutAmount(), { gas: 2500000 });
+                return proposalContract.registerStartPayout(tools.newGuid(true), proposalContract.getStartPayoutAmount(), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -245,7 +246,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isPaymentComplete(), "End payment complete");
 
                 // Set first end paid
-                return proposalContract.setPaid(1, 3, "tx848948", proposalContract.getEndPaymentAmount(1), { gas: 2500000 });
+                return proposalContract.setPaid(1, 3, tools.newGuid(true), proposalContract.getEndPaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -253,7 +254,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isReadyForEndPayout(), "Not ready for start payout");
 
                 // Set second end paid
-                return proposalContract.setPaid(2, 3, "tx65489746", proposalContract.getEndPaymentAmount(2), { gas: 2500000 });
+                return proposalContract.setPaid(2, 3, tools.newGuid(true), proposalContract.getEndPaymentAmount(2), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -276,7 +277,7 @@ describe("ProposalRegistry payouts", () => {
                 assert.equal(proposalContract.getEndPayoutAmount().toNumber(), endPayoutAmount, "End payout amount");
 
                 // Register end payment
-                return proposalContract.registerEndPayout("tx8489234", proposalContract.getEndPayoutAmount(), { gas: 2500000 });
+                return proposalContract.registerEndPayout(tools.newGuid(true), proposalContract.getEndPayoutAmount(), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {

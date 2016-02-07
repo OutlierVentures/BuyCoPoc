@@ -5,6 +5,7 @@ import fs = require('fs');
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
 import serviceFactory = require('../../services/serviceFactory');
+import tools = require('../../lib/tools');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
@@ -128,8 +129,8 @@ describe("ProposalRegistry backing", () => {
         var price1 = 11035;
         var amount1 = 105;
 
-        var pledgePaymentTxId = "tx" + Math.round(Math.random() * 1000000);
-        var startPaymentTxId = "tx" + Math.round(Math.random() * 1000000);
+        var pledgePaymentTxId = tools.newGuid(true);
+        var startPaymentTxId = tools.newGuid(true);
 
         // Currently all transactions are sent from a single address. Hence the "backer" is
         // also that address.
@@ -220,7 +221,7 @@ describe("ProposalRegistry backing", () => {
 
         // Currently all transactions are sent from a single address. Hence the "backer" is
         // also that address.
-        var backerAddress1:string = web3.eth.coinbase;
+        var backerAddress1: string = web3.eth.coinbase;
 
         var proposalContract: contractInterfaces.IProposalContract;
 
