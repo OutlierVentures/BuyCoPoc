@@ -37,7 +37,10 @@ export var userSchema = new mongoose.Schema({
         }]
     },
     buyerId: mongoose.Schema.Types.ObjectId,
-    sellerId: mongoose.Schema.Types.ObjectId
+    sellerId: mongoose.Schema.Types.ObjectId,
+    preferences: {
+        perspective: String
+    }
 });
 
 export interface ICredentials {
@@ -59,6 +62,13 @@ export interface IBlockchainAccount {
 export interface IBlockchainAccountCollection {
     accounts: IBlockchainAccount[],
     selected: string
+}
+
+export interface IUserPreferences {
+    /**
+     * Valid values: empty, "buyer", "seller"
+     */
+    perspective: string;
 }
 
 
@@ -90,6 +100,8 @@ export interface IUser extends mongoose.Document {
 
     buyerId: string;
     sellerId: string;
+
+    preferences: IUserPreferences;
 }
 
 /**

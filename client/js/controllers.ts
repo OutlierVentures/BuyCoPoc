@@ -67,6 +67,8 @@ class LoginController {
 
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
+
+            t.loadUserData();
         } else if (this.$location.path() === "/auth/uphold/callback"
             // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
@@ -118,6 +120,8 @@ class LoginController {
 
                 // Store in scope to show in view
                 $scope.userInfo = resultData.user;
+
+                t.loadUserData();
             }).error(function (error) {
                 // Handle error
                 console.log("Error on OAuth callback to API:");
@@ -138,6 +142,28 @@ class LoginController {
             t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
         });
 
+    }
+
+    loadUserData() {
+        var t = this;
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/user',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: IUser) {
+            t.$rootScope.userInfo = resultData;
+
+            // Homepage per perspective
+            if (t.$location.path() == "/") {
+                if (resultData.preferences && resultData.preferences.perspective) {
+                    if (resultData.preferences.perspective == "seller")
+                        t.$location.path('/seller-proposal/list');
+                }
+            }
+        }).error(function (error) {
+            // Handle error
+            console.log(error);
+        });
     }
 }
 

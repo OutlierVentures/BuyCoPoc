@@ -1,5 +1,6 @@
 ﻿﻿interface IProposalListScope {
     proposals: Array<IProposal>;
+    user: IUser;
     vm: ProposalListController;
 }
 
@@ -23,6 +24,7 @@ class ProposalListController {
         private identityService: IdentityService) {
 
         $scope.vm = this;
+        $scope.user = $rootScope.userInfo;
 
         this.list($route.current.params.mainCategory, $route.current.params.subCategory);
     }

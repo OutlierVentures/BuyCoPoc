@@ -23,10 +23,13 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn">
+                            <a class="navbar-brand" href="/" ng-cloak ng-show="!isLoggedIn || !userInfo.preferences.perspective ">
                                 <img src="images/logo.png">
                             </a>
-                            <a class="navbar-brand" href="/" ng-cloak ng-hide="isLoggedIn">
+                            <a class="navbar-brand" href="/" ng-cloak ng-show="isLoggedIn && userInfo.preferences.perspective=='buyer'">
+                                <img src="images/logo.png">
+                            </a>
+                            <a class="navbar-brand" href="/seller-proposal/list" ng-cloak ng-show="isLoggedIn && userInfo.preferences.perspective=='seller'">
                                 <img src="images/logo.png">
                             </a>
                         </div>
@@ -56,17 +59,20 @@
                 <div class="submenu" ng-cloak>
                     <div class="container">
                         <ul class="nav navbar-nav">
-                            <li data-match-route="/">
+                            <li data-match-route="/" ng-show="$root.userInfo.preferences.perspective=='buyer'">
                                 <a href="/">Product Categories</a>
                             </li>
-                            <li data-match-route="/seller-proposals/list">
-                                <a href="seller-proposal/list">Seller Proposals</a>
+                            <li data-match-route="/seller-proposals/list" ng-show="$root.userInfo.preferences.perspective=='seller'" >
+                                <a href="/seller-proposal/list">Requests for Quotes</a>
                             </li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <li>
-                                <p class="navbar-btn" style="margin-right: 15px;">
+                                <p class="navbar-btn" style="margin-right: 15px;" ng-show="$root.userInfo.preferences.perspective=='buyer'">
                                     <a href="/proposal/new" class="btn btn-default"><i class="fa fa-pencil"></i>&nbsp;&nbsp;&nbsp;Create Proposal</a>
+                                </p>
+                                <p class="navbar-btn" style="margin-right: 15px;" ng-show="$root.userInfo.preferences.perspective=='seller'">
+                                    <a href="/seller-proposal/list" class="btn btn-default"><i class="fa fa-pencil"></i>&nbsp;&nbsp;&nbsp;Create Offer</a>
                                 </p>
                             </li>
                         </ul>
@@ -162,10 +168,10 @@
     <script src="js/common/types.js"></script>
     <script src="js/common/underscore.service.js"></script>
     <script src="js/common/uri.service.js"></script>
-    <script src="js/controllers/proposalController.js"></script>
-    <script src="js/controllers/proposalListController.js"></script>
     <script src="js/lib/ethereumjs-accounts.js"></script>
     <script src="js/lib/hooked-web3-provider.js"></script>
+    <script src="js/proposals/proposalController.js"></script>
+    <script src="js/proposals/proposalListController.js"></script>
     <script src="js/seller-proposals/seller-proposal-resource.mock.js"></script>
     <script src="js/seller-proposals/seller-proposal.service.js"></script>
     <script src="js/sellers/configuration.service.js"></script>

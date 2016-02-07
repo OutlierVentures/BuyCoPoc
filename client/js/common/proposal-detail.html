@@ -20,8 +20,8 @@
             </span><br>
             <h1 class="large" ng-cloak ng-show="!proposal.isClosed && proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
             <!-- TODO: make these buttons appear according to view as a buyer or a seller -->
-            <a class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
-            <a class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>
+            <a ng-show="$root.userInfo.preferences.perspective=='buyer'" class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
+            <a ng-show="$root.userInfo.preferences.perspective=='seller'" class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>
         </div>
     </div>
 </div>

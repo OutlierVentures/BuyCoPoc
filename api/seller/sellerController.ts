@@ -101,6 +101,8 @@ export class SellerController {
             userRepo.getUserByExternalId(userExternalId)
                 .then(user => {
                     user.sellerId = seller.id;
+                    // Currently any user with a seller account uses the seller perspective.
+                    user.preferences.perspective = "seller";
                     user.save((err, userRes) => {
                         if (err) {
                             res.status(500).json({

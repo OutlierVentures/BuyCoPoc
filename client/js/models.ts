@@ -32,6 +32,14 @@ interface IBlockchainAccountCollection {
 }
 
 
+interface IUserPreferences {
+    /**
+     * Valid values: empty, "buyer", "seller"
+     */
+    perspective: string;
+}
+
+
 interface IUser extends IDocument {
     name: string;
     /**
@@ -56,6 +64,9 @@ interface IUser extends IDocument {
 
     buyerId: string;
     sellerId: string;
+
+    preferences: IUserPreferences;
+
 }
 
 interface ICredentials {

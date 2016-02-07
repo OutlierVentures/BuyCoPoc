@@ -71,7 +71,8 @@ export function configure(app: express.Express) {
     var uac = new userAccountController.UserAccountController();
     apiRouter.route("/user/accounts").post(uac.saveBlockchainAccounts);
     apiRouter.route("/user/accounts").get(uac.getBlockchainAccounts);
-        
+    apiRouter.route("/user").get(uac.getUserInfo);            
+
     // Migrations
     var mc = new migrationController.MigrationController();
     apiRouter.route("/migration/update").post(mc.update);

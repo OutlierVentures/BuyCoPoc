@@ -225,6 +225,9 @@ class SellerSignupController implements ISellerSignUp {
         this.sellerResource.save(
             this.seller,
             (data: any) => {
+                if (!this.$rootScope.userInfo.preferences) this.$rootScope.userInfo.preferences = <IUserPreferences>{};
+
+                this.$rootScope.userInfo.preferences.perspective = "seller";
                 // alert(`success: ${data}`);
                 this.seller = data.seller;
                 this.showMessage('You signed up as seller', false);

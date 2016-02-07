@@ -37,9 +37,10 @@ export class StubOAuthController {
 
         var t = this;
 
-        var randomToken = "stubToken" + Math.random() * 100000;
+        // Use the same token every time for persistence over multiple logons.
+        var token = "stubToken";
 
-        saveToken(randomToken);
+        saveToken(token);
 
         // TODO: reuse function from real oauthController. Now code is duplicated.
 
