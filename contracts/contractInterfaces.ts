@@ -30,7 +30,7 @@ export interface IWeb3TransactionCallback {
 
 export interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
-    addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
+    addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number | IBigNumber, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
     proposals(index: number | IBigNumber, callback?): string;
     proposalIndex(): IBigNumber;
 
@@ -41,11 +41,11 @@ export interface IProposalRegistryContract extends IWeb3Contract {
 export interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
 
-    back(amount: number, options?: IWeb3TransactionOptions): Promise<string>;
+    back(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 
-    offer(price: number, minimumAmount: number, options?: IWeb3TransactionOptions): Promise<string>;
+    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 
-    setPaid(backingIndex: number, paymentType: number, transactionId: string, amount: number, options?: IWeb3TransactionOptions): Promise<string>;
+    setPaid(backingIndex: number | IBigNumber, paymentType: number | IBigNumber, transactionId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 
     close(options?: IWeb3TransactionOptions): Promise<string>;
 

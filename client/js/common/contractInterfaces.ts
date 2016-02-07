@@ -34,7 +34,7 @@ interface IWeb3TransactionCallback {
 
 interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
-    addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number | IBigNumber, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
     proposals(index: number | IBigNumber, callback?): string;
     proposalIndex(): IBigNumber;
 
@@ -45,11 +45,11 @@ interface IProposalRegistryContract extends IWeb3Contract {
 interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    back(amount: number, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    back(amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    offer(price: number, minimumAmount: number, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    setPaid(backingIndex: number, paymentType: number, transactionId: string, amount: number, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    setPaid(backingIndex: number | IBigNumber, paymentType: number | IBigNumber, transactionId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
     close(options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
