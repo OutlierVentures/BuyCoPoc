@@ -84,6 +84,22 @@ export class CachedProposalService {
     }
 
     /**
+     * Gets all proposals which are up for closing (enddate pased but not closed yet).
+     */
+    getClosingCandidates(): PromiseLike<IProposalDocument[]> {
+        // TODO: handle time zones (now all times are UTC)
+        var query = Proposal.find({
+            isClosed: false,
+            // COULD DO: add date as a parameter
+            endDate: { $lte: new Date() }
+        })
+
+        return query.exec();
+    }
+
+
+
+    /**
      * Clear the proposals cache in Mongo.
      */
     clearMongoCache(): IPromise<boolean> {

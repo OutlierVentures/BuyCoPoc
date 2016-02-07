@@ -37,6 +37,7 @@ export function configure(app: express.Express) {
     // Proposals
     var pc = new proposalController.ProposalController();
     apiRouter.route("/proposal").get(pc.get);
+    apiRouter.route("/proposal/closing-candidates").get(pc.getClosingCandidates);
 
     apiRouter.route("/proposal/:id").get(pc.getOne);
     apiRouter.route("/proposal/:id/back").post(pc.back);

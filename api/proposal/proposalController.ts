@@ -246,4 +246,33 @@ export class ProposalController {
             })
     }
 
+    getClosingCandidates = (req: express.Request, res: express.Response) => {
+        var token = req.headers["accesstoken"];
+        
+        // Create a proposal service and query it for proposals within the determined filter - if any.
+        serviceFactory.createCachedProposalService()
+            .then(
+            function (cps) {
+                return cps.getClosingCandidates();
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing proposals service"
+                });
+                return null;
+            })
+            .then(
+            function (proposals) {
+                res.json(proposals);
+            }, function (proposalsErr) {
+                res.status(500).json({
+                    "error": proposalsErr,
+                    "error_location": "getting proposals which are candidate for closing"
+                });
+                return null;
+            });
+    }
+
+
 }
