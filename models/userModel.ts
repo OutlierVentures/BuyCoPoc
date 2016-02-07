@@ -1,5 +1,7 @@
 ﻿import mongoose = require("mongoose");
 import { Promise } from "q";
+import { buyerSchema, IBuyer } from './buyerModel'
+import { sellerSchema, ISeller} from './sellerModel'
 
 /**
  * Backing token of the user for a specific BuyCo.
@@ -33,7 +35,9 @@ export var userSchema = new mongoose.Schema({
             public: String,
             balance: Number
         }]
-    }
+    },
+    buyerId: mongoose.Schema.Types.ObjectId,
+    sellerId: mongoose.Schema.Types.ObjectId
 });
 
 export interface ICredentials {
@@ -79,6 +83,13 @@ export interface IUser extends mongoose.Document {
     backings: [Backing];
 
     blockchainAccounts: IBlockchainAccountCollection;
+
+    isBuyer: boolean;
+
+    isSeller: boolean;
+
+    buyerId: string;
+    sellerId: string;
 }
 
 /**

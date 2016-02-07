@@ -19,8 +19,8 @@ export var sellerSchema = new mongoose.Schema({
     region: String,
     regionCode: String
 }, {
-    timestamps: true
-});
+        timestamps: true
+    });
 
 export interface ISeller extends mongoose.Document { // , TODO inherit (extra) from SellerModel instead of having body.
     _id: mongoose.Types.ObjectId;
@@ -73,14 +73,14 @@ export class SellerRepository {
      */
     public find(cond: Object): q.Promise<ISeller[]> {
         var result = q.Promise<ISeller[]>(
-        (resolve: (sellers: ISeller[]) => void, reject: (error: any) => void) => {
-            Seller.find(cond, (err: any, results: ISeller[]) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(results);
+            (resolve: (sellers: ISeller[]) => void, reject: (error: any) => void) => {
+                Seller.find(cond, (err: any, results: ISeller[]) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(results);
+                });
             });
-        });
         return result;
     };
 
@@ -89,16 +89,16 @@ export class SellerRepository {
      * For now just a simple one to one mapping with mongoose create function, but 'Promisied'.
      * @param seller
      */
-    public create(newSeller: ISeller): q.Promise<ISeller> { 
+    public create(newSeller: ISeller): q.Promise<ISeller> {
         var result = q.Promise<ISeller>(
-        (resolve: (resultSeller: ISeller) => void, reject: (error: any) => void) => {
-            Seller.create(newSeller, (err: any, resultSeller: ISeller) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(resultSeller);
+            (resolve: (resultSeller: ISeller) => void, reject: (error: any) => void) => {
+                Seller.create(newSeller, (err: any, resultSeller: ISeller) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(resultSeller);
+                });
             });
-        });
         return result;
     };
 
@@ -107,14 +107,18 @@ export class SellerRepository {
      * @param seller
      */
     public update(updatedSeller: ISeller): q.Promise<ISeller> {
+        var t = this;
         var result = q.Promise<ISeller>(
             (resolve: (resultSeller: ISeller) => void, reject: (error: any) => void) => {
 
-                Seller.update({ userExternalId: updatedSeller.userExternalId }, { $set: updatedSeller}, (err: any, affectedRows: number, resultSeller: ISeller) => {
+                Seller.update({ userExternalId: updatedSeller.userExternalId }, { $set: updatedSeller }, (err: any, affectedRows: number, resultSeller: ISeller) => {
                     if (err) {
                         reject(err);
                     }
-                    resolve(updatedSeller);
+
+                    // Get the updated seller document
+                    t.getSellerByUserExternalId(updatedSeller.userExternalId)
+                        .then(s => resolve(s), err => reject(err));
                 });
             });
         return result;
@@ -124,12 +128,12 @@ export class SellerRepository {
         var result = q.Promise<ISeller>(
             (resolve: (resultSeller: ISeller) => void, reject: (error: any) => void) => {
                 Seller.findOneAndRemove({ userExternalId: externalId }, (err: any, result: ISeller) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(result);
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
             });
-        });
         return result;
-    };       
+    };
 }

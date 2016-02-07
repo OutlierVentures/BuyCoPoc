@@ -53,6 +53,9 @@ interface IUser extends IDocument {
     //backings: [Backing];
 
     blockchainAccounts: IBlockchainAccountCollection;
+
+    buyerId: string;
+    sellerId: string;
 }
 
 interface ICredentials {
