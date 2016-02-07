@@ -343,9 +343,7 @@ class ProposalController {
                 t.$scope.successMessage = undefined;
 
                 // Redirect to the proposal view
-                // TODO: go to individual proposal once there is a view for it.
-                //t.$location.path("/proposal/" + resultData._id);
-                t.$location.path("/proposal/list");
+                t.$location.path("/proposal/" + resultData.contractAddress);
             });
         }).error(function (error) {
             t.$scope.processMessage = undefined;

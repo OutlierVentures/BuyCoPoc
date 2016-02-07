@@ -110,7 +110,6 @@ interface IApplicationInfo {
 // Difference with server-side definition: property "id" contains the contract address,
 // while at the server side it's the Mongo ID.
 interface IProposal {
-    id: string;
     contractAddress: string;
     productName: string;
     productDescription: string;
@@ -121,11 +120,13 @@ interface IProposal {
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
+
+    isClosed?: boolean;
+
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
     totalAmount?: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
-
 interface IProposalFilter {
     maxPrice?: number;
     minPrice?: number;

@@ -13,7 +13,7 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
         .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html', name: 'new' })
-        .when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
+        //.when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
         .when('/proposal/:id', { controller: ProposalController, templateUrl: 'views/proposal-details.html', name: 'details' })
         .when('/proposal/:id/back', { controller: ProposalController, templateUrl: 'views/proposal-back.html', name: 'back' })
         .when('/proposal/:proposalId/offer/new', { controller: OfferController, controllerAs: "vm", templateUrl: 'js/offers/offer-form.html', name: 'new' })

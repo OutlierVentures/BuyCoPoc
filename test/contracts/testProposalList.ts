@@ -288,7 +288,7 @@ describe("ProposalRegistry list", () => {
                             subCategory: proposal.subCategory(),
                             maxPrice: proposal.maxPrice().toNumber(),
                             endDate: proposal.endDate(),
-                            ultimateDeliveryDate: proposal.ultimateDeliveryDate()
+                            ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
                         };
 
                         //var p: proposalModel.IProposal = {
