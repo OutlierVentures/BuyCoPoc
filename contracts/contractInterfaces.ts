@@ -30,22 +30,16 @@ export interface IWeb3TransactionCallback {
 
 export interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
-    addProposal(productName: string,
-        productCategory: string,
-        productSubCategory: string,
-        maxPrice: number,
-        endDate: string,
-        ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
+    addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
     proposals(index: number | IBigNumber, callback?): string;
     proposalIndex(): IBigNumber;
 
     name(): string;
+    owner(): string;
 }
 
 export interface IProposalContract extends IWeb3Contract {
-    setDetails(productDescription: string,
-        productSku: string,
-        productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
+    setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
 
     back(amount: number, options?: IWeb3TransactionOptions): Promise<string>;
 
@@ -53,8 +47,11 @@ export interface IProposalContract extends IWeb3Contract {
 
     setPaid(backingIndex: number, paymentType: number, transactionId: string, amount: number, options?: IWeb3TransactionOptions): Promise<string>;
 
+    close(options?: IWeb3TransactionOptions): Promise<string>;
+
     offers(index: number | IBigNumber, callback?): string;
     offerIndex(): IBigNumber;
+    offerIndexByAddress(address: string): IBigNumber;
 
     backers(index: number | IBigNumber, callback?): any[];
     backerIndex(): IBigNumber;
@@ -67,11 +64,18 @@ export interface IProposalContract extends IWeb3Contract {
     getStartPaymentAmount(backerIndex: number | IBigNumber): IBigNumber;
     getEndPaymentAmount(backerIndex: number | IBigNumber): IBigNumber;
 
+    isStartPaymentComplete(): boolean;
+    isPaymentComplete(): boolean;
+
+
+
     isClosed(): boolean;
     getBestOfferIndex(): IBigNumber;
     getBestPrice(): IBigNumber;
-    close();
+    acceptedOffer(): string;
 
+    registry(): string;
+    owner(): string;
     productName(): string;
     productDescription(): string;
     productSku(): string;
@@ -81,10 +85,34 @@ export interface IProposalContract extends IWeb3Contract {
     maxPrice(): IBigNumber;
     endDate(): string;
     ultimateDeliveryDate(): string;
+
+    pledgePaymentPercentage(): IBigNumber;
+    startPaymentPercentage(): IBigNumber;
+
+    reportDelivery(backerIndex: number | IBigNumber, isCorrect: boolean, options?: IWeb3TransactionOptions): Promise<string>;
+
+    minimumReportedCorrectDeliveryPercentage(): IBigNumber;
+    getMinimumCorrectDeliveryCount(): IBigNumber;
+    getCorrectDeliveryCount(): IBigNumber;
+    isDeliveryComplete(): boolean;
+
+    startPayoutAmount(): IBigNumber;
+    startPayoutTransactionID(): string;
+    endPayoutAmount(): IBigNumber;
+    endPayoutTransactionID(): string;
+    isReadyForStartPayout(): boolean;
+    isReadyForEndPayout(): string;
+    getStartPayoutAmount(): IBigNumber;
+    getEndPayoutAmount(): IBigNumber;
+
+    registerStartPayout(txId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    registerEndPayout(txId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 }
 
 export interface IOfferContract extends IWeb3Contract {
     sellerAddress(): string;
     price(): IBigNumber;
     minimumAmount(): IBigNumber;
+    setPrice(price: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    setMinimumAmount(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 }

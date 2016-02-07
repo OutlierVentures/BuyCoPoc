@@ -436,7 +436,7 @@ contract Proposal {
      * Returns whether all the start (and pledge) payments have been received
      * from the backers.
      */
-    function isStartPaymentComplete() public returns (bool isComplete) {
+    function isStartPaymentComplete() constant public returns (bool isComplete) {
         for (uint i = 1; i <= backerIndex; i++)
         {
             if(backers[i].startPaymentAmount == 0) return;
@@ -447,7 +447,7 @@ contract Proposal {
     /*
      * Returns whether all the payments have been received from the backers.
      */
-    function isPaymentComplete() public returns (bool isComplete) {
+    function isPaymentComplete() constant public returns (bool isComplete) {
         for (uint i = 1; i <= backerIndex; i++)
         {
             if(backers[i].endPaymentAmount == 0) return;
