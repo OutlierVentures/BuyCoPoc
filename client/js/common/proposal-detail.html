@@ -18,7 +18,7 @@
             <span class="small">
                 Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm'}}</span>
             </span><br>
-            <h1 class="large" ng-cloak ng-show="proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
+            <h1 class="large" ng-cloak ng-show="!proposal.isClosed && proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
             <!-- TODO: make these buttons appear according to view as a buyer or a seller -->
             <a class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
             <a class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>

@@ -28,7 +28,7 @@ interface IProposalDetailScope {
       "productName": "@",
       "productDescription": "@"
     };
-    templateUrl: string = "js/common/proposal-detail-ava.html";
+    templateUrl: string = "js/common/proposal-detail.html";
     restrict: string = "EA";
   }
     

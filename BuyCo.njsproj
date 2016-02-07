@@ -39,7 +39,6 @@
     <Content Include="client\js\categories\main-category-details.html" />
     <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
-    <Content Include="client\js\common\proposal-detail-ava.html" />
     <Content Include="client\js\common\proposal-detail.html" />
     <Content Include="client\js\offers\offer-details.html" />
     <Content Include="client\js\offers\offer-form.html" />
