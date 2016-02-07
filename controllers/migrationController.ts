@@ -2,7 +2,11 @@
 import userModel = require('../models/userModel');
 import configModel = require('../models/configModel');
 import serviceFactory = require('../services/serviceFactory');
+import contractService = require('../services/contractService');
+import fs = require('fs');
+
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
+import contractInterfaces = require('../contracts/contractInterfaces');
 import _ = require('underscore');
 import Q = require('q');
 
@@ -68,7 +72,7 @@ export class MigrationController {
                 res.status(500).json(
                     {
                         "status": "Error",
-                        "error": err,
+                        "error": err
                     });
             });
     }
@@ -77,77 +81,66 @@ export class MigrationController {
      * Seed the smart contracts with some test data.
      */
     seedTestData = (req: express.Request, res: express.Response) => {
-        var promises = new Array<Q.Promise<string>>();
-
         // Ensure some proposals
 
         // Load the registry contract.
-        // TODO: move this to a service as it will be used all over the place.
-        var deferLoadRegistry = Q.defer<any>();
+        var contractService: contractService.ContractService;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        web3plus.loadContractFromFile("ProposalRegistry.sol", "ProposalRegistry", this.config.ethereum.contracts.proposalRegistry,
-            true, function (loadErr, loadRes) {
-                if (loadErr) {
-                    deferLoadRegistry.reject(loadErr);
-                    return;
-                }
+        serviceFactory.getContractService()
+            .then(cs=> {
+                contractService = cs;
 
-                deferLoadRegistry.resolve(loadRes);
-            });
+                var deferAddTestData = Q.defer<string>();
+                var promises = new Array<Q.Promise<string>>();
+                promises.push(deferAddTestData.promise);
 
-        var registryContract;
-        var proposalContract;
-        var proposalContractDefinition;
-
-        var deferAddTestData = Q.defer<string>();
-        promises.push(deferAddTestData.promise);
-
-        deferLoadRegistry.promise
-            .then(function (con) {
-                registryContract = con;
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
-
-                return con.addProposal("Ethiopia Adado Coop", "A very special coffee, per kilogram", "Food and drink", "Coffee",
+                //var proposals = JSON.parse(fs.readFileSync('../client/data/proposals.json', 'utf8'));
+                // proposals.forEach(proposal
+                
+                contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
                     4, "2016-03-01", "2016-05-01", { gas: 2500000 });
-            },
-            function (regConErr) {
-                deferAddTestData.reject(regConErr);
+
+                return contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
+                    4, "2016-03-01", "2016-05-01", { gas: 2500000 });
+            }, err=> {
+                res.status(500).json({
+                    "error_location": "loading registry",
+                    "error": err,
+                });
+                return null;
             })
             .then(web3plus.promiseCommital)
             .then(function addBackers(tx) {
                 // TODO: get the proposal by... generated ID? Now this always gets the first
-                // proposal.
-                var newProposalAddress = registryContract.proposals(1);
+                // proposal, even if there are multiple.
+                // Use transaction hash.
+                var newProposalAddress = contractService.registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc => {
+                proposalContract = pc;
 
                 proposalContract.back(15, { gas: 2500000 });
                 proposalContract.back(20, { gas: 2500000 });
                 proposalContract.back(35, { gas: 2500000 });
                 proposalContract.back(45, { gas: 2500000 });
                 return proposalContract.back(55, { gas: 2500000 });
-            }, function (addBackersError) {
-                deferAddTestData.reject(addBackersError);
             })
             .then(web3plus.promiseCommital)
             .then(function finish(tx) {
-                deferAddTestData.resolve(tx);
-            });
-
-        Q.all(promises)
-            .then(function (results) {
                 res.status(200).json({
                     "status": "Ok",
                     "message": "Test data added",
-                    "results": results,
+                    "results": tx,
                 });
-            })
-            .catch(function (err) {
-                res.status(500).json(
-                    {
-                        "status": "Error",
-                        "error": err,
-                    });
+            }, err => {
+                res.status(500).json({
+                    "error_location": "adding backers",
+                    "error": err,
+                });
+                return null;
             });
     }
 

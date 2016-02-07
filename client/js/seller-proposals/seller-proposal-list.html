@@ -21,17 +21,8 @@
                 <label for="filterCategory">Category</label>
                 <select class="form-control" ng-model="vm.proposalFilter.subCategory" name="category" id="filterCategory" >
                     <option value="">[any category]</option>
-                    <optgroup label="Electronics">
-                        <option value="Camera">Electronics - Camera</option>
-                    </optgroup>
-                    <optgroup label="Food and drink">
-                        <option value="Coffee">Food and drink - Coffee</option>
-                    </optgroup>
-                    <optgroup label="Books">
-                        <option value="Fantasy books">Books - Fantasy books</option>
-                    </optgroup>
-                    <optgroup label="Shoes">
-                        <option value="Running shoes">Shoes - Running shoes</option>
+                    <optgroup ng-repeat="mainCat in vm.allCategories track by mainCat.name" label="{{mainCat.name}}">
+                        <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value="{{mainCat.name}} - {{subCat.name}}">{{subCat.name}}</option>
                     </optgroup>
                 </select>
             </div>

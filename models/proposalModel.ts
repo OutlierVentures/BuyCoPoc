@@ -7,7 +7,8 @@ export var proposalSchema = new mongoose.Schema({
     contractAddress: String,
     productName: String,
     productDescription: String,
-    //productSku: String,
+    productSku: String,
+    productUnitSize: String,
     mainCategory: String,
     subCategory: String,
     maxPrice: Number,
@@ -15,14 +16,15 @@ export var proposalSchema = new mongoose.Schema({
     ultimateDeliveryDate: Date,
     nrOfBackings: Number,
     nrOfBackers: Number,
-    totalAmount: Number  
+    totalAmount: Number
 });
 
 export interface IProposal {
     contractAddress: string;
     productName: string;
     productDescription: string;
-    //productSku: string;
+    productSku: string;
+    productUnitSize: string;
     mainCategory: string;
     subCategory: string;
     maxPrice: number;
@@ -37,8 +39,8 @@ export interface IProposalDocument extends mongoose.Document, IProposal {
 }
 
 export interface IProposalFilter {
-    maxPrice?: number | Object;
-    minimumTotalAmount?: number | Object;
+    maxPrice?: number;
+    minimumTotalAmount?: number;
     partNumber?: string;
     mainCategory?: string;
     subCategory?: string;

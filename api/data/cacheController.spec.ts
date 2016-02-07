@@ -40,4 +40,22 @@ describe("CacheController", () => {
                 done(err);
             });
     });
+
+    it("should do a full refresh of the cache on POST /api/data/cache/refresh", function (done) {
+        this.timeout(1000000);
+
+        request(theApp)
+            .post('/api/data/cache/refresh')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var result = res.body;
+                
+                // Assert stuff on the result
+                //assert.equal(result.status, "Ok", "Result is ok");
+            })
+            .end(function (err, res) {
+                done(err);
+            });
+    });
 });

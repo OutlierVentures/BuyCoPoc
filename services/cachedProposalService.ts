@@ -54,13 +54,40 @@ export class CachedProposalService {
      * Gets all proposals that match the filter (or just all if no filter :).
      */
     get(proposalFilter: IProposalFilter): PromiseLike<IProposalDocument[]> {
-        // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+        var query = Proposal.find({});
+
+        // Apply filters to the mongo query. Use the typed methods of mongoose.
+        // Field names are contained as strings and hence not typesafe. Not sure 
+        // if there is a way to access field names typesafe (something like query.maxPrice.lte(10))
         if (proposalFilter) {
             if (proposalFilter.maxPrice) {
-                proposalFilter.maxPrice = { $lt: proposalFilter.maxPrice };
+                // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+                query = query.lte("maxPrice", proposalFilter.maxPrice + 0);
             }
+            if (proposalFilter.partNumber) {
+                // Use a case insensitive regex to get a case insensitive "contains".
+                query = query.where("productSku", RegExp(proposalFilter.partNumber, "i"));
+            }
+            if (proposalFilter.minimumTotalAmount) {
+                query = query.gte("totalAmount", proposalFilter.minimumTotalAmount);
+            }
+            if (proposalFilter.mainCategory) query = query.where("mainCategory", proposalFilter.mainCategory);
+            if (proposalFilter.subCategory) query = query.where("subCategory", proposalFilter.subCategory);
+
         }
-        return Proposal.find(proposalFilter).exec();
+
+        return query.exec();
+    }
+
+    /**
+     * Clear the proposals cache in Mongo.
+     */
+    clearMongoCache(): IPromise<boolean> {
+        return Promise<boolean>((resolve, reject) => {
+            Proposal.find({}).remove().exec()
+                .then(proposals => resolve(true),
+                err=> reject(err));
+        });
     }
 
     /**
@@ -76,21 +103,9 @@ export class CachedProposalService {
 
                     // Delete all proposals from the cache which are not currently in the contract
                     // (e.g. after clearing the blockchain during development)
-                    // TODO                    
-
                     var proposalsPromises = new Array<Promise<IProposal>>();
-
                     for (let i = 0; i < proposals.length; i++) {
                         var p = proposals[i];
-                        // Get backings 
-                        //this.proposalService.getBackers(p.contractAddress)
-                        //.then((proposalBackings) => {
-                        //    let sum = 0;
-                        //    _.each(proposalBackings, (backing) => { sum += backing.amount; });
-                        //    p.totalAmount = sum;
-                        //    p.nrOfBackings = proposalBackings.length;
-                        //    p.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
-                        //});
                         proposalsPromises.push(this.ensureCacheProposal(p));
                     }
 
@@ -111,13 +126,74 @@ export class CachedProposalService {
         });
     }
 
+    private addProposalBackingTotals(proposal: IProposal): Promise<IProposal> {
+        // console.log(`addProposalBackingTotals: got ${proposals.length} proposals from blockchain to add backing totals to.`);
+
+        var t = this;
+        return Q.Promise<IProposal>((resolve, reject) => {
+            try {
+                //console.log('proposal.contractAddress: ');
+                //console.log(proposal.contractAddress);
+                return t.proposalService.getBackers(proposal.contractAddress)
+                    .then((proposalBackings) => {
+                        console.log(`addProposalBackingTotals: got ${proposalBackings.length} proposalbackings for proposal ${proposal.contractAddress}.`);
+                        console.log('proposal.contractAddress: ');
+                        console.log(proposal.contractAddress);
+                        let sum = 0;
+                        _.each(proposalBackings, (backing) => { sum += backing.amount; });
+                        proposal.totalAmount = sum;
+                        proposal.nrOfBackings = proposalBackings.length;
+                        proposal.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+                        resolve(proposal);
+                    }).catch((err) => {
+                        reject(err);
+                    });
+            } catch (err) {
+                reject(err);
+            }
+        });
+
+        //return Q.all<IProposal>(proposals.map((proposal) => {
+        //    //console.log('proposal: ');
+        //    //console.log(proposal);
+        //    return Q.Promise<IProposal>((resolve, reject) => {
+        //        console.log('proposal.contractAddress: ');
+        //        console.log(proposal.contractAddress);
+        //        this.proposalService.getBackers(proposal.contractAddress)
+        //        .then((proposalBackings) => {
+        //            console.log(`addProposalBackingTotals: got ${proposals.length} proposalbackings for proposal ${proposal.contractAddress}.`);
+        //            console.log('proposal.contractAddress: ');
+        //            console.log(proposal.contractAddress);
+        //            let sum = 0;
+        //            _.each(proposalBackings, (backing) => { sum += backing.amount; });
+        //            proposal.totalAmount = sum;
+        //            proposal.nrOfBackings = proposalBackings.length;
+        //            proposal.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
+        //            resolve(proposal);
+        //        });
+        //    });
+        //}));
+        
+        // Simple form of Promise:
+        //return Promise<Array<IProposal>>((resolve, reject) => {
+        //    resolve(proposals);
+        //});
+    };
+
+
     /**
      * Ensure that this proposal is present and up to date in the Mongo cache.
      * @param p
      */
     ensureCacheProposal(p: IProposal): Promise<IProposal> {
+        var t = this;
         return Promise<IProposal>((resolve, reject) => {
-            Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec()
+            // Add backing stats
+            t.addProposalBackingTotals(p)
+                .then(p => {
+                    // Try to find record from MongoDB
+                    return Proposal.findOne().where("contractAddress").equals(p.contractAddress).exec();
+                })
                 .then((currentProposal) => {
                     // TODO: refactor this to a separate method too
                     var saveDefer = Q.defer<IProposal>();
@@ -135,6 +211,9 @@ export class CachedProposalService {
                         currentProposal.productDescription = p.productDescription;
                         currentProposal.mainCategory = p.mainCategory;
                         currentProposal.subCategory = p.subCategory;
+
+                        currentProposal.productSku = p.productSku;
+                        currentProposal.productUnitSize = p.productUnitSize;
 
                         currentProposal.endDate = p.endDate;
                         currentProposal.ultimateDeliveryDate = p.ultimateDeliveryDate;

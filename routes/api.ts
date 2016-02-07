@@ -26,7 +26,9 @@ export function configure(app: express.Express) {
     // Categories
     var catCon = new categoryController.CategoryController();
     // All categories (to fill dropdowns etc)
-    apiRouter.route("/category").get(catCon.getMainCategories);
+    apiRouter.route("/category/").get(catCon.getMainCategories);
+    // There may not be a category named "all"
+    apiRouter.route("/category/all").get(catCon.getAllCategories);
     apiRouter.route("/category/:mainCategory").get(catCon.getOneMainCategory);
     // Categories used in proposals (for browsing)
     apiRouter.route("/proposal/category").get(catCon.getUsedMainCategories);
@@ -77,6 +79,7 @@ export function configure(app: express.Express) {
     // Cache
     var cacheCon = new cacheController.CacheController();
     apiRouter.route("/data/cache/update").post(cacheCon.update);
+    apiRouter.route("/data/cache/refresh").post(cacheCon.fullRefresh);
 
     // Catch non-existing api calls.
     apiRouter.route("*").all(function (req, res) {

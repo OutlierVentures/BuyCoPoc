@@ -2,6 +2,10 @@
 import web3config = require('./web3config');
 import fs = require('fs');
 
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import contractService = require('../../services/contractService');
+import serviceFactory = require('../../services/serviceFactory');
+
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
@@ -9,9 +13,9 @@ describe("ProposalRegistry", () => {
     /**
      * The Solidity web3 contract.
      */
-    var registryContract;
+    var registryContract: contractInterfaces.IProposalRegistryContract;
 
-    var proposalContractDefinition;
+    var contractService: contractService.ContractService;
 
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
@@ -33,10 +37,11 @@ describe("ProposalRegistry", () => {
                 timeAfterDeployment = Date.now();
                 registryContract = res;
 
-                // Save the sub contract definitions to variables for easy access.
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
-
-                done(err);
+                serviceFactory.getContractService()
+                    .then(cs => {
+                        contractService = cs;
+                        done();
+                    }, err => done(err));
             },
             testRegistryName);
     });
@@ -58,7 +63,11 @@ describe("ProposalRegistry", () => {
         // To facilitate this for calling code, a convenience function getCreationTime() could
         // be created in web3plus.enhanceContract().
 
-        web3.eth.getTransaction(registryContract.transactionHash, function processTransactionInfo(err, tx) {
+        // The transactionHash property is present in contracts returned
+        // after deployment. Not in sub contracts loaded through .at(). Not
+        // clear whether it's present in contracts loaded with web3plus.load(..).
+        var registryContractAny = <any>registryContract;
+        web3.eth.getTransaction(registryContractAny.transactionHash, function processTransactionInfo(err, tx) {
             web3.eth.getBlock(tx.blockNumber, function processBlockInfo(err, block) {
                 if (err) {
                     done(err);
@@ -99,24 +108,30 @@ describe("ProposalRegistry", () => {
 
         var proposalContract;
 
-        registryContract.addProposal(name1, "A very special product", "Food and drink", "Coffee", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Food and drink", "Coffee", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                var addProposalPromise = registryContract.addProposal(name2, "Another exceptional product", "Food and drink", "Coffee", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
+                var addProposalPromise = registryContract.addProposal(name2, "Food and drink", "Coffee", price2, "2016-04-01", "2016-07-01", { gas: 2500000 });
                 return addProposalPromise;
             })
             .then(web3plus.promiseCommital)
             .then(function testGetMember(tx) {
                 var newProposalAddress = registryContract.proposals(2);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
 
                 assert.equal(proposalContract.productName(), name2);
                 assert.equal(proposalContract.maxPrice().toNumber(), price2);

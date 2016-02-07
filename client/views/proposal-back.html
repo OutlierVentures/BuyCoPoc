@@ -3,7 +3,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h2>Back a BuyCo</h2>
+                    <h2>Buy together</h2>
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -30,8 +30,8 @@
                                 <div class="form-group">
                                     <label>Card to pay from</label>
                                     <p class="help-block">
-                                        The initial payment of 50% of the total amount will be made immediately into the BuyCo escrow. If the sale doesn't
-                                        close, your money will be returned on the proposal end date of {{proposal.endDate}}.
+                                        An initial payment of 5% of the total amount will be made immediately into the BuyCo escrow. If the sale doesn't
+                                        close, your money will be returned on the proposal end date of {{proposal.endDate | amDateFormat: 'DD-MM-YYYY HH:mm'}} ({{proposal.endDate | amTimeAgo}}).
                                         <br /> Which Uphold card do you want to pay from?
                                     </p>
                                     <select class="form-control" ng-model="fromCard" required>

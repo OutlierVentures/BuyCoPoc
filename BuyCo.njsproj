@@ -65,6 +65,7 @@
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
     <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
+    <TypeScriptCompile Include="client\js\common\contractInterfaces.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.directive.ts" />
     <TypeScriptCompile Include="client\js\common\proposal-detail.directive.ts" />
@@ -100,6 +101,7 @@
     <TypeScriptCompile Include="client\typings\urijs\URIjs.d.ts" />
     <TypeScriptCompile Include="api\data\cacheController.ts" />
     <TypeScriptCompile Include="api\configuration\configurationController.ts" />
+    <TypeScriptCompile Include="contracts\contractInterfaces.ts" />
     <TypeScriptCompile Include="controllers\oauthController.ts" />
     <TypeScriptCompile Include="controllers\migrationController.ts" />
     <TypeScriptCompile Include="api\seller\sellerController.ts" />
@@ -344,8 +346,10 @@
     <Content Include="key.default.pem" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <TypeScriptCompile Include="services\contractService.ts" />
     <TypeScriptCompile Include="services\configurationService.ts" />
     <TypeScriptCompile Include="services\cachedProposalService.ts" />
+    <TypeScriptCompile Include="services\proposalService.spec.ts" />
     <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />

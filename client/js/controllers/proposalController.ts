@@ -10,6 +10,8 @@
     errorMessage: string;
     successMessage: string;
     transactionId: string;
+    pageUrl: string;
+    allCategories: IMainCategory[];
 }
 
 interface IProposalRouteParameters extends ng.route.IRouteParamsService {
@@ -47,7 +49,9 @@ class ProposalController {
 
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
-        if (this.$route.current.name === "back") {
+        if (this.$route.current.name === "new") {
+            this.create();
+        } if (this.$route.current.name === "back") {
             this.back(proposalId);
         } else if (this.$route.current.name === "details") {
             this.view(proposalId);
@@ -55,6 +59,28 @@ class ProposalController {
             this.close(proposalId);
         }
 
+    }
+
+    create() {
+        this.getCategoryData((err, res) => {});
+    }
+
+    private getCategoryData(cb: any) {
+        var t = this;
+
+        // Get category data
+        t.$http({
+            method: 'GET',
+            url: apiUrl + '/category/all'
+        }).success(function (resultData: IMainCategory[]) {
+            t.$scope.allCategories = resultData;
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            console.log(error);
+
+            cb("Error getting category data", null);
+        });
     }
 
     private getCardsData(cb: any) {
@@ -84,6 +110,8 @@ class ProposalController {
 
     private getProposalData(proposalId: string, cb: any) {
         var t = this;
+
+        t.$scope.pageUrl = t.$location.absUrl();
 
         // Get Proposal data
         this.$http({
@@ -225,7 +253,7 @@ class ProposalController {
         // TODO: verify that an ethereum account for the user has been configured.
         this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
             proposalContract => {
-                var options = {
+                var options: IWeb3TransactionOptions = {
                     // Still unclear how much gas should really be used. 250000 works at this point.
                     // If too low, it will be shown in the UX.
                     gas: 250000,
@@ -290,8 +318,7 @@ class ProposalController {
 
     }
 
-
-    create() {
+    processCreate() {
         // TODO: check for validity
         var t = this;
 
@@ -328,7 +355,7 @@ class ProposalController {
             console.log(error);
 
             // Show notification
-            if(error.error)
+            if (error.error)
                 t.$scope.errorMessage = error.error;
             else
                 t.$scope.errorMessage = error;

@@ -34,8 +34,21 @@ export class CategoryController {
             })
     }
 
+    getAllCategories = (req: express.Request, res: express.Response) => {
+        this.categoryService.getAllCategories()
+            .then(categories => {
+                res.json(categories);
+            }, err => {
+                res.status(500).json({
+                    "error": err,
+                    "error_location": "getting all categories"
+                });
+                return null;
+            })
+    }
+
+
     getOneMainCategory = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
         var mainCategoryName = req.params.mainCategory;
 
         this.categoryService.getOneMainCategory(mainCategoryName)

@@ -231,7 +231,7 @@ class BlockchainService {
         return this.accounts.get()["selected"];
     }
 
-    getProposalContract(address: string): PromiseLike<any> {
+    getProposalContract(address: string): PromiseLike<IProposalContract> {
         var t = this;
 
         var defer = t.$q.defer<any>();

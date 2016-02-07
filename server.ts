@@ -116,11 +116,11 @@ export class Server {
         this.db = mongoose.connect(this.config.database.url);
 
         // Client folder containing the Angular SPA, serve as static assets
-        var clientDir = path.join(__dirname, 'client')
+        var clientDir = path.join(__dirname, 'client');
         app.use(express.static(clientDir));
 
         // Static assets for other data
-        var categoryDir = path.join(__dirname, 'api/category/data')
+        var categoryDir = path.join(__dirname, 'api/category/data');
         app.use("/data/category", express.static(categoryDir));
 
         // All routes which are directly accessible (i.e. not only from within the Angular SPA).
