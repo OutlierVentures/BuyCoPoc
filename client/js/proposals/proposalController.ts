@@ -286,9 +286,9 @@ class ProposalController {
                             fromCard: t.$scope.fromCard
                         },
                         headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-                    }).success(function (resultData: any) {
+                    }).success(function (resultData: IProposalBacking) {
                         t.$scope.processMessage = undefined;
-                        t.$scope.transactionId = resultData.startPaymentTransactionId;
+                        t.$scope.transactionId = resultData.pledgePaymentTransactionId;
                         t.$scope.successMessage = "You successfully backed this proposal for " + t.$scope.amount +
                             " units of " + t.$scope.proposal.productName + "! Taking you back to the proposal...";
                         t.$timeout(() => {
@@ -343,9 +343,7 @@ class ProposalController {
                 t.$scope.successMessage = undefined;
 
                 // Redirect to the proposal view
-                // TODO: go to individual proposal once there is a view for it.
-                //t.$location.path("/proposal/" + resultData._id);
-                t.$location.path("/proposal/list");
+                t.$location.path("/proposal/" + resultData.contractAddress);
             });
         }).error(function (error) {
             t.$scope.processMessage = undefined;

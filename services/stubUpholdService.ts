@@ -1,5 +1,6 @@
 ﻿import upholdService = require('./upholdService');
 import userModel = require('../models/userModel');
+import tools = require('../lib/tools');
 
 export class StubUpholdService {
     constructor(
@@ -205,7 +206,7 @@ export class StubUpholdService {
         recipient: string,
         callback: upholdService.IUpholdTransactionCallback) => {
 
-        var newId = "tx" + Math.random() * 1000000;
+        var newId = tools.newGuid();
 
         var transaction: upholdService.IUpholdTransaction =
             {

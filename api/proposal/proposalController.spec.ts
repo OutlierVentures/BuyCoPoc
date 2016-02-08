@@ -95,6 +95,27 @@ describe("ProposalController", () => {
 
     });
 
+    it("should return a list of proposals in a category on GET /api/proposal/category/:main/:sub", function (done) {
+        this.timeout(10000);
+
+        request(theApp)
+            .get('/api/proposal/category/Electronics/Camera')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var list = <Array<proposalModel.IProposal>>res.body;
+                
+                // TODO: get a category that contains data from Mongo, then use that
+                // to have at least one result
+                assert.ok(list, "List is set");
+            })
+            .end(function (err, res) {
+                done(err);
+            });
+    });
+
+
+
     it("should create a proposal on POST /api/proposal", function (done) {
         this.timeout(200000);
 
@@ -104,7 +125,7 @@ describe("ProposalController", () => {
             "productSku": "SKU123",
             "productUnitSize": "1 unit",
             "category": "Electronics - Camera",
-            "maxPrice": 0.02,
+            "maxPrice": 0.10,
         };
 
         var newProposal: proposalModel.IProposal;
@@ -234,7 +255,7 @@ describe("ProposalController", () => {
                         "productName": "A testing product", "productDescription": "From the unit tests",
                         //"productSku": "SKU123",
                         "category": "Electronics - Camera",
-                        "maxPrice": 0.02,
+                        "maxPrice": 0.10,
                         "endDate": "2016-12-01",
                         "ultimateDeliveryDate": "2017-12-01",
                     })
@@ -288,5 +309,25 @@ describe("ProposalController", () => {
 
 
     });
+
+    it("should return a list of proposals ready to close GET /api/proposal/closing-candidates", function (done) {
+        this.timeout(10000);
+
+        request(theApp)
+            .get('/api/proposal/closing-candidates')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .expect(function (res) {
+                var list = <Array<proposalModel.IProposal>>res.body;
+                
+                // TODO: ensure there's a proposal ready to close, then use that
+                // to have at least one result
+                assert.ok(list, "List is set");
+            })
+            .end(function (err, res) {
+                done(err);
+            });
+    });
+
 
 });

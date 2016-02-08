@@ -29,6 +29,18 @@ export class ProposalController {
         // Only the maincategory and subcategory are in the URL part itself.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
+
+        var categoryString = req.query.category;
+
+        if (categoryString && categoryString.indexOf(" - ")) {
+            var parts = categoryString.split(" - ")
+            if (parts.length == 2) {
+                proposalFilter.mainCategory = parts[0];
+                proposalFilter.subCategory = parts[1];
+            }
+            (<any>proposalFilter).category = undefined;
+        }
+
         if (mainCategory) { proposalFilter.mainCategory = mainCategory; }
         if (subCategory) { proposalFilter.subCategory = subCategory; }
         
@@ -87,6 +99,8 @@ export class ProposalController {
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
         var proposalData = <IProposal>req.body;
+
+        // TODO: furter validation.
 
         // The category arrives as a string: [main] - [sub]
         // Example: "Electronics - Camera"
@@ -243,5 +257,34 @@ export class ProposalController {
                 return null;
             })
     }
+
+    getClosingCandidates = (req: express.Request, res: express.Response) => {
+        var token = req.headers["accesstoken"];
+        
+        // Create a proposal service and query it for proposals within the determined filter - if any.
+        serviceFactory.createCachedProposalService()
+            .then(
+            function (cps) {
+                return cps.getClosingCandidates();
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing proposals service"
+                });
+                return null;
+            })
+            .then(
+            function (proposals) {
+                res.json(proposals);
+            }, function (proposalsErr) {
+                res.status(500).json({
+                    "error": proposalsErr,
+                    "error_location": "getting proposals which are candidate for closing"
+                });
+                return null;
+            });
+    }
+
 
 }

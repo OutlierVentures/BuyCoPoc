@@ -9,7 +9,7 @@ import web3config = require('../contracts/web3config');
 import server = require('../../server');
 
 import proposalModel = require('../../models/proposalModel');
-import offerModel = require('../../offers/offerModel');
+import offerModel = require('../../models/offerModel');
 import userModel = require('../../models/userModel');
 import _ = require('underscore');
 
@@ -85,7 +85,9 @@ describe("OfferController", () => {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 proposalId = list[0].contractAddress;
                 maxPrice = list[0].maxPrice;
-                offerPrice = maxPrice - 0.01;
+                // Offer price is 1 cent below max price. Compute in cents to
+                // avoid floating point blues (i.e. the amount becoming 0.0900000000000000000000000000001something)
+                offerPrice = Math.round(maxPrice * 100 - 1) / 100;
             })
             .end(function (err, res) {
 
@@ -101,10 +103,10 @@ describe("OfferController", () => {
                         var newOffer = <offerModel.IOffer>res.body;
                 
                         // Assert stuff on the result
-                        assert.notEqual(newOffer.id, "0x", "New proposal has an ID");
-                        assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New proposal has an ID");                       
-                        assert.equal(newOffer.price, offerPrice, "New proposal has the correct price");
-                        assert.equal(newOffer.minimumAmount, 456, "New proposal has the correct minimum amount");
+                        assert.notEqual(newOffer.id, "0x", "New offer has an ID");
+                        assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");                       
+                        assert.equal(newOffer.price, offerPrice, "New offer has the correct price");
+                        assert.equal(newOffer.minimumAmount, 456, "New offer has the correct minimum amount");
 
                         // TODO: add test to GET ../offers for this proposal and ensure this one is included
                         // TODO: apply different ethereum accounts in the tests when available, to be 

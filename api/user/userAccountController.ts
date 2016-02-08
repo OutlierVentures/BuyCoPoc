@@ -7,6 +7,8 @@ import userModel = require('../../models/userModel');
 
 import {Promise} from 'q';
 
+var userRepo = new userModel.UserRepository();
+
 /**
  * Access information about the smart contracts
  */
@@ -16,7 +18,19 @@ export class UserAccountController {
     registryContract;
 
     constructor() {
-    }   
+    }
+
+
+    getUserInfo = (req: express.Request, res: express.Response) => {
+        var accessToken = req.header("AccessToken");
+
+        userRepo.getUserByAccessToken2(accessToken)
+            .then(u => res.json(u),
+            err => res.status(500).json({
+                "error": err,
+                "error_location": "getting user data"
+            }));
+    }
 
     getBlockchainAccounts = (req: express.Request, res: express.Response) => {
         var accessToken = req.header("AccessToken");

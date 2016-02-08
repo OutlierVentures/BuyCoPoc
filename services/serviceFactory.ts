@@ -5,7 +5,7 @@ import contractService = require('./contractService');
 
 import proposalService = require('./proposalService');
 import cachedProposalService = require('./cachedProposalService');
-import offerService = require('../offers/offerContractService');
+import offerService = require('../api/offer/offerContractService');
 import userAccountService = require('../api/user/userAccountService');
 
 import Q = require('q');

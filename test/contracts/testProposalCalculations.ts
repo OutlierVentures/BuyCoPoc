@@ -46,6 +46,65 @@ describe("ProposalRegistry calculation", () => {
             testRegistryName);
     });
 
+
+    it("should calculate correct payment amounts", function (done) {
+        // It can take quite a while til transactions are processed.
+        this.timeout(180000);
+
+        var name1 = "Ethiopia Adado Coop";
+        var price1 = 10299;
+        var amount1 = 15;
+
+        // Currently all transactions are sent from a single address. Hence the "backer" is
+        // also that address.
+        var backerAddress1 = web3.eth.coinbase;
+
+        var proposalContract: contractInterfaces.IProposalContract;
+
+        registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+            .then(web3plus.promiseCommital)
+            .then(function testGetMember(tx) {
+                var newProposalAddress = registryContract.proposals(1);
+
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc=> {
+                proposalContract = pc;
+
+                assert.equal(proposalContract.productName(), name1);
+                assert.equal(proposalContract.maxPrice().toNumber(), price1);
+
+                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                return backPromise;
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetBacker(tx) {
+                var newBacker = proposalContract.backers(1);
+
+                assert.equal(newBacker[0], backerAddress1);
+                assert.equal(newBacker[1].toNumber(), amount1);
+
+                // Pledge payment: 5% up front
+                assert.equal(proposalContract.pledgePaymentPercentage().toNumber(), 5);
+                var pledgePaymentAmount = Math.floor(price1 * amount1 * 0.05);
+
+                // The calculations in the contract on (u)ints always round downwards, so
+                // compare to Math.floor().
+                assert.equal(proposalContract.getPledgePaymentAmount(1).toNumber(), pledgePaymentAmount, "pledge payment amount is correct");
+
+                // Start payment: 45% up front
+                assert.equal(proposalContract.startPaymentPercentage().toNumber(), 45);
+                var startPaymentAmount = Math.floor(price1 * amount1 * 0.45);
+
+                assert.equal(proposalContract.getStartPaymentAmount(1).toNumber(), startPaymentAmount, "start payment amount is correct");
+
+                done();
+            })
+            .catch((reason) => {
+                done(reason);
+            });
+    });
+
     it("should calculate the total backed amount", function (done) {
         // It can take quite a while til transactions are processed.
         this.timeout(180000);
@@ -58,7 +117,7 @@ describe("ProposalRegistry calculation", () => {
         // also that address.
         var sellerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
         registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)

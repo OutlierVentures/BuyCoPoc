@@ -4,7 +4,7 @@ import userModel = require('../models/userModel');
 
 import { IProposal, Proposal, IProposalDocument, IProposalFilter } from '../models/proposalModel';
 import {IMainCategory, ISubCategory} from '../models/categoryModel';
-import offerModel = require('../offers/offerModel');
+import offerModel = require('../models/offerModel');
 
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
@@ -60,8 +60,12 @@ export class CachedProposalService {
         // Field names are contained as strings and hence not typesafe. Not sure 
         // if there is a way to access field names typesafe (something like query.maxPrice.lte(10))
         if (proposalFilter) {
+            if (proposalFilter.minPrice) {
+                // Sellers are interested in a higher price. Test "greater than or equal"
+                query = query.gte("maxPrice", proposalFilter.minPrice + 0);
+            }
             if (proposalFilter.maxPrice) {
-                // Queries with a set maxPrice are filtered with all items lesser than ('$lt' in Mongoose) instead of the default (exactly) equal.
+                // Buyers are interested in a lower price. Test "less than or equal"
                 query = query.lte("maxPrice", proposalFilter.maxPrice + 0);
             }
             if (proposalFilter.partNumber) {
@@ -78,6 +82,22 @@ export class CachedProposalService {
 
         return query.exec();
     }
+
+    /**
+     * Gets all proposals which are up for closing (enddate pased but not closed yet).
+     */
+    getClosingCandidates(): PromiseLike<IProposalDocument[]> {
+        // TODO: handle time zones (now all times are UTC)
+        var query = Proposal.find({
+            isClosed: false,
+            // COULD DO: add date as a parameter
+            endDate: { $lte: new Date() }
+        })
+
+        return query.exec();
+    }
+
+
 
     /**
      * Clear the proposals cache in Mongo.

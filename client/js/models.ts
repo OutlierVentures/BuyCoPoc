@@ -32,6 +32,14 @@ interface IBlockchainAccountCollection {
 }
 
 
+interface IUserPreferences {
+    /**
+     * Valid values: empty, "buyer", "seller"
+     */
+    perspective: string;
+}
+
+
 interface IUser extends IDocument {
     name: string;
     /**
@@ -53,6 +61,12 @@ interface IUser extends IDocument {
     //backings: [Backing];
 
     blockchainAccounts: IBlockchainAccountCollection;
+
+    buyerId: string;
+    sellerId: string;
+
+    preferences: IUserPreferences;
+
 }
 
 interface ICredentials {
@@ -110,7 +124,6 @@ interface IApplicationInfo {
 // Difference with server-side definition: property "id" contains the contract address,
 // while at the server side it's the Mongo ID.
 interface IProposal {
-    id: string;
     contractAddress: string;
     productName: string;
     productDescription: string;
@@ -121,13 +134,16 @@ interface IProposal {
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
+
+    isClosed?: boolean;
+
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
     totalAmount?: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
 }
-
 interface IProposalFilter {
     maxPrice?: number;
+    minPrice?: number;
     minimumTotalAmount?: number;
     partNumber?: string;
     mainCategory?: string;
@@ -181,6 +197,16 @@ interface IProposalBacking {
      * The amount of products this buyer is willing to purchase.
      */
     amount: number;
+
+    /**
+     * Transaction ID of the initial payment (at moment of backing).
+     */
+    pledgePaymentTransactionId: string;
+
+    /**
+     * Amount of initial payment.
+     */
+    pledgePaymentAmount: number;
 
     /**
      * Transaction ID of the initial payment (at moment of backing).

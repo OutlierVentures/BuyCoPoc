@@ -16,9 +16,17 @@
                                 The maximum price is <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
                             </p>
                             <p>
-                                <label>Payment conditions</label>
-                                The payment schedule for this BuyCo is... [TODO]
+                                <h3>Payment conditions</h3>
+                                The payment schedule for this BuyCo is:
                             </p>
+                            <p>
+                                <!-- TODO: fill numbers filled from the proposal-->
+                                <ul>
+                                    <li>50% of the maximum price on closing (GBP xx.xx per product, total amount GBP yy.yy at your minimum amount of N)</li>
+                                    <li>The remaining amount on after N% of the buyers have reported successful delivery</li>
+                                </ul>
+                            </p>
+
                             <form role="form" name="offerForm" novalidate>
                                 <div class="form-group">
                                     <label>Minimum amount</label>

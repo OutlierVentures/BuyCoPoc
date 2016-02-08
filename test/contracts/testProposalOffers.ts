@@ -58,7 +58,8 @@ describe("ProposalRegistry offers", () => {
         // also that address.
         var sellerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
+
 
         registryContract.addProposal(name1, "Electronics", "Camera", price1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)

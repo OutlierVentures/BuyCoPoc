@@ -1,26 +1,20 @@
-﻿interface ISellerSignUp {
-    seller: Seller;
+﻿interface IBuyerSignUp {
+    buyer: Buyer;
     signUp(): void;
 }
 
-enum DisplayMode {
-    Add = 0,
-    Read = 1,
-    Edit = 2
-};
-
 // Set the properties on scope that have a $watch
 // (not the other props, as we don't use $scope but controller-as syntax).
-interface ISellerSignupScope extends ng.IScope {
+interface IBuyerSignupScope extends ng.IScope {
     currentCountryCode: string;
     currentRegionCode: string;
     messageType: string;
 }
 
-class SellerSignupController implements ISellerSignUp {
+class BuyerSignupController implements IBuyerSignUp {
     displayMode: DisplayMode;
     displayModes: any;
-    seller: ISeller;
+    buyer: IBuyer;
     countries: ICountry[];
     currentCountry: ICountry;
     currentCountryCode: string;
@@ -32,7 +26,7 @@ class SellerSignupController implements ISellerSignUp {
     form: ng.IFormController;
     
     private messageType: MessageType;
-    private sellerResource: ISellerResourceClass;
+    private buyerResource: IBuyerResourceClass;
     private countryResource: ICountryResourceClass;
     private regionResource: IRegionResourceClass;
     private static defaultCountryCode: string = "GB";
@@ -47,7 +41,7 @@ class SellerSignupController implements ISellerSignUp {
     ];
 
     constructor(
-        private $scope: ISellerSignupScope,
+        private $scope: IBuyerSignupScope,
         private $rootScope: BuyCoRootScope,
         private $q: ng.IQService,
         private types: any,
@@ -57,7 +51,7 @@ class SellerSignupController implements ISellerSignUp {
         this.displayMode = DisplayMode.Add;
         this.displayModes = DisplayMode; 
         let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
-        this.sellerResource = this.dataAccessService.getSellerResource(creds);
+        this.buyerResource = this.dataAccessService.getBuyerResource(creds);
         this.countryResource = this.dataAccessService.getCountryResource();
         
         // Watch the currentCountryCode and then update current country if it is changed. 
@@ -88,7 +82,7 @@ class SellerSignupController implements ISellerSignUp {
            
         this.getCountries()
         .then(() => {
-            return this.getSeller();
+            return this.getBuyer();
         }).catch((err) => {
             return this.showMessage(err);
         });
@@ -144,29 +138,29 @@ class SellerSignupController implements ISellerSignUp {
         }
     }
     
-    getSeller() {
+    getBuyer() {
         return this.$q((resolve, reject) => {
             if (this.$rootScope.userInfo) {
-                this.sellerResource.get(
+                this.buyerResource.get(
                     { },
-                    (seller: ISeller) => {
-                        if (seller.userExternalId) {
-                            this.seller = seller;
+                    (buyer: IBuyer) => {
+                        if (buyer.userExternalId) {
+                            this.buyer = buyer;
                             this.loadCountryAndRegionDropdown();
                             this.displayMode = DisplayMode.Read;
                         } else {
-                            // User doesn't exist yet, initialize seller object with on user info
-                            // Set isActive to true, as the user will sign up as active seller if he saves the form.
-                            this.seller = new Seller(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
-                            this.seller.countryCode = SellerSignupController.defaultCountryCode;
+                            // User doesn't exist yet, initialize buyer object with on user info
+                            // Set isActive to true, as the user will sign up as active buyer if he saves the form.
+                            this.buyer = new Buyer(this.$rootScope.userInfo.externalId, this.$rootScope.userInfo.email, true);
+                            this.buyer.countryCode = BuyerSignupController.defaultCountryCode;
                             this.loadCountryAndRegionDropdown();
                             this.displayMode = DisplayMode.Add;
                         }
-                        resolve(this.seller);
+                        resolve(this.buyer);
                     },
                     (httpResponse: any) => {
                         console.log(httpResponse);
-                        let errorMessage = `Error getting seller: ${httpResponse}`;
+                        let errorMessage = `Error getting buyer: ${httpResponse}`;
                         // throw new Error(errorMessage);
                         reject(errorMessage);
                     }
@@ -215,23 +209,23 @@ class SellerSignupController implements ISellerSignUp {
             this.showMessage("Some missing or invalid fields.");
             return;
         };
-        if (!this.seller) {
+        if (!this.buyer) {
             this.showMessage("Error on save.");
             return;
         }
         // Assign selected country and region from dropdown to string field.
         this.saveCountryAndRegionString();
          
-        this.sellerResource.save(
-            this.seller,
+        this.buyerResource.save(
+            this.buyer,
             (data: any) => {
                 if (!this.$rootScope.userInfo.preferences) this.$rootScope.userInfo.preferences = <IUserPreferences>{};
 
-                this.$rootScope.userInfo.preferences.perspective = "seller";
-                this.$rootScope.userInfo.sellerId = "pending"; // For UX dependencies
+                this.$rootScope.userInfo.preferences.perspective = "buyer";            
+                this.$rootScope.userInfo.buyerId = "pending"; // For UX dependencies
                 // alert(`success: ${data}`);
-                this.seller = data.seller;
-                this.showMessage('Your seller data was saved successfully.', false);
+                this.buyer = data.buyer;
+                this.showMessage('Your buyer data was saved successfully', false);
                 this.displayMode = DisplayMode.Read;
             },
             (httpResponse) => {
@@ -255,23 +249,23 @@ class SellerSignupController implements ISellerSignUp {
     };
     
     private saveCountryAndRegionString() {
-        this.seller.country = this.currentCountry.name;
-        this.seller.countryCode = this.currentCountry.code;
+        this.buyer.country = this.currentCountry.name;
+        this.buyer.countryCode = this.currentCountry.code;
         // Save region if filled in.
         if (this.currentRegion) {
-            this.seller.region = this.currentRegion.name;
-            this.seller.regionCode = this.currentRegion.code;
+            this.buyer.region = this.currentRegion.name;
+            this.buyer.regionCode = this.currentRegion.code;
         }
     }
     
     private loadCountryAndRegionDropdown() {
-        this.setCurrentCountry(this.seller.countryCode);
+        this.setCurrentCountry(this.buyer.countryCode);
         this.getRegions().
         then((result) => {
-            this.setCurrentRegion(this.seller.regionCode);
+            this.setCurrentRegion(this.buyer.regionCode);
         });
     }
 }
 
 angular.module("buyCoApp")
-.controller("SellerSignupController", SellerSignupController);
+.controller("BuyerSignupController", BuyerSignupController);

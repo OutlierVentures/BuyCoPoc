@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="client\accounts-manager.html" />
+    <Content Include="client\js\buyers\buyer-signup.html" />
     <Content Include="client\js\categories\main-category-details.html" />
     <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
@@ -47,6 +48,7 @@
     <Content Include="client\less\app.less" />
     <Content Include="config.json" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\buyer\buyerController.ts" />
     <TypeScriptCompile Include="api\category\categoryService.ts" />
     <TypeScriptCompile Include="api\category\categoryController.spec.ts">
       <TestFramework>Mocha</TestFramework>
@@ -64,6 +66,10 @@
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer-resource.mock.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer-signup.controller.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer.service.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer.ts" />
     <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
     <TypeScriptCompile Include="client\js\common\contractInterfaces.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
@@ -73,15 +79,15 @@
     <TypeScriptCompile Include="client\js\common\underscore.service.ts" />
     <TypeScriptCompile Include="client\js\common\uri.service.ts" />
     <TypeScriptCompile Include="client\js\controllers.ts" />
-    <TypeScriptCompile Include="client\js\controllers\proposalController.ts" />
-    <TypeScriptCompile Include="client\js\controllers\proposalListController.ts" />
+    <TypeScriptCompile Include="client\js\proposals\proposalController.ts" />
+    <TypeScriptCompile Include="client\js\proposals\proposalListController.ts" />
     <TypeScriptCompile Include="client\js\LoginController.spec.ts" />
     <TypeScriptCompile Include="client\js\models.ts" />
     <TypeScriptCompile Include="client\js\offers\offer.controller.ts" />
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal-list.controller.ts" />
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal-resource.mock.ts" />
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal.service.ts" />
-    <TypeScriptCompile Include="client\js\sellers\configuration.service.ts" />
+    <TypeScriptCompile Include="client\js\common\configuration.service.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-resource.mock.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-signup.controller.ts" />
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
@@ -114,11 +120,12 @@
     <TypeScriptCompile Include="models\categoryModel.ts" />
     <TypeScriptCompile Include="models\proposalBackingModel.ts" />
     <TypeScriptCompile Include="models\proposalModel.ts" />
+    <TypeScriptCompile Include="models\buyerModel.ts" />
     <TypeScriptCompile Include="models\sellerModel.ts" />
     <TypeScriptCompile Include="models\userModel.ts" />
-    <TypeScriptCompile Include="offers\offerController.ts" />
-    <TypeScriptCompile Include="offers\offerContractService.ts" />
-    <TypeScriptCompile Include="offers\offerModel.ts" />
+    <TypeScriptCompile Include="api\offer\offerController.ts" />
+    <TypeScriptCompile Include="api\offer\offerContractService.ts" />
+    <TypeScriptCompile Include="models\offerModel.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="launcher.ts" />
     <TypeScriptCompile Include="routes\api.ts" />
@@ -350,12 +357,17 @@
     <TypeScriptCompile Include="services\configurationService.ts" />
     <TypeScriptCompile Include="services\cachedProposalService.ts" />
     <TypeScriptCompile Include="services\proposalService.spec.ts" />
-    <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
     <TypeScriptCompile Include="services\upholdService.ts" />
     <TypeScriptCompile Include="test\contracts\testProposalCalculations.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\testProposalPayouts.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\testProposalDeliveries.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\testProposalClose.ts">
@@ -417,6 +429,8 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
+    <Folder Include="api\delivery\" />
+    <Folder Include="api\buyer\" />
     <Folder Include="api\user\" />
     <Folder Include="api\seller\" />
     <Folder Include="api\configuration\" />
@@ -427,11 +441,11 @@
     <Folder Include="client\data\countries\" />
     <Folder Include="client\images\" />
     <Folder Include="client\js\" />
-    <Folder Include="client\js\controllers\" />
+    <Folder Include="client\js\buyers\" />
+    <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\common\" />
     <Folder Include="client\js\categories\" />
     <Folder Include="client\js\user\" />
-    <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\offers\" />
     <Folder Include="client\js\seller-proposals\" />
     <Folder Include="client\js\sellers\" />
@@ -452,7 +466,7 @@
     <Folder Include="contracts\" />
     <Folder Include="models\" />
     <Folder Include="api\" />
-    <Folder Include="offers\" />
+    <Folder Include="api\offer\" />
     <Folder Include="routes\" />
     <Folder Include="test\" />
     <Folder Include="test\contracts\" />

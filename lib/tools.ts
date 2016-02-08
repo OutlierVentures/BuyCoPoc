@@ -29,3 +29,23 @@ export function guidAddDashes(guid: string) {
         + "-" + guid.substring(16, 20)
         + "-" + guid.substring(20);
 }
+
+/**
+ * Generate a guid, by default with dashes (length 36). Pass skipDashes
+ * to get a guid without them (length 32).
+ * @param skipDashes
+ */
+export function newGuid(skipDashes?: boolean) {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+
+    var separator = "";
+    if (!skipDashes)
+        separator = '-';
+
+    return s4() + s4() + separator + s4() + separator + s4() + separator +
+        s4() + separator + s4() + s4() + s4();
+};

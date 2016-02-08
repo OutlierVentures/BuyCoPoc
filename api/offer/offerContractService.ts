@@ -1,14 +1,14 @@
 ﻿import request = require('request');
-import userModel = require('../models/userModel');
-import proposalModel = require('../models/proposalModel');
-import offerModel = require('./offerModel');
-import serviceFactory = require('../services/serviceFactory');
-import web3plus = require('../node_modules/web3plus/lib/web3plus');
-import tools = require('../lib/tools');
-import configurationService = require('../services/configurationService');
-import contractService = require('../services/contractService');
+import userModel = require('../../models/userModel');
+import proposalModel = require('../../models/proposalModel');
+import offerModel = require('../../models/offerModel');
+import serviceFactory = require('../../services/serviceFactory');
+import web3plus = require('../../node_modules/web3plus/lib/web3plus');
+import tools = require('../../lib/tools');
+import configurationService = require('../../services/configurationService');
+import contractService = require('../../services/contractService');
 
-import contractInterfaces = require('../contracts/contractInterfaces');
+import contractInterfaces = require('../../contracts/contractInterfaces');
 
 import Q = require('q');
 

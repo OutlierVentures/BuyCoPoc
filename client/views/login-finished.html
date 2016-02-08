@@ -1,12 +1,38 @@
-﻿<div class="container">
-    <div class="jumbotron" ng-hide="isGlobalAdmin">
-        <div class="container">
+﻿<div class="section-branded">
+    <div class="container">
+        <div class="jumbotron" ng-hide="isGlobalAdmin">
             <h4>Welcome</h4>
             <p>Hello {{userInfo.name}}, you have successfully logged in.</p>
 
-            <a class="btn btn-brand" href="/proposal/new">Create a new BuyCo to start saving</a>
-            <a class="btn btn-primary" href="/">See what's for sale</a>
-            <a class="btn btn-primary" href="/seller/signup">Sign up as a seller</a>
+            <h4>For buyers</h4>
+            <ul class="buttons">
+                <li>
+                    <a class="btn btn-primary" href="/proposal/new">Create a new BuyCo to start saving</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/"><i class="fa fa-th-large"></i>&nbsp;&nbsp;See what's for sale</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/buyer/signup">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;
+                        <span ng-hide="$root.userInfo.buyerId">Sign up as a buyer</span>
+                        <span ng-show="$root.userInfo.buyerId">My buyer data</span>
+                    </a>
+                </li>
+            </ul>
+            <h4>For sellers</h4>
+            <ul class="buttons">
+                <li>
+                    <a class="btn btn-primary" href="/seller-proposal/list">Find BuyCo's for your market</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/seller/signup">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;
+                        <span ng-hide="$root.userInfo.sellerId">Sign up as a seller</span>
+                        <span ng-show="$root.userInfo.sellerId">My seller data</span>
+                    </a>
+                </li>
+            </ul>
             <!-- <div class="row">
                 <div class="col-md-12">
                     <div class="btn-group" role="group" aria-label="Buing proposals">
@@ -25,25 +51,28 @@
             </div>-->
         </div>
     </div>
-    <div class="panel panel-default" ng-cloak ng-show="blockchainAccounts && !isGlobalAdmin">
-        <div class="panel-heading">
-            <h3>Your blockchain accounts</h3>
-        </div>
-        <div class="panel-body">
-            <div class="list-group">
-                <p href="#" ng-repeat="account in blockchainAccounts.accounts track by account.address" class="list-group-item">
-                    <code>{{account.address}}</code>
-                </p>
-            </div>
-
-        </div>
+</div>
+<div class="section-inverse" ng-cloak ng-show="blockchainAccounts && !isGlobalAdmin">
+    <div class="container">
+        <h4>Your blockchain accounts</h4>
     </div>
-    <div class="jumbotron" ng-show="isGlobalAdmin">
-        <div class="container">
-            <h5>Global Circle Vault</h5>
-            <p>Hello {{userInfo.name}},</p>
-            <p>You successfully logged in!</p>
-            <p>Your access token has been stored for the app to use. The app is now able to pay out loans on your behalf. You can now close this window.</p>
+    <ul class="nav nav-accounts">
+        <li ng-repeat="account in blockchainAccounts.accounts track by account.address" class="list-group-item">
+            <div class="container">
+                <a href="#"><code>{{account.address}}</code></a>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="page-wrapper ng-hide" ng-show="isGlobalAdmin">
+    <div class="container">
+        <div class="jumbotron">
+            <div class="container">
+                <h5>Global Circle Vault</h5>
+                <p>Hello {{userInfo.name}},</p>
+                <p>You successfully logged in!</p>
+                <p>Your access token has been stored for the app to use. The app is now able to pay out loans on your behalf. You can now close this window.</p>
+            </div>
         </div>
     </div>
 </div>

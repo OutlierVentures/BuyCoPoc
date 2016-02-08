@@ -4,7 +4,7 @@ import domain = require('domain');
 import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import proposalBackingModel = require('../models/proposalBackingModel');
-import offerModel = require('../offers/offerModel');
+import offerModel = require('../models/offerModel');
 import contractInterfaces = require('../contracts/contractInterfaces');
 
 import serviceFactory = require('../services/serviceFactory');
@@ -97,6 +97,7 @@ export class ProposalService {
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
                     getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
                     getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
+                    getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
 
                     Q.all(getProperties)
                         .then(function () {
@@ -180,7 +181,7 @@ export class ProposalService {
         var t = this;
 
         // Get the proposal contract
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
         var getBackerDetailsPromises = new Array<Q.Promise<proposalBackingModel.IProposalBacking>>();
 
         t.contractService.getProposalContractAt(proposalId)
@@ -229,26 +230,36 @@ export class ProposalService {
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
-                var startTx: string;
+                var pledgeTx: string;
                 if (backer[2] && backer[2].length == 32)
-                    startTx = tools.guidAddDashes(backer[2])
+                    pledgeTx = tools.guidAddDashes(backer[2])
+
+                var pledgePaymentAmount: number;
+                if (backer[3])
+                    pledgePaymentAmount = backer[3].toNumber();
+
+                var startTx: string;
+                if (backer[4] && backer[4].length == 32)
+                    startTx = tools.guidAddDashes(backer[4])
 
                 var startPaymentAmount: number;
-                if (backer[3])
-                    startPaymentAmount = backer[3].toNumber();
+                if (backer[5])
+                    startPaymentAmount = backer[5].toNumber();
 
                 var endTx: string;
-                if (backer[4] && backer[4].length == 32)
-                    endTx = tools.guidAddDashes(backer[4])
+                if (backer[6] && backer[6].length == 32)
+                    endTx = tools.guidAddDashes(backer[6])
 
                 var endPaymentAmount: number;
-                if (backer[5])
-                    endPaymentAmount = backer[5].toNumber();
+                if (backer[7])
+                    endPaymentAmount = backer[7].toNumber();
 
                 defer.resolve({
                     address: backerAddress,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
+                    pledgePaymentTransactionId: pledgeTx,
+                    pledgePaymentAmount: pledgePaymentAmount,
                     startPaymentTransactionId: startTx,
                     startPaymentAmount: startPaymentAmount,
                     endPaymentTransactionId: endTx,
@@ -380,6 +391,7 @@ export class ProposalService {
         var proposalContract: contractInterfaces.IProposalContract;
 
         var t = this;
+        var newBackerIndex: number;
 
         t.contractService.getProposalContractAt(p.contractAddress)
             .then(pr=> {
@@ -389,12 +401,13 @@ export class ProposalService {
             .then(function (tx) {
                 // Get the from address from the transaction. If it is our global account or the account
                 // of an individual user, both will be set here.
-                var backingAddress = tx.from;
+                var backingAddress: string = tx.from;
 
                 // Check whether the backer was actually added. Otherwise reject.
                 // WARNING: this way of getting the backing by index is not foolproof (like other
                 // places where this is done).
-                var backerFromContract = proposalContract.backers(proposalContract.backerIndex());
+                newBackerIndex = proposalContract.backerIndex().toNumber();
+                var backerFromContract = proposalContract.backers(newBackerIndex);
 
                 if (!(backerFromContract[0] == backingAddress && backerFromContract[1].toNumber() == amount)) {
                     defer.reject("Backing could not be added to contract.");
@@ -417,11 +430,8 @@ export class ProposalService {
                         // Do payment and store it
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
 
-                        // TODO: move percentage to contract payment terms
-                        var paymentPercentage = 0.5;
-
                         // Amounts are specified in cents, hence / 100.
-                        var paymentAmount = Math.round(amount * proposalContract.maxPrice().toNumber() * paymentPercentage) / 100;
+                        var paymentAmount = proposalContract.getPledgePaymentAmount(newBackerIndex).toNumber() / 100;
                         
                         // Create transaction
                         upholdService.createTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress,
@@ -440,12 +450,12 @@ export class ProposalService {
 
                                         // Store transaction with backing after it's finished
                                         // paymentType 1 = initial payment
-                                        proposalContract.setPaid(backingAddress, 1, tools.guidRemoveDashes(committedTransaction.id),
+                                        proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
                                             paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
                                                 // Test correct storage
-                                                var backing = proposalContract.backers(proposalContract.backerIndexByAddress(backingAddress));
+                                                var backing = proposalContract.backers(newBackerIndex);
                                                 if (!backing[2]) {
                                                     defer.reject("Error saving transaction ID");
                                                     return;
@@ -455,8 +465,10 @@ export class ProposalService {
                                                     address: backingAddress,
                                                     amount: amount,
                                                     userId: backingUser.id,
-                                                    startPaymentTransactionId: committedTransaction.id,
-                                                    startPaymentAmount: paymentAmount,
+                                                    pledgePaymentTransactionId: committedTransaction.id,
+                                                    pledgePaymentAmount: paymentAmount,
+                                                    startPaymentTransactionId: undefined,
+                                                    startPaymentAmount: undefined,
                                                     endPaymentTransactionId: undefined,
                                                     endPaymentAmount: undefined,
                                                 });

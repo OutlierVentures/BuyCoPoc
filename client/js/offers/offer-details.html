@@ -15,12 +15,42 @@
         </span><br><br>
     </div>
     <div class="panel panel-default">
+        <!-- TODO: show only to the winning offer -->
         <div class="panel-heading">
-            <h2>Seller</h2>
+            Accepted
         </div>
         <div class="panel-body">
-            <h3>{{seller.name}}</h3>
-            <p>{{seller.description}}</p>
+            <p>Congratulations, your offer has been accepted!</p>
+            <h4>Payment details</h4>
+            <div class="list-group">
+                <p class="list-group-item">
+                    <!-- TODO: fill correct tx IDs and amounts -->
+                    Start payment of GBP xxx.xx paid on 2016-01-15 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                </p>
+                <p class="list-group-item">
+                    <!-- TODO: fill correct tx IDs and amounts -->
+                    End payment of GBP xxx.xx paid on 2016-01-28 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                </p>
+            </div>
+            <h4>Buyer details</h4>
+            <!-- TODO: fill table below with buyer data -->
+            <p>Please use the following details for delivery of the goods.</p>
+            <table class="table table-striped">
+                <thead><tr><th>Name</th><th>Address</th><th>Product count</th><th>Total amount (GBP)</th></tr></thead>
+                <tbody>
+                    <tr><td>John Smith</td><td>High Street 48<br />Ipswich<br />Sussex<br />AB1 QR5<br />United Kingdom</td><td>45</td><td>487.98</td></tr>
+                    <tr><td>Pete McMahon</td><td>Some Street 10<br />London<br />Greater London<br />AB1 QR5<br />United Kingdom</td><td>2</td><td>12.05</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Seller data
+        </div>
+        <div class="panel-body">
+            <h4>{{seller.name}}</h4>
+            <p>{{seller.address}}</p>
         </div>
     </div>
 </div>

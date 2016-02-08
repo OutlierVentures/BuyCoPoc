@@ -14,6 +14,9 @@ export var proposalSchema = new mongoose.Schema({
     maxPrice: Number,
     endDate: Date,
     ultimateDeliveryDate: Date,
+
+    isClosed: Boolean,
+
     nrOfBackings: Number,
     nrOfBackers: Number,
     totalAmount: Number
@@ -30,6 +33,9 @@ export interface IProposal {
     maxPrice: number;
     endDate: Date;
     ultimateDeliveryDate: Date;
+
+    isClosed?: boolean;
+
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
     totalAmount?: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
@@ -40,6 +46,7 @@ export interface IProposalDocument extends mongoose.Document, IProposal {
 
 export interface IProposalFilter {
     maxPrice?: number;
+    minPrice?: number;
     minimumTotalAmount?: number;
     partNumber?: string;
     mainCategory?: string;
