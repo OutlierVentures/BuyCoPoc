@@ -3,10 +3,22 @@
         <div class="container">
             <h4>Welcome</h4>
             <p>Hello {{userInfo.name}}, you have successfully logged in.</p>
-
-            <a class="btn btn-brand" href="/proposal/new">Create a new BuyCo to start saving</a>
-            <a class="btn btn-primary" href="/">See what's for sale</a>
-            <a class="btn btn-primary" href="/seller/signup">Sign up as a seller</a>
+            <div class="btn-group" role="group" aria-label="Buying proposals">
+                <a class="btn btn-primary" href="/proposal/new" ng-show="$root.userInfo.buyerId">Create Proposal</a>
+                <a class="btn btn-primary" href="/" ng-show="$root.userInfo.buyerId">See what's for sale</a>
+                <a class="btn btn-primary" href="/buyer/signup">
+                    <span ng-hide="$root.userInfo.buyerId">Sign up as a buyer</span>
+                    <span ng-show="$root.userInfo.buyerId">My buyer data</span>
+                </a>
+            </div>
+            <br />
+            <br />
+            <div class="btn-group" role="group" aria-label="Buying proposals">
+                <a class="btn btn-primary" href="/seller/signup">
+                    <span ng-hide="$root.userInfo.sellerId">Sign up as a seller</span>
+                    <span ng-show="$root.userInfo.sellerId">My seller data</span>
+                </a>
+            </div>
             <!-- <div class="row">
                 <div class="col-md-12">
                     <div class="btn-group" role="group" aria-label="Buing proposals">
@@ -35,7 +47,6 @@
                     <code>{{account.address}}</code>
                 </p>
             </div>
-
         </div>
     </div>
     <div class="jumbotron" ng-show="isGlobalAdmin">

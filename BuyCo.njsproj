@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="client\accounts-manager.html" />
+    <Content Include="client\js\buyers\buyer-signup.html" />
     <Content Include="client\js\categories\main-category-details.html" />
     <Content Include="client\js\categories\category-list.html" />
     <Content Include="client\js\common\ov-message.html" />
@@ -47,6 +48,7 @@
     <Content Include="client\less\app.less" />
     <Content Include="config.json" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\buyer\buyerController.ts" />
     <TypeScriptCompile Include="api\category\categoryService.ts" />
     <TypeScriptCompile Include="api\category\categoryController.spec.ts">
       <TestFramework>Mocha</TestFramework>
@@ -64,6 +66,10 @@
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer-resource.mock.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer-signup.controller.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer.service.ts" />
+    <TypeScriptCompile Include="client\js\buyers\buyer.ts" />
     <TypeScriptCompile Include="client\js\categories\categoryController.ts" />
     <TypeScriptCompile Include="client\js\common\contractInterfaces.ts" />
     <TypeScriptCompile Include="client\js\common\ov-message.controller.ts" />
@@ -81,7 +87,7 @@
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal-list.controller.ts" />
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal-resource.mock.ts" />
     <TypeScriptCompile Include="client\js\seller-proposals\seller-proposal.service.ts" />
-    <TypeScriptCompile Include="client\js\sellers\configuration.service.ts" />
+    <TypeScriptCompile Include="client\js\common\configuration.service.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-resource.mock.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller-signup.controller.ts" />
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
@@ -351,7 +357,6 @@
     <TypeScriptCompile Include="services\configurationService.ts" />
     <TypeScriptCompile Include="services\cachedProposalService.ts" />
     <TypeScriptCompile Include="services\proposalService.spec.ts" />
-    <TypeScriptCompile Include="services\sellerService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
@@ -436,6 +441,7 @@
     <Folder Include="client\data\countries\" />
     <Folder Include="client\images\" />
     <Folder Include="client\js\" />
+    <Folder Include="client\js\buyers\" />
     <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\common\" />
     <Folder Include="client\js\categories\" />

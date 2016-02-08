@@ -6,6 +6,7 @@ import proposalController = require('../api/proposal/proposalController');
 import categoryController = require('../api/category/categoryController');
 import offerController = require('../api/offer/offerController');
 import sellerController = require('../api/seller/sellerController');
+import buyerController = require('../api/buyer/buyerController');
 import configController = require('../api/configuration/configurationController');
 import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
@@ -56,6 +57,11 @@ export function configure(app: express.Express) {
     var sc = new sellerController.SellerController();
     apiRouter.route("/seller/:id").get(sc.get);
     apiRouter.route("/seller/:id").post(sc.save);
+
+    // Buyers
+    var bc = new buyerController.BuyerController();
+    apiRouter.route("/buyer/:id").get(bc.get);
+    apiRouter.route("/buyer/:id").post(bc.save);
 
     // Config
     var cc = new configController.ConfigurationController();

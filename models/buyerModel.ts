@@ -19,8 +19,8 @@ export var buyerSchema = new mongoose.Schema({
     region: String,
     regionCode: String
 }, {
-    timestamps: true
-});
+        timestamps: true
+    });
 
 export interface IBuyer extends mongoose.Document { // , TODO inherit (extra) from BuyerModel instead of having body.
     _id: mongoose.Types.ObjectId;
@@ -73,14 +73,14 @@ export class BuyerRepository {
      */
     public find(cond: Object): q.Promise<IBuyer[]> {
         var result = q.Promise<IBuyer[]>(
-        (resolve: (buyers: IBuyer[]) => void, reject: (error: any) => void) => {
-            Buyer.find(cond, (err: any, results: IBuyer[]) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(results);
+            (resolve: (buyers: IBuyer[]) => void, reject: (error: any) => void) => {
+                Buyer.find(cond, (err: any, results: IBuyer[]) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(results);
+                });
             });
-        });
         return result;
     };
 
@@ -89,16 +89,16 @@ export class BuyerRepository {
      * For now just a simple one to one mapping with mongoose create function, but 'Promisied'.
      * @param buyer
      */
-    public create(newBuyer: IBuyer): q.Promise<IBuyer> { 
+    public create(newBuyer: IBuyer): q.Promise<IBuyer> {
         var result = q.Promise<IBuyer>(
-        (resolve: (resultBuyer: IBuyer) => void, reject: (error: any) => void) => {
-            Buyer.create(newBuyer, (err: any, resultBuyer: IBuyer) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(resultBuyer);
+            (resolve: (resultBuyer: IBuyer) => void, reject: (error: any) => void) => {
+                Buyer.create(newBuyer, (err: any, resultBuyer: IBuyer) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(resultBuyer);
+                });
             });
-        });
         return result;
     };
 
@@ -107,14 +107,18 @@ export class BuyerRepository {
      * @param buyer
      */
     public update(updatedBuyer: IBuyer): q.Promise<IBuyer> {
+        var t = this;
         var result = q.Promise<IBuyer>(
             (resolve: (resultBuyer: IBuyer) => void, reject: (error: any) => void) => {
 
-                Buyer.update({ userExternalId: updatedBuyer.userExternalId }, { $set: updatedBuyer}, (err: any, affectedRows: number, resultBuyer: IBuyer) => {
+                Buyer.update({ userExternalId: updatedBuyer.userExternalId }, { $set: updatedBuyer }, (err: any, affectedRows: number, resultBuyer: IBuyer) => {
                     if (err) {
                         reject(err);
                     }
-                    resolve(updatedBuyer);
+
+                    // Get the updated buyer document
+                    t.getBuyerByUserExternalId(updatedBuyer.userExternalId)
+                        .then(s => resolve(s), err => reject(err));
                 });
             });
         return result;
@@ -124,12 +128,12 @@ export class BuyerRepository {
         var result = q.Promise<IBuyer>(
             (resolve: (resultBuyer: IBuyer) => void, reject: (error: any) => void) => {
                 Buyer.findOneAndRemove({ userExternalId: externalId }, (err: any, result: IBuyer) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(result);
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
             });
-        });
         return result;
-    };       
+    };
 }

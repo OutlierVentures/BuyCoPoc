@@ -59,11 +59,11 @@
                 <div class="submenu" ng-cloak>
                     <div class="container">
                         <ul class="nav navbar-nav">
-                            <li data-match-route="/" ng-show="$root.userInfo.preferences.perspective=='buyer'">
+                            <li data-match-route="/" ng-show="!isLoggedIn || $root.userInfo.preferences.perspective=='buyer'">
                                 <a href="/">Product Categories</a>
                             </li>
                             <li data-match-route="/seller-proposals/list" ng-show="$root.userInfo.preferences.perspective=='seller'" >
-                                <a href="/seller-proposal/list">Requests for Quotes</a>
+                                <a href="/seller-proposal/list">Buying Proposals</a>
                             </li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
@@ -156,11 +156,16 @@
     <script src="js/controllers.js"></script>
     <script src="js/app.routes.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/buyers/buyer-signup.controller.js"></script>
     <script src="js/common/ov-message.controller.js"></script>
     <script src="js/offers/offer.controller.js"></script>
     <script src="js/seller-proposals/seller-proposal-list.controller.js"></script>
     <script src="js/sellers/seller-signup.controller.js"></script>
+    <script src="js/buyers/buyer-resource.mock.js"></script>
+    <script src="js/buyers/buyer.js"></script>
+    <script src="js/buyers/buyer.service.js"></script>
     <script src="js/categories/categoryController.js"></script>
+    <script src="js/common/configuration.service.js"></script>
     <script src="js/common/contractInterfaces.js"></script>
     <script src="js/common/dataAccess.service.js"></script>
     <script src="js/common/ov-message.directive.js"></script>
@@ -174,11 +179,9 @@
     <script src="js/proposals/proposalListController.js"></script>
     <script src="js/seller-proposals/seller-proposal-resource.mock.js"></script>
     <script src="js/seller-proposals/seller-proposal.service.js"></script>
-    <script src="js/sellers/configuration.service.js"></script>
     <script src="js/sellers/seller-resource.mock.js"></script>
     <script src="js/sellers/seller.js"></script>
     <script src="js/sellers/seller.service.js"></script>
-    <script src="js/sellers/userResourceMock.js"></script>
     <script src="js/user/blockchainService.js"></script>
     <script src="js/user/userAccountController.js"></script>
     <!-- endinjector -->

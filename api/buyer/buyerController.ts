@@ -1,16 +1,16 @@
 ﻿import express = require("express");
 import { IUser, User, UserRepository } from "../../models/userModel";
-import { ISeller, SellerRepository } from "../../models/sellerModel";
+import { IBuyer, BuyerRepository } from "../../models/buyerModel";
 import Q = require("q");
 
 var userRepo = new UserRepository();
-var sellerRepo = new SellerRepository();
+var buyerRepo = new BuyerRepository();
 
 /**
- * Controller for Sellers.
+ * Controller for Buyers.
  */
-// TODO BW dd. 2015-01-08: Perhaps all sellerModel stuff should only be called from separate sellerService, and this controller should only do the mapping of that service from and to request, resp. response.
-export class SellerController {
+// TODO BW dd. 2015-01-08: Perhaps all buyerModel stuff should only be called from separate buyerService, and this controller should only do the mapping of that service from and to request, resp. response.
+export class BuyerController {
     get = (req: express.Request, res: express.Response) => {
         let externalId = req.url.split("/").pop();
         let externalIdHeader = req.headers["externalid"];
@@ -29,10 +29,10 @@ export class SellerController {
             return res.status(401);
         };
         userRepo.getUserByAccessToken2(accessToken).then((user: IUser) => {
-            return sellerRepo.getSellerByUserExternalId(user.externalId);
-        }).then((seller: ISeller) => {
-            if (seller) {
-                return res.send(seller);
+            return buyerRepo.getBuyerByUserExternalId(user.externalId);
+        }).then((buyer: IBuyer) => {
+            if (buyer) {
+                return res.send(buyer);
             } else {
                 res.send({});
             }
@@ -46,14 +46,14 @@ export class SellerController {
 
         var userExternalId = req.body.userExternalId;
 
-        var saveSellerDefer = Q.defer<ISeller>();
+        var saveBuyerDefer = Q.defer<IBuyer>();
 
-        // Check if there's already a seller for the current user.
-        sellerRepo.getSellerByUserExternalId(userExternalId)
-            .then((sellerResult: ISeller) => {
-                var doesSellerExist: Boolean = !!sellerResult;
+        // Check if there's already a buyer for the current user.
+        buyerRepo.getBuyerByUserExternalId(userExternalId)
+            .then((buyerResult: IBuyer) => {
+                var doesBuyerExist: Boolean = !!buyerResult;
 
-                // Make SellerDocument from data from posted request/form.
+                // Make BuyerDocument from data from posted request/form.
                 // Note: using 'object literal' instead of constructor+ set props, because it refactors more easily).
                 var input = {
                     userExternalId: userExternalId,
@@ -73,31 +73,31 @@ export class SellerController {
                 };
 
                 // If already exists and no error then save, update otherwise.
-                if (doesSellerExist) {
-                    sellerRepo.update(input as ISeller)
-                        .then((seller: ISeller) => {
-                            saveSellerDefer.resolve(seller);
+                if (doesBuyerExist) {
+                    buyerRepo.update(input as IBuyer)
+                        .then((buyer: IBuyer) => {
+                            saveBuyerDefer.resolve(buyer);
                         }).catch((err: any) => {
-                            saveSellerDefer.reject(err);
+                            saveBuyerDefer.reject(err);
                         });
                 } else {
-                    // Seller doesn't exist yet.
-                    sellerRepo.create(input as ISeller)
-                        .then((sellerRes: ISeller) => {
-                            saveSellerDefer.resolve(sellerRes);
+                    // Buyer doesn't exist yet.
+                    buyerRepo.create(input as IBuyer)
+                        .then((buyerRes: IBuyer) => {
+                            saveBuyerDefer.resolve(buyerRes);
                         }).catch((err: any) => {
-                            saveSellerDefer.reject(err);
+                            saveBuyerDefer.reject(err);
                         });
                 }
             });
 
-        saveSellerDefer.promise.then(seller => {
+        saveBuyerDefer.promise.then(buyer => {
             // Save it with the user
             userRepo.getUserByExternalId(userExternalId)
                 .then(user => {
-                    user.sellerId = seller.id;
-                    // Currently any user with a seller account uses the seller perspective.
-                    user.preferences.perspective = "seller";
+                    user.buyerId = buyer.id;
+                    // Currently any user with a buyer account uses the buyer perspective.
+                    user.preferences.perspective = "buyer";
                     user.save((err, userRes) => {
                         if (err) {
                             res.status(500).json({
@@ -110,7 +110,7 @@ export class SellerController {
                         // Handle result.             
                         res.json({
                             "status": "Ok",
-                            "seller": seller
+                            "buyer": buyer
                         });
                     });
                 }, err => {
