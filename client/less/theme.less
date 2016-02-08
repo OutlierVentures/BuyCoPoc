@@ -49,6 +49,18 @@ body {
   font-weight: 200;
 }
 
+.product-title {
+    border-top: 1px solid #DDDDDD;
+    padding-top: 30px;
+    margin-top: 10px;
+
+    span {
+      color: @text-color;
+      line-height: 16px;
+      font-size: 12px;
+    }
+}
+
 // Tables =====================================================================
 
 th {
@@ -273,6 +285,13 @@ input[type="checkbox"],
   }
 }
 
+select {
+  padding-left: 20px;
+}
+select option:disabled {
+  color: @input-color-placeholder!important;
+}
+
 
 // Navs =======================================================================
 
@@ -292,10 +311,46 @@ input[type="checkbox"],
   }
 }
 
+.navbar-main {
+  .navbar-header {
+    float: left!important;
+  }
+  .navbar-collapse.collapse {
+    display: block!important;
+  }
+
+  .navbar-nav>li, .navbar-nav {
+    float: left !important;
+  }
+
+  .navbar-nav.navbar-right:last-child {
+    margin-right: -15px !important;
+  }
+
+  .navbar-right {
+    float: right!important;
+  }
+}
+
 .submenu {
   color: #fff;
+  border-color: transparent;
   background: url(../images/slider-pattern.png);
+  margin-bottom: 0px;
+  border-radius: 0;
+  @media (max-width: 768px) {
+    li>p.navbar-btn {
+        margin-right: 0!important; 
+        text-align: left;
+        margin-left: 20px;
+      }
+  }
+  .navbar-collapse,
+  .navbar-form {
+    border-color: transparent;
+  }
   .nav>li>a {
+    position: relative;
     color: #fff;
     border-bottom: 3px solid transparent;
     padding-left: 0;
@@ -304,18 +359,47 @@ input[type="checkbox"],
     &:hover,
     &:active,
     &:focus {
+      color: #fff;
       background-color: transparent;
-      border-bottom: 3px solid #fff;
+      @media (min-width: 769px) {
+        &:after {
+          display: block;
+          content: " ";
+          width: 100%;
+          background-color: #fff;
+          height: 3px;
+          position: absolute;
+          left: 0;
+          bottom: -4px;
+        }
+      }
+      @media (max-width: 768px) {
+        background-color: darken(@brand-primary, 10%);
+      }
     }
 
     @media (max-width: 768px) {
-      text-align: center;
+      text-align: left;
+      padding-left: 20px;
       margin-right: 0;
       &:hover,
       &:active,
       &:focus {
         border-bottom-color: transparent;
       }
+    }
+  }
+  .navbar-toggle {
+    /*margin-right: 0px;*/
+    background-color: darken(@brand-primary, 10%);
+    border-color: transparent;
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: darken(@brand-primary, 15%);
+    }
+    .icon-bar {
+      background-color: #fff;
     }
   }
 }
@@ -325,16 +409,201 @@ input[type="checkbox"],
 // Progress bars ==============================================================
 
 // Containers =================================================================
+.section-white {
+  background-color: #fff;
+  margin-top: -40px;
+  padding: 40px 0;
+  border-bottom: 1px solid @panel-default-border;
+  margin-bottom: 40px;
+}
+.timer {
+  font-weight: normal;
+  .timer-label {
+    font-size: 12px;
+    position: relative;
+    display: block;
+    bottom: 0;
+    /*width: 10%;*/
+  }
+  .timer-time {
+    display: inline-block;
+  }
+  .timer-break {
+    font-weight: 300;
+    vertical-align: top;
+    color: #c4cacc;
+  }
+}
+.jumbotron-product {
+  position: relative;
+  overflow: hidden;
+  border-radius: @border-radius-large;
+  .box-shadow(0px 10px 14px -9px rgba(0,0,0,0.42));
+  background-color: #fff;
+  margin-bottom: 48px;
+  border: 1px solid @panel-default-border;
+  
+  h2 {
+    margin-top: 15px;
+  }
+  .half {
+    /*display: inline-block;*/
+    float: left;
+  }
+  .half:first-child {
+    width: 60%;
+    padding: 60px 20px 60px 48px;
+  }
+  .half:last-child {
+    text-align: center;
+    color: #fff;
+    width: 40%;
+    padding: 60px 48px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #333;
+    .btn {
+      position: absolute;
+      bottom: 48px;
+      left: 0px;
+      right: 0px;
+      margin: 0 60px;
+      width: auto;
+      margin-top: 30px;
+    }
+    p {
+      color: #fff;
+      &.text-muted {
+        color: #868686;
+      }
+    }
+    .bgimage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.3;
+        min-width: 100%;
+        background-size: cover;
+      }
+  }
+  @media (max-width: 992px) {
+    .half {
+      width: 100%!important;
+      display: block;
+      position: relative!important;
+    }
+    .half:last-child {
+      .btn {
+        position: relative;
+        margin-left: 20px;
+        margin-right: 20px;
+        bottom: 0px;
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    .half {
+      padding: 20px!important;
+    }
+    .half:last-child {
+      .timer {
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      /*min-height: 300px;*/
+    }
+  }
+}
+.popover-wide {
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+}
+.timer {
+  position: relative;
+}
+.timer-label {
+  position: absolute;
+  font-size: @font-size-base;
+  bottom: -15px;
+}
+.container {
+  .jumbotron {
+    position: relative;
+    background-color: #fff!important;
+    .box-shadow(0px 10px 14px -9px rgba(0,0,0,0.42));
+    
+    .buttons {
+      padding-left: 0;
+      li {
+        display: inline-block;
+      }
+    }
+    @media (max-width: 768px) {
+      .buttons {
+        li {
+          display: block;
+          margin-bottom: 15px;
+        }
+      }
+    }
+
+    .timer {
+      p {
+        font-size: 16px;
+      }
+      font-size: 36px;
+    }
+    .half-unbranded {
+      width:60%;
+      float: left;
+    }
+    .half-branded {
+      overflow: hidden;
+      border-radius: 4px;
+      float: right;
+      width: 40%;
+      height: 100%;
+      /*margin-top: -48px;
+      margin-bottom: -48px;
+      margin-right: -60px;*/
+      color: #fff;
+      background: @brand-primary url("../images/slider-pattern.png");
+    }
+    /*&:before {
+      display: block;
+      content: " ";
+      position: absolute;
+      width: 100%;
+      height: 100px;
+      background: url("../images/slider-pattern.png");
+      top: 165px;
+      left: 0;
+      z-index: -1;
+    }*/
+  }
+}
+
+.section-branded {
+  background: url("../images/slider-pattern.png");
+}
 
 .page-wrapper {
   padding: 40px 0;
+
+  .section-branded {
+    margin-top: -40px;
+    padding: 40px 0;
+  }
 }
 
 .well {
   outline: none!important;
-  -webkit-box-shadow: none!important;
-  -moz-box-shadow:    none!important;
-  box-shadow:         none!important;
+  .box-shadow(none)!important;
 }
 
 .navbar {
@@ -355,11 +624,39 @@ input[type="checkbox"],
 .page-heading {
   margin-top: 0;
   padding-bottom: 20px;
-  /*border-bottom: 1px solid lighten(@gray-light, 7%);
-  margin-bottom: 30px;*/
+}
+
+.panel-heading {
+  h4 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  p {
+    margin-bottom: 0;
+  }
 }
 
 .panel {
+  hr {
+    margin-right: -48px;
+    margin-left: -48px;
+    border-color: @panel-default-border;
+    @media (max-width: 768px) {
+      margin-right: -15px;
+      margin-left: -15px;
+    }
+  }
+}
+@media (min-width: 769px) {
+  .panel-heading {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .panel-body {
+    padding: 30px;
+  }
+}
+.panel-body {
   overflow: hidden;
 }
 .panel-link:hover {
@@ -380,24 +677,14 @@ input[type="checkbox"],
 // Layout =====================================================================
 
 #app {
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
-  display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  .flex-display(flex);
 
   min-height: 100vh;
   
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
+ .flex-direction(column);
 }
 #wrapper {
-  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
-  -moz-box-flex: 1;         /* OLD - Firefox 19- */
-  -webkit-flex: 1;          /* Chrome */
-  -ms-flex: 1;              /* IE 10 */
-  flex: 1;                  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  .flex(1);
 }
 @media only screen and (max-width: 768px) {
     #wrapper {
@@ -418,7 +705,7 @@ input[type="checkbox"],
   -webkit-font-smoothing: antialiased;
   border-radius: 3px;
 
-  .transition(padding 0.2s ease-out);
+  .transition (padding 0.2s ease-out);
 
   span {
     position: absolute;
@@ -426,7 +713,7 @@ input[type="checkbox"],
     right: 0;
     opacity: 0;
     font-weight: 700;
-    .transition(opacity 0.2s ease-out);
+    .transition (opacity 0.2s ease-out);
   }
   span.abs {
     opacity: 1;
@@ -442,7 +729,7 @@ input[type="checkbox"],
     bottom: 0;
     opacity: 0.6;
     min-width: 100%;
-    .transition(opacity 0.2s ease-out);
+    .transition (opacity 0.2s ease-out);
   }
 
   &:hover,

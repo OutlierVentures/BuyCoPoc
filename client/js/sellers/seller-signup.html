@@ -1,94 +1,93 @@
-﻿<div class="panel panel-default">
-    <br /><br />
-    <div class="panel-heading">
-        <h3 class="panel-title">Seller data</h3>
-    </div>
-    <div class="panel-body">
-        <ov-message message="vm.message" message-type="vm.messageType">
-            <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
-                <div ng-message="required">Company name is required</div>
-            </div>
-            <div ng-messages="vm.form.email.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.email.$invalid && vm.form.email.$touched">
-                <div ng-message="required">Email name is invalid</div>
-            </div>
-            <div ng-messages="vm.form.country.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.country.$invalid && vm.form.country.$touched">
-                <div ng-message="required">Country is required</div>
-            </div>
-        </ov-message>
-        </div>
-        <form id="seller-signup" name="vm.form" class="form-horizontal" ng-submit="vm.signUp()" novalidate>
-            <div class="row">
-                <div class="col-md-6 col-sm-10">
-                    <div class="form-group" ng-class="{ 'has-error': vm.form.company.$invalid && vm.form.company.$touched}">
-                        <label for="company" class="col-sm-2 control-label">Company</label>
-                        <div class="col-sm-10">
-                            <span ng-if="vm.displayMode===vm.displayModes.read">{{ vm.seller.company }}</span>
-                            <input ng-if="vm.displayMode!==vm.displayModes.read" type="text" class="form-control" id="company" name="company" ng-model="vm.seller.company" required="required" />
+﻿<div class="container">
+    <h1 class="page-heading">Sign up as a seller</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <ov-message message="vm.message" message-type="vm.messageType">
+                <div ng-messages="vm.form.company.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.company.$invalid && vm.form.company.$touched">
+                    <div ng-message="required">Company name is required</div>
+                </div>
+                <div ng-messages="vm.form.email.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.email.$invalid && vm.form.email.$touched">
+                    <div ng-message="required">Email name is invalid</div>
+                </div>
+                <div ng-messages="vm.form.country.$error" class="help-block" role="alert" ng-cloak ng-show="vm.form.country.$invalid && vm.form.country.$touched">
+                    <div ng-message="required">Country is required</div>
+                </div>
+            </ov-message>
+            <form id="seller-signup" name="vm.form" class="form-horizontal" ng-submit="vm.signUp()" novalidate>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group" ng-class="{ 'has-error': vm.form.company.$invalid && vm.form.company.$touched}">
+                            <label for="company" class="col-sm-2 control-label">Company</label>
+                            <div class="col-sm-10">
+                                <span ng-if="vm.displayMode===vm.displayModes.read">{{ vm.seller.company }}</span>
+                                <input ng-if="vm.displayMode!==vm.displayModes.read" type="text" class="form-control" id="company" name="company" ng-model="vm.seller.company" required="required" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" ng-class="{ 'has-error': vm.form.email.$invalid && vm.form.email.$touched}">
-                        <label for="email" class="col-sm-2 control-label">Email</label>
-                        <div class="col-sm-10">
-                            <input type="email" class="form-control" id="email" name="email" ng-model="vm.seller.email" />
+                        <div class="form-group" ng-class="{ 'has-error': vm.form.email.$invalid && vm.form.email.$touched}">
+                            <label for="email" class="col-sm-2 control-label">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="email" name="email" ng-model="vm.seller.email" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="addressLine1" class="col-sm-2 control-label">Address line 1</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="addressLine1" ng-model="vm.seller.addressLine1" />
+                        <div class="form-group">
+                            <label for="addressLine1" class="col-sm-2 control-label">Address line 1</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="addressLine1" ng-model="vm.seller.addressLine1" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="addressLine2" class="col-sm-2 control-label">Address line 2</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="addressLine2" ng-model="vm.seller.addressLine2" />
+                        <div class="form-group">
+                            <label for="addressLine2" class="col-sm-2 control-label">Address line 2</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="addressLine2" ng-model="vm.seller.addressLine2" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="postalcode" class="col-sm-2 control-label">Postalcode</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="postalcode" ng-model="vm.seller.postalCode" />
+                        <div class="form-group">
+                            <label for="postalcode" class="col-sm-2 control-label">Postalcode</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="postalcode" ng-model="vm.seller.postalCode" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="city" class="col-sm-2 control-label">City</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="city" ng-model="vm.seller.city" />
+                        <div class="form-group">
+                            <label for="city" class="col-sm-2 control-label">City</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="city" ng-model="vm.seller.city" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" ng-class="{ 'has-error': vm.form.country.$invalid && vm.form.country.$touched}">
-                        <label for="country" class="col-sm-2 control-label">Country</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" id="country" name="country" ng-model="vm.currentCountryCode" required="required">
-                                <option value="">Select..</option>
-                                <option ng-repeat="country in vm.countries" value="{{ country.code }}">{{ country.name }}</option>
-                            </select>
+                        <div class="form-group" ng-class="{ 'has-error': vm.form.country.$invalid && vm.form.country.$touched}">
+                            <label for="country" class="col-sm-2 control-label">Country</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="country" name="country" ng-model="vm.currentCountryCode" required="required">
+                                    <option value="">Select..</option>
+                                    <option ng-repeat="country in vm.countries" value="{{ country.code }}">{{ country.name }}</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="telephone" class="col-sm-2 control-label">Telephone number</label>
-                        <div class="col-sm-10">
-                            <input type="tel" class="form-control" id="telephone" ng-model="vm.seller.telephone" />
+                        <div class="form-group">
+                            <label for="telephone" class="col-sm-2 control-label">Telephone number</label>
+                            <div class="col-sm-10">
+                                <input type="tel" class="form-control" id="telephone" ng-model="vm.seller.telephone" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="region" class="col-sm-2 control-label">Region</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" id="region" name="region" ng-model="vm.currentRegionCode">
-                                <option value="" ng-if="vm.currentCountryCode">Select..</option>
-                                <option value="" ng-if="!vm.currentCountryCode">Pick country first..</option>
-                                <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option>
-                            </select>
+                        <div class="form-group">
+                            <label for="region" class="col-sm-2 control-label">Region</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="region" name="region" ng-model="vm.currentRegionCode">
+                                    <option value="" ng-if="vm.currentCountryCode">Select..</option>
+                                    <option value="" ng-if="!vm.currentCountryCode">Pick country first..</option>
+                                    <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-2 control-label"></div>
-                        <div class="col-sm-10">
-                            <input type="submit" class="btn btn-default" value="Submit" />
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label"></div>
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-default" value="Submit" />
+                            </div>
                         </div>
                     </div>
                 </div>
+            </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>

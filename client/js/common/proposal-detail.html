@@ -1,8 +1,11 @@
 <div class="col-lg-4 col-md-6">
     <div class="panel panel-default">
-        <div class="panel-heading"><a href="/proposal/{{proposal.contractAddress}}"><h4>{{proposal.productName}}</h4></a></div>
+        <div class="panel-heading">
+        <p class="text-muted small" ng-show="proposal.mainCategory">{{proposal.mainCategory}} - {{proposal.subCategory}}</p>
+        <a href="/proposal/{{proposal.contractAddress}}">
+        <h4>{{proposal.productName}}</h4></a>
+        </div>
         <div class="panel-body">
-            <p ng-show="proposal.mainCategory"><strong>{{proposal.mainCategory}} - {{proposal.subCategory}}</strong></p>
             <span class="small" ng-show="proposal.productSku">
                 Part number: {{proposal.productSku}}<br>
             </span>
@@ -18,10 +21,36 @@
             <span class="small">
                 Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm'}}</span>
             </span><br>
-            <h1 class="large" ng-cloak ng-show="!proposal.isClosed && proposal.endDate"><timer max-time-unit="day" end-time="proposal.endDate">{{ddays}}:{{hhours}}:{{mminutes}}:{{sseconds}}</timer></h1>
+            <h1 class="timer" style="margin-top: 10px;">
+                <timer max-time-unit="day" end-time="proposal.endDate">
+                    <div class="timer-labels">
+                        <span class="timer-time">
+                        {{ddays}}
+                        <span class="timer-label text-muted">Days</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                        {{hhours}}
+                        <span class="timer-label text-muted">Hours</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                        {{mminutes}}
+                        <span class="timer-label text-muted">Minutes</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                        {{sseconds}}
+                        <span class="timer-label text-muted">Seconds</span>
+                        </span>
+                    </div>
+                </timer>
+            </h1>
             <!-- TODO: make these buttons appear according to view as a buyer or a seller -->
-            <a ng-show="$root.userInfo.preferences.perspective=='buyer'" class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
-            <a ng-show="$root.userInfo.preferences.perspective=='seller'" class="btn btn-primary btn-block" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>
+            <div class="btn-group btn-group-justified" role="group">
+              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
+              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>
+            </div>
         </div>
     </div>
 </div>
