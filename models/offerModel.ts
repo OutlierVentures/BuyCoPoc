@@ -7,4 +7,6 @@ export interface IOffer {
     price: number;
     minimumAmount: number;
     toCard: string;
+
+    sellerName: string;
 }

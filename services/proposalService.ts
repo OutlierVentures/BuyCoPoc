@@ -5,6 +5,7 @@ import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import proposalBackingModel = require('../models/proposalBackingModel');
 import offerModel = require('../models/offerModel');
+import sellerModel = require('../models/sellerModel');
 import contractInterfaces = require('../contracts/contractInterfaces');
 
 import serviceFactory = require('../services/serviceFactory');
@@ -15,12 +16,16 @@ import contractService = require('./contractService');
 
 import cachedProposalService = require('../services/cachedProposalService');
 
+import _ = require('underscore');
 import { Promise } from 'q';
 import Q = require('q');
 
 interface IBigNumber {
     toNumber(): number
 }
+
+var userRepo = new userModel.UserRepository();
+var sellerRepo = new sellerModel.SellerRepository();
 
 /**
  * Service for dealing with buying proposals on the blockchain. All functions
@@ -496,6 +501,8 @@ export class ProposalService {
 
         var proposalContract: contractInterfaces.IProposalContract;
 
+        var offers: Array<offerModel.IOffer>;
+
         // Load the proposal contract
         t.contractService.getProposalContractAt(proposalId)
             .then(pc=> {
@@ -506,10 +513,35 @@ export class ProposalService {
                 return os.getAll(proposalContract);
             },
             createServiceError => { defer.reject(createServiceError); return null; })
-            .then(offers => {
+            .then(off => {
+                offers = off;
+
+                // Load seller data for these offers
+                var allSellerAddresses = _(offers).map(o => {
+                    return o.sellerAddress;
+                });
+
+                return userModel.User
+                    .find({ "blockchainAccounts.accounts.address": { "$in": allSellerAddresses } })
+                    .populate({ path: "sellerId" }).exec();
+            }, offersErr => { defer.reject(offersErr); return null; })
+            .then(usersWithSellers=> {
+                // Match the seller name with the offer.
+                // There must be a far more efficient and concise way to do this with mongo and/or underscore.
+                for (var k in offers) {
+                    var o = offers[k];
+                    var theSeller = _(usersWithSellers).find(us=> {
+                        if (!us.blockchainAccounts) return false;
+                        if (!us.blockchainAccounts.accounts) return false;
+                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.sellerAddress);
+                    });
+
+                    if (theSeller) o.sellerName = theSeller.name;
+                    else o.sellerName = "Undisclosed seller";
+                }
+
                 defer.resolve(offers);
-            },
-            offersErr => { defer.reject(offersErr); return null; });
+            }, err=> { defer.reject(err); return null; });
         ;
 
         return defer.promise;
