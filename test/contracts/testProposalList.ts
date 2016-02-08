@@ -268,7 +268,7 @@ describe("ProposalRegistry list", () => {
                     }
 
                     // Keep using contractDefinition.at() here because we're testing the contract libraries.
-                    proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal) {
+                    proposalContractDefinition.at(proposalAddress, function (propContrErr, proposal: contractInterfaces.IProposalContract) {
                         // Surprisingly, the proposals are processed / almost / synchronously.
                         // These console.logs appear about every 2 seconds and the whole thing 
                         // takes almost 6. 
@@ -287,8 +287,11 @@ describe("ProposalRegistry list", () => {
                             mainCategory: proposal.mainCategory(),
                             subCategory: proposal.subCategory(),
                             maxPrice: proposal.maxPrice().toNumber(),
-                            endDate: proposal.endDate(),
-                            ultimateDeliveryDate: proposal.ultimateDeliveryDate(),
+                            endDate: new Date(proposal.endDate()),
+                            ultimateDeliveryDate: new Date(proposal.ultimateDeliveryDate()),
+                            pledgePaymentPercentage: proposal.pledgePaymentPercentage().toNumber(),
+                            startPaymentPercentage: proposal.startPaymentPercentage().toNumber(),
+                            minimumReportedCorrectDeliveryPercentage: proposal.minimumReportedCorrectDeliveryPercentage().toNumber(),
                         };
 
                         //var p: proposalModel.IProposal = {
@@ -359,7 +362,7 @@ describe("ProposalRegistry list", () => {
 
 
             console.log("Before loading contract:" + Date.now());
-            var proposal = proposalContractDefinition.at(proposalAddress);
+            var proposal: contractInterfaces.IProposalContract = proposalContractDefinition.at(proposalAddress);
             console.log("After loading contract:" + Date.now());
 
             const p: proposalModel.IProposal = {
@@ -371,8 +374,11 @@ describe("ProposalRegistry list", () => {
                 mainCategory: proposal.mainCategory(),
                 subCategory: proposal.subCategory(),
                 maxPrice: proposal.maxPrice().toNumber(),
-                endDate: proposal.endDate(),
-                ultimateDeliveryDate: proposal.ultimateDeliveryDate()
+                endDate: new Date(proposal.endDate()),
+                ultimateDeliveryDate: new Date(proposal.ultimateDeliveryDate()),
+                pledgePaymentPercentage: proposal.pledgePaymentPercentage().toNumber(),
+                startPaymentPercentage: proposal.startPaymentPercentage().toNumber(),
+                minimumReportedCorrectDeliveryPercentage: proposal.minimumReportedCorrectDeliveryPercentage().toNumber(),
             };
 
             //var p: proposalModel.IProposal = {

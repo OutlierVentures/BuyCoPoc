@@ -21,6 +21,37 @@ export class OfferController {
     constructor() {
     }
 
+    getOne = (req: express.Request, res: express.Response) => {
+        //var token = req.header("AccessToken");
+
+        // TODO: add permission checks. Offer detail data shouldn't be public.
+
+        var offerId = req.params.id;
+
+        serviceFactory.createOfferContractService()
+            .then(
+            function (ocs) {
+                return ocs.getOne(offerId);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing offer service"
+                });
+                return null;
+            })
+            .then(
+            function (proposal) {
+                res.json(proposal);
+            }, function (createErr) {
+                res.status(500).json({
+                    "error": createErr,
+                    "error_location": "getting offer"
+                });
+                return null;
+            });
+    }
+
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
         var proposalId = req.params.id;
@@ -34,7 +65,7 @@ export class OfferController {
             function (initErr) {
                 res.status(500).json({
                     "error": initErr,
-                    "error_location": "initializing proposal service"
+                    "error_location": "initializing offer service"
                 });
                 return null;
             })

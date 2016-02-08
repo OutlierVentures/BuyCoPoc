@@ -20,10 +20,9 @@
                                 The payment schedule for this BuyCo is:
                             </p>
                             <p>
-                                <!-- TODO: fill numbers filled from the proposal-->
                                 <ul>
-                                    <li>5% on registration (GBP xx.xx per product)</li>
-                                    <li>45% on closing (GBP xx.xx per product)</li>
+                                    <li>{{proposal.pledgePaymentPercentage}}% on registration (GBP {{proposal.pledgePaymentPerProduct | number: 2}} per product)</li>
+                                    <li>{{proposal.startPaymentPercentage}}% on closing a deal with a seller (GBP {{proposal.startPaymentPerProduct | number: 2}} per product)</li>
                                     <li>The rest of the amount on delivery</li>
                                 </ul>
                             </p>

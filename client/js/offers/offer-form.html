@@ -20,10 +20,9 @@
                                 The payment schedule for this BuyCo is:
                             </p>
                             <p>
-                                <!-- TODO: fill numbers filled from the proposal-->
                                 <ul>
-                                    <li>50% of the maximum price on closing (GBP xx.xx per product, total amount GBP yy.yy at your minimum amount of N)</li>
-                                    <li>The remaining amount on after N% of the buyers have reported successful delivery</li>
+                                    <li>{{proposal.startPayoutPercentage}}% of the maximum price on closing (GBP {{proposal.startPayoutPerProduct}} per product)</li>
+                                    <li>The remaining amount after {{proposal.minimumReportedCorrectDeliveryPercentage}}% of the buyers have reported successful delivery</li>
                                 </ul>
                             </p>
 

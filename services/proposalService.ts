@@ -104,6 +104,10 @@ export class ProposalService {
                     getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
                     getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
 
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.minimumReportedCorrectDeliveryPercentage)().then(function (rp) { p.minimumReportedCorrectDeliveryPercentage = rp.toNumber(); }));
+
                     Q.all(getProperties)
                         .then(function () {
                             d.resolve(p);
@@ -261,6 +265,7 @@ export class ProposalService {
 
                 defer.resolve({
                     address: backerAddress,
+                    backerIndex: index,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
                     pledgePaymentTransactionId: pledgeTx,
@@ -466,8 +471,10 @@ export class ProposalService {
                                                     return;
                                                 }
 
+                                                // TODO: convert to "backing to IProposalBacking" function
                                                 defer.resolve({
                                                     address: backingAddress,
+                                                    backerIndex: newBackerIndex,
                                                     amount: amount,
                                                     userId: backingUser.id,
                                                     pledgePaymentTransactionId: committedTransaction.id,

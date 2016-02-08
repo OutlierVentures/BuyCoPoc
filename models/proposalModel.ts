@@ -19,7 +19,11 @@ export var proposalSchema = new mongoose.Schema({
 
     nrOfBackings: Number,
     nrOfBackers: Number,
-    totalAmount: Number
+    totalAmount: Number,
+
+    pledgePaymentPercentage: Number,
+    startPaymentPercentage: Number,
+    minimumReportedCorrectDeliveryPercentage: Number,
 });
 
 export interface IProposal {
@@ -39,6 +43,10 @@ export interface IProposal {
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
     totalAmount?: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
+
+    pledgePaymentPercentage: number;
+    startPaymentPercentage: number;
+    minimumReportedCorrectDeliveryPercentage: number;
 }
 
 export interface IProposalDocument extends mongoose.Document, IProposal {

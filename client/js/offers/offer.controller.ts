@@ -6,6 +6,8 @@
     offer: IOffer;
     toCard: string;
 
+    seller: ISeller;
+
     processMessage: string;
     errorMessage: string;
     successMessage: string;
@@ -79,6 +81,30 @@ class OfferController {
         });
     }
 
+    private getOfferData(offerId: string, cb: any) {
+        var t = this;
+
+        // Get Proposal data
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/offer/' + offerId,
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: IOffer) {
+            t.$scope.offer = resultData;            
+
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            console.log("Error loading offer data:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error.error;
+
+            cb("Error getting offer data", null);
+        });
+    }
+
     private getProposalData(proposalId: string, cb: any) {
         var t = this;
 
@@ -89,6 +115,11 @@ class OfferController {
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: IProposal) {
             t.$scope.proposal = resultData;
+
+            var anyP = <any>t.$scope.proposal;
+            var startPayoutPerc = resultData.pledgePaymentPercentage + resultData.startPaymentPercentage;
+            anyP.startPayoutPercentage = startPayoutPerc;
+            anyP.startPayoutPerProduct = startPayoutPerc / 100 * resultData.maxPrice;            
 
             cb(null, resultData);
         }).error(function (error) {
@@ -105,9 +136,10 @@ class OfferController {
 
     view(offerId: string, proposalId: string) {
         var t = this;
-
-        // TODO: get offer data
-
+        
+        t.getOfferData(offerId, function (err, res) {
+            // The getter already sets scope variables. Nothing to do here.
+        });
 
         t.getProposalData(proposalId, function (err, res) {
             // The getter already sets scope variables. Nothing to do here.
