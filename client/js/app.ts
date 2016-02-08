@@ -39,3 +39,9 @@ angular.module("buyCoApp").run(['$rootScope', function ($rootScope: BuyCoRootSco
 function angularGetService(serviceName: string) {
     return angular.element(document.querySelector('.ng-scope')).injector().get(serviceName);
 }
+
+angular.module("buyCoApp").filter('spaceless', function () {
+  return function (input) {
+      return input.replace(/ /g, '%20');
+  };
+});
