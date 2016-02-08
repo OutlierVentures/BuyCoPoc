@@ -25,7 +25,7 @@ angular.module("buyCoApp").run(['$rootScope', function ($rootScope: BuyCoRootSco
     /**
      * Returns whether this is a public page.
      */
-    $rootScope.isPublicPage = function() {
+    $rootScope.isPublicPage = function () {
         // Don't know how to get access to Angular items here. Inject for $location
         // doesn't work.
         // Hence just access window.location directly.
@@ -41,7 +41,8 @@ function angularGetService(serviceName: string) {
 }
 
 angular.module("buyCoApp").filter('spaceless', function () {
-  return function (input) {
-      return input.replace(/ /g, '%20');
-  };
+    return function (input) {
+        if (!input) return input;
+        return input.replace(/ /g, '%20');
+    };
 });

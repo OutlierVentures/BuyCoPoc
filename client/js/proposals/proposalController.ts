@@ -121,6 +121,13 @@ class ProposalController {
         }).success(function (resultData: IProposal) {
             t.$scope.proposal = resultData;
 
+            // Enhance the proposal data
+            var anyP = <any>t.$scope.proposal;
+
+            // TODO: move these server side
+            anyP.pledgePaymentPerProduct = Math.min(resultData.pledgePaymentPercentage / 100 * resultData.maxPrice, 0.01);
+            anyP.startPaymentPerProduct = Math.min(resultData.startPaymentPercentage / 100 * resultData.maxPrice, 0.01);
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error

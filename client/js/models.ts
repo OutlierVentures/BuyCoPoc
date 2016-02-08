@@ -140,7 +140,12 @@ interface IProposal {
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
     totalAmount?: number;  // Amount of each backer summed up for all backers (e.g. can never be smaller than nrOfBackers)
+
+    pledgePaymentPercentage: number;
+    startPaymentPercentage: number;
+    minimumReportedCorrectDeliveryPercentage: number;
 }
+
 interface IProposalFilter {
     maxPrice?: number;
     minPrice?: number;
@@ -194,6 +199,11 @@ interface IProposalBacking {
     address: string;
 
     /**
+     * Backer index within the proposal.
+     */
+    backerIndex: number;
+
+    /**
      * The amount of products this buyer is willing to purchase.
      */
     amount: number;
@@ -239,6 +249,8 @@ interface IOffer {
     price: number;
     minimumAmount: number;
     toCard: string;
+
+    sellerName: string;
 }
 
 

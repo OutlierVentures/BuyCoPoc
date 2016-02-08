@@ -28,6 +28,11 @@ export interface IProposalBacking {
     address: string;
 
     /**
+     * Backer index within the proposal.
+     */
+    backerIndex: number;
+
+    /**
      * The amount of products this buyer is willing to purchase.
      */
     amount: number;

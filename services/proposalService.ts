@@ -5,6 +5,7 @@ import userModel = require('../models/userModel');
 import proposalModel = require('../models/proposalModel');
 import proposalBackingModel = require('../models/proposalBackingModel');
 import offerModel = require('../models/offerModel');
+import sellerModel = require('../models/sellerModel');
 import contractInterfaces = require('../contracts/contractInterfaces');
 
 import serviceFactory = require('../services/serviceFactory');
@@ -15,12 +16,16 @@ import contractService = require('./contractService');
 
 import cachedProposalService = require('../services/cachedProposalService');
 
+import _ = require('underscore');
 import { Promise } from 'q';
 import Q = require('q');
 
 interface IBigNumber {
     toNumber(): number
 }
+
+var userRepo = new userModel.UserRepository();
+var sellerRepo = new sellerModel.SellerRepository();
 
 /**
  * Service for dealing with buying proposals on the blockchain. All functions
@@ -98,6 +103,10 @@ export class ProposalService {
                     getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
                     getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
                     getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
+
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
+                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.minimumReportedCorrectDeliveryPercentage)().then(function (rp) { p.minimumReportedCorrectDeliveryPercentage = rp.toNumber(); }));
 
                     Q.all(getProperties)
                         .then(function () {
@@ -256,6 +265,7 @@ export class ProposalService {
 
                 defer.resolve({
                     address: backerAddress,
+                    backerIndex: index,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
                     pledgePaymentTransactionId: pledgeTx,
@@ -461,8 +471,10 @@ export class ProposalService {
                                                     return;
                                                 }
 
+                                                // TODO: convert to "backing to IProposalBacking" function
                                                 defer.resolve({
                                                     address: backingAddress,
+                                                    backerIndex: newBackerIndex,
                                                     amount: amount,
                                                     userId: backingUser.id,
                                                     pledgePaymentTransactionId: committedTransaction.id,
@@ -496,6 +508,8 @@ export class ProposalService {
 
         var proposalContract: contractInterfaces.IProposalContract;
 
+        var offers: Array<offerModel.IOffer>;
+
         // Load the proposal contract
         t.contractService.getProposalContractAt(proposalId)
             .then(pc=> {
@@ -506,10 +520,35 @@ export class ProposalService {
                 return os.getAll(proposalContract);
             },
             createServiceError => { defer.reject(createServiceError); return null; })
-            .then(offers => {
+            .then(off => {
+                offers = off;
+
+                // Load seller data for these offers
+                var allSellerAddresses = _(offers).map(o => {
+                    return o.sellerAddress;
+                });
+
+                return userModel.User
+                    .find({ "blockchainAccounts.accounts.address": { "$in": allSellerAddresses } })
+                    .populate({ path: "sellerId" }).exec();
+            }, offersErr => { defer.reject(offersErr); return null; })
+            .then(usersWithSellers=> {
+                // Match the seller name with the offer.
+                // There must be a far more efficient and concise way to do this with mongo and/or underscore.
+                for (var k in offers) {
+                    var o = offers[k];
+                    var theSeller = _(usersWithSellers).find(us=> {
+                        if (!us.blockchainAccounts) return false;
+                        if (!us.blockchainAccounts.accounts) return false;
+                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.sellerAddress);
+                    });
+
+                    if (theSeller) o.sellerName = theSeller.name;
+                    else o.sellerName = "Undisclosed seller";
+                }
+
                 defer.resolve(offers);
-            },
-            offersErr => { defer.reject(offersErr); return null; });
+            }, err=> { defer.reject(err); return null; });
         ;
 
         return defer.promise;

@@ -81,7 +81,7 @@
         </div>
         <div class="panel-body" ng-show="backers.length > 0">
             <div class="list-group">
-                <p href="#" ng-repeat="backer in backers track by backer.address" class="list-group-item">
+                <p href="#" ng-repeat="backer in backers track by backer.backerIndex" class="list-group-item">
                     Address <code>{{backer.address}}</code><span ng-show="backer.startPaymentTransactionId"> (<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see initial payment</a>)</span>:
                     <span class="pull-right text-muted">{{backer.amount}} unit(s)</span>
                     <!-- TODO: only display this when delivery has been reported (now included as demo) -->
@@ -107,7 +107,7 @@
             <div class="list-group">
                 <p href="#" ng-repeat="offer in offers track by offer.id" class="list-group-item">
                     <!-- TODO: fill in real seller name -->
-                    Johnson &amp; Co (<code>{{offer.sellerAddress}}</code>) offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
+                    {{offer.sellerName}} (<code>{{offer.sellerAddress}}</code>) offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
                     <span class="small"><strong>this is the accepted offer</strong></span>
                     <a href="/proposal/{{proposal.contractAddress}}/offer/{{offer.id}}" class="btn btn-primary">
                         See the offer

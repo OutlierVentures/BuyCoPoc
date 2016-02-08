@@ -153,7 +153,7 @@ export class OfferContractService {
     }
 
     /**
-     * Create a new proposal in the blockchain.
+     * Create a new offer for a proposal in the blockchain.
      * @param proposalId proposal to add the offer to
      * @param o the new offer
      * @return The IProposal with the property "id" set to the contract address.

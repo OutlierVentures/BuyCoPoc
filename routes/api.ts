@@ -52,6 +52,7 @@ export function configure(app: express.Express) {
     // Offers
     var oc = new offerController.OfferController();
     apiRouter.route("/proposal/:id/offer").post(oc.create);
+    apiRouter.route("/offer/:id").get(oc.getOne);
 
     // Sellers
     var sc = new sellerController.SellerController();
