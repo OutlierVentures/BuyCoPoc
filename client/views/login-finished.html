@@ -3,7 +3,8 @@
         <div class="jumbotron" ng-hide="isGlobalAdmin">
             <h4>Welcome</h4>
             <p>Hello {{userInfo.name}}, you have successfully logged in.</p>
-    
+
+            <h4>For buyers</h4>
             <ul class="buttons">
                 <li>
                     <a class="btn btn-primary" href="/proposal/new">Create a new BuyCo to start saving</a>
@@ -12,7 +13,24 @@
                     <a class="btn btn-link" href="/"><i class="fa fa-th-large"></i>&nbsp;&nbsp;See what's for sale</a>
                 </li>
                 <li>
-                    <a class="btn btn-link" href="/seller/signup"><i class="fa fa-user"></i>&nbsp;&nbsp;Sign up as a seller</a>
+                    <a class="btn btn-link" href="/buyer/signup">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;
+                        <span ng-hide="$root.userInfo.buyerId">Sign up as a buyer</span>
+                        <span ng-show="$root.userInfo.buyerId">My buyer data</span>
+                    </a>
+                </li>
+            </ul>
+            <h4>For sellers</h4>
+            <ul class="buttons">
+                <li>
+                    <a class="btn btn-primary" href="/seller-proposal/list">Find BuyCo's for your market</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/seller/signup">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;
+                        <span ng-hide="$root.userInfo.sellerId">Sign up as a seller</span>
+                        <span ng-show="$root.userInfo.sellerId">My seller data</span>
+                    </a>
                 </li>
             </ul>
             <!-- <div class="row">
@@ -46,7 +64,6 @@
         </li>
     </ul>
 </div>
-
 <div class="page-wrapper ng-hide" ng-show="isGlobalAdmin">
     <div class="container">
         <div class="jumbotron">

@@ -29,6 +29,18 @@ export class ProposalController {
         // Only the maincategory and subcategory are in the URL part itself.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
+
+        var categoryString = req.query.category;
+
+        if (categoryString && categoryString.indexOf(" - ")) {
+            var parts = categoryString.split(" - ")
+            if (parts.length == 2) {
+                proposalFilter.mainCategory = parts[0];
+                proposalFilter.subCategory = parts[1];
+            }
+            (<any>proposalFilter).category = undefined;
+        }
+
         if (mainCategory) { proposalFilter.mainCategory = mainCategory; }
         if (subCategory) { proposalFilter.subCategory = subCategory; }
         

@@ -21,7 +21,7 @@
             <span class="small">
                 Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm'}}</span>
             </span><br>
-            <h1 class="timer" style="margin-top: 10px;">
+            <h1 class="timer" style="margin-top: 10px;" ng-cloak ng-show="!proposal.isClosed && proposal.endDate">
                 <timer max-time-unit="day" end-time="proposal.endDate">
                     <div class="timer-labels">
                         <span class="timer-time">
@@ -48,8 +48,8 @@
             </h1>
             <!-- TODO: make these buttons appear according to view as a buyer or a seller -->
             <div class="btn-group btn-group-justified" role="group">
-              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/back">Buy together</a>
-              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/offer/new">Make an offer</a>
+              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/back" ng-show="$root.userInfo.preferences.perspective=='buyer' && !proposal.isClosed">Buy together</a>
+              <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/offer/new" ng-show="$root.userInfo.preferences.perspective=='seller' && !proposal.isClosed">Make an offer</a>
             </div>
         </div>
     </div>
