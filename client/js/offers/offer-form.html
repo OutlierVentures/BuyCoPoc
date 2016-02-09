@@ -47,7 +47,7 @@
                                         If your offer is accepted, the amount will be transferred to your account according to the payment schedule.
                                         <br /> Which Uphold card do you want to be paid to?
                                     </p>
-                                    <select class="form-control" ng-model="fromCard" required>
+                                    <select class="form-control" ng-model="toCard" required>
                                         <option ng-hide="cards.length > 0">Loading your cards...</option>
                                         <option ng-repeat="card in cards track by card.id" value="{{card.id}}">{{card.label}} ({{card.currency}} {{card.available}})</option>
                                     </select>

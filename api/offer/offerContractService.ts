@@ -161,35 +161,75 @@ export class OfferContractService {
     create(proposalId: string, o: offerModel.IOffer): Q.Promise<offerModel.IOffer> {
         var t = this;
 
-        var defer = Q.defer<offerModel.IOffer>();
-
         // Normalize amount for contract
+        // TODO: introduce a more stable way to do this,
         o.price = o.price * 100;
 
-        t.contractService.getProposalContractAt(proposalId)
-            .then(proposalContract => {
+        o.sellerAddress = web3plus.web3.coinbase;
 
-                proposalContract.offer(o.price, o.minimumAmount, { gas: 2500000 })
-                    .then(web3plus.promiseCommital)
-                    .then(function createOfferResult(tx) {
-                        // TODO: get the offer by a unique identifier.
-                        // TODO: ensure that the offer was actually created. defer.reject if not.
-                        // This can happen for various reasons, both technical and functional (i.e. price too high)
-                        var offerIndex = proposalContract.offerIndex().toNumber();
-                        var newOfferAddress = proposalContract.offers(offerIndex);
+        var proposalContract: contractInterfaces.IProposalContract;
+
+
+        return t.contractService.getProposalContractAt(proposalId)
+            .then(pc => {
+                proposalContract = pc;
+
+                var offerPromise = proposalContract.offer(o.price, o.minimumAmount, { gas: 2500000 });
+
+                // Normalize amount for display, again
+                o.price = o.price / 100;
+
+                return offerPromise;
+            })
+            .then(txId => {
+                return this.processCreate(txId, proposalId, o);
+            });
+    }
+
+    /**
+     * Process the creation a new offer for a proposal in the blockchain.
+     * @param proposalId proposal to add the offer to
+     * @param o the new offer
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processCreate(transactionId: string, proposalId: string, o: offerModel.IOffer): Q.Promise<offerModel.IOffer> {
+        var t = this;
+
+        var defer = Q.defer<offerModel.IOffer>();
+
+        var proposalContract: contractInterfaces.IProposalContract;
+
+        t.contractService.getProposalContractAt(proposalId)
+            .then(pr=> {
+                proposalContract = pr;
+                return web3plus.promiseCommital(transactionId);
+            })
+            .then(function createOfferResult(tx) {
+                var offerIndex = proposalContract.offerIndex().toNumber();
+                var newOfferAddress = proposalContract.offers(offerIndex);
+
+                web3plus.loadContractFromFile("ProposalRegistry.sol", "Offer", newOfferAddress, true,
+                    function (err, offerContract: contractInterfaces.IOfferContract) {
+                        if (err) defer.reject(err);
+
+                        var newOfferSellerAddress = offerContract.sellerAddress();
+
+                        if (!(newOfferSellerAddress == o.sellerAddress
+                            && offerContract.minimumAmount().toNumber() == o.minimumAmount
+                            && offerContract.price().toNumber() == o.price * 100)) {
+                            defer.reject("Offer could not be added to contract.");
+                            return;
+                        }
 
                         o.id = newOfferAddress;
 
-                        // Normalize amount for display, again
-                        o.price = o.price / 100;
                         defer.resolve(o);
-                    }, function getProposalErr(err) {
-                        defer.reject(err);
                     });
+
+            }).catch(err => {
+                defer.reject(err);
             });
 
         return defer.promise;
     }
-
-
 }

@@ -62,7 +62,7 @@ class ProposalController {
     }
 
     create() {
-        this.getCategoryData((err, res) => {});
+        this.getCategoryData((err, res) => { });
     }
 
     private getCategoryData(cb: any) {
@@ -258,8 +258,8 @@ class ProposalController {
 
         // Call the proposal contract from our own address.
         // TODO: verify that an ethereum account for the user has been configured.
-        this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
-            proposalContract => {
+        this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress)
+            .then(proposalContract => {
                 var options: IWeb3TransactionOptions = {
                     // Still unclear how much gas should really be used. 250000 works at this point.
                     // If too low, it will be shown in the UX.
@@ -320,8 +320,7 @@ class ProposalController {
             }, err => {
                 t.$scope.processMessage = undefined;
                 t.$scope.errorMessage = err;
-            }
-        );
+            });
 
     }
 

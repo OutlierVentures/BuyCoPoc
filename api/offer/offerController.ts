@@ -55,12 +55,17 @@ export class OfferController {
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
         var proposalId = req.params.id;
-        var offerData = <offerModel.IOffer>req.body;
+        var offerData = <offerModel.IOffer>req.body.offer;
+        var transactionId: string = req.body.transactionId;
 
         serviceFactory.createOfferContractService()
             .then(
             function (ocs) {
-                return ocs.create(proposalId, offerData);
+                if (transactionId)
+                    // User has submitted backing transaction
+                    return ocs.processCreate(transactionId, proposalId, offerData);
+                else
+                    return ocs.create(proposalId, offerData);
             },
             function (initErr) {
                 res.status(500).json({

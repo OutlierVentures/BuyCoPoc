@@ -373,7 +373,6 @@ export class ProposalService {
     back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
 
-        var defer = Q.defer<proposalBackingModel.IProposalBacking>();
         return t.contractService.getProposalContractAt(p.contractAddress)
             .then(proposalContract => {
 
@@ -396,7 +395,6 @@ export class ProposalService {
      */
     processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var defer = Q.defer<proposalBackingModel.IProposalBacking>();
-
 
         var proposalContract: contractInterfaces.IProposalContract;
 
