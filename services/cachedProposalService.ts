@@ -227,6 +227,8 @@ export class CachedProposalService {
                     }
                     else {
                         // Update it
+                        currentProposal.owner = p.owner;
+
                         currentProposal.productName = p.productName;
                         currentProposal.productDescription = p.productDescription;
                         currentProposal.mainCategory = p.mainCategory;

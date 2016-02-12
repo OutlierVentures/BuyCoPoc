@@ -76,7 +76,7 @@ class BlockchainService {
         // Override the password request function for decrypting the password.
         // ethereumjs-accounts calls this function with the account info any 
         // time a transaction sent from that account has to be signed.  
-        this.accounts.options.request = function(accountObject) {
+        this.accounts.options.request = function (accountObject) {
             // TODO: securely let the user provide a password.
             // The user could be requested the password for address accountObject.address.
             // Any integration of key management should be done at this point.
@@ -111,8 +111,8 @@ class BlockchainService {
                     t.accounts.new(DUMMY_PASSWORD);
                     t.saveAccounts();
                 }
-                
-                t.$rootScope.$emit('blockchainConnected');                
+
+                t.$rootScope.$emit('blockchainConnected');
             }, err => {
                 // On error, also ensure we have at least one account. This could be a new
                 // user without any accounts.
@@ -229,6 +229,42 @@ class BlockchainService {
 
     getCurrentAccount(): string {
         return this.accounts.get()["selected"];
+    }
+
+    getProposalRegistryContract(): ng.IPromise<IProposalRegistryContract> {
+        var t = this;
+
+        var defer = t.$q.defer<any>();
+
+        t.$q.all(
+            [
+                // Get address of the registry
+                t.$http({
+                    method: 'GET',
+                    url: apiUrl + "/config/ethereum/contracts/proposalRegistry",
+                }),           
+                // Get ABI for the contract
+                t.$http({
+                    method: 'GET',
+                    url: apiUrl + '/contract/ProposalRegistry/abi',
+                })
+            ])
+            .then((results: ng.IHttpPromiseCallbackArg<any>[]) => {
+                var registryAddress = results[0].data;
+                var contractAbi = results[1].data;
+
+                var contractDef = web3.eth.contract(contractAbi);
+
+                var con = contractDef.at(registryAddress);
+
+                defer.resolve(con);
+            })
+            .catch(error => {
+                // Handle error
+                defer.reject(error);
+            });
+
+        return defer.promise;
     }
 
     getProposalContract(address: string): PromiseLike<IProposalContract> {

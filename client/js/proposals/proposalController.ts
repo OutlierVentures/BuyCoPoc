@@ -327,42 +327,89 @@ class ProposalController {
     processCreate() {
         // TODO: check for validity
         var t = this;
+        var p = t.$scope.proposal;
+        var cat = JSON.parse((<any>p).category);
 
-        // Process creating a new Proposal.
-        t.$scope.processMessage = "Creating Proposal... this may take a while because we're creating the smart contract that guarantees the correct and incorruptible functioning of your Proposal.";
-        t.$scope.errorMessage = undefined;
-        t.$scope.successMessage = undefined;
+        p.mainCategory = cat.mainCategory;
+        p.subCategory = cat.subCategory;
 
-        this.$http({
-            method: 'POST',
-            url: apiUrl + '/proposal',
-            data: t.$scope.proposal,
-            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
-        }).success(function (resultData: IProposal) {
-            t.$scope.processMessage = undefined;
-            t.$scope.errorMessage = undefined;
-            t.$scope.proposal = resultData;
-            t.$scope.successMessage = "Your Proposal to buy '" + resultData.productName + "' has been created successfully.";
+        t.$scope.processMessage = "Submitting proposal...";
 
-            t.$timeout(() => {
-            }, 5000).then((promiseValue) => {
-                t.$scope.successMessage = undefined;
+        // Call the proposal contract from our own address.
+        // TODO: verify that an ethereum account for the user has been configured.
+        this.blockchainService.getProposalRegistryContract()
+            .then(registryContract => {
+                var ownerAddress = t.blockchainService.getCurrentAccount();
+                var options: IWeb3TransactionOptions = {
+                    gas: 2500000,
+                    from: ownerAddress,
+                };
 
-                // Redirect to the proposal view
-                t.$location.path("/proposal/" + resultData.contractAddress);
+                // Set owner address for integrity checks
+                p.owner = ownerAddress;
+
+                registryContract.addProposal(p.productName,
+                    p.mainCategory,
+                    p.subCategory,
+                    p.maxPrice * 100,
+                    p.endDate.toString(), p.ultimateDeliveryDate.toString(), options,
+                    function (err, transactionId) {
+                        if (err) {
+                            t.$scope.processMessage = undefined;
+                            if (err.message) err = err.message;
+                            t.$scope.errorMessage = err;
+                            // Unless we do $scope.$apply, the error message doesn't appear. I still don't fully
+                            // understand when this is and when this isn't necessary. It can lead to errors
+                            // when calling it at points where it should not be called.
+                            t.$scope.$apply();
+                            return;
+                        }
+                        // Process creating a new Proposal.
+                        t.$scope.processMessage = "Creating Proposal... this may take a while because we're creating the smart contract that guarantees the correct and incorruptible functioning of your Proposal.";
+                        t.$scope.errorMessage = undefined;
+                        t.$scope.successMessage = undefined;
+
+                        t.$http({
+                            method: 'POST',
+                            url: apiUrl + '/proposal',
+                            data: {
+                                proposal: t.$scope.proposal,
+                                transactionId: transactionId
+                            },
+                            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+                        }).success(function (resultData: IProposal) {
+                            t.$scope.processMessage = undefined;
+                            t.$scope.errorMessage = undefined;
+                            t.$scope.proposal = resultData;
+                            t.$scope.successMessage = "Your Proposal to buy '" + resultData.productName + "' has been created successfully.";
+
+                            t.$timeout(() => {
+                            }, 5000).then((promiseValue) => {
+                                t.$scope.successMessage = undefined;
+
+                                // Redirect to the proposal view
+                                t.$location.path("/proposal/" + resultData.contractAddress);
+                            });
+                        }).error(function (error) {
+                            t.$scope.processMessage = undefined;
+
+                            // Handle error
+                            console.log("Error saving proposal:");
+                            console.log(error);
+
+                            // Show notification
+                            if (error.error)
+                                t.$scope.errorMessage = error.error;
+                            else
+                                t.$scope.errorMessage = error;
+                        });
+                    });
+            })
+            .catch(err => {
+                t.$scope.processMessage = undefined;
+                t.$scope.errorMessage = err;
             });
-        }).error(function (error) {
-            t.$scope.processMessage = undefined;
-
-            // Handle error
-            console.log("Error saving proposal:");
-            console.log(error);
-
-            // Show notification
-            if (error.error)
-                t.$scope.errorMessage = error.error;
-            else
-                t.$scope.errorMessage = error;
-        });
     }
+
 }
+

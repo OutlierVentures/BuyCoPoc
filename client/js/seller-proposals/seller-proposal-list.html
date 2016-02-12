@@ -20,7 +20,7 @@
                     <select class="form-control" ng-model="vm.proposalFilter.category" name="category" id="filterCategory" >
                         <option value="">[any category]</option>
                         <optgroup ng-repeat="mainCat in vm.allCategories track by mainCat.name" label="{{mainCat.name}}">
-                            <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value="{{mainCat.name}} - {{subCat.name}}">{{subCat.name}}</option>
+                            <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value='{ "mainCategory": "{{mainCat.name}}", "subCategory": "{{subCat.name}}"}'>{{subCat.name}}</option>
                         </optgroup>
                     </select>
                 </div>

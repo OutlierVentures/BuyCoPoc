@@ -5,6 +5,7 @@ import { Promise } from "q";
 export var proposalSchema = new mongoose.Schema({
     id: String,
     contractAddress: String,
+    owner: String,
     productName: String,
     productDescription: String,
     productSku: String,

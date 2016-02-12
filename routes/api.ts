@@ -69,6 +69,7 @@ export function configure(app: express.Express) {
     apiRouter.route("/config/useStubs").get(cc.useStubs);
     apiRouter.route("/config/getversion").get(cc.getVersion);
     apiRouter.route("/config/ethereum/jsonRpcUrl").get(cc.getEthereumJsonRpcUrl);
+    apiRouter.route("/config/ethereum/contracts/proposalRegistry").get(cc.getProposalRegistryAddress);
 
     // Smart contracts for client side blockchain interaction
     var contractCon = new contractController.ContractController();

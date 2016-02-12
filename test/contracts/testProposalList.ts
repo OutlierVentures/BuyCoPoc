@@ -280,6 +280,7 @@ describe("ProposalRegistry list", () => {
 
                         const p: proposalModel.IProposal = {
                             contractAddress: proposalAddress,
+                            owner: web3plus.web3.eth.coinbase,
                             productName: proposal.productName(),
                             productDescription: proposal.productDescription(),
                             productSku: proposal.productSku(),
@@ -367,6 +368,7 @@ describe("ProposalRegistry list", () => {
 
             const p: proposalModel.IProposal = {
                 contractAddress: proposalAddress,
+                owner: web3plus.web3.eth.coinbase,
                 productName: proposal.productName(),
                 productDescription: proposal.productDescription(),
                 productSku: proposal.productSku(),

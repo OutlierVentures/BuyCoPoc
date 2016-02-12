@@ -29,20 +29,6 @@ export class ProposalController {
         // Only the maincategory and subcategory are in the URL part itself.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
-
-        var categoryString = req.query.category;
-
-        if (categoryString && categoryString.indexOf(" - ")) {
-            var parts = categoryString.split(" - ")
-            if (parts.length == 2) {
-                proposalFilter.mainCategory = parts[0];
-                proposalFilter.subCategory = parts[1];
-            }
-            (<any>proposalFilter).category = undefined;
-        }
-
-        if (mainCategory) { proposalFilter.mainCategory = mainCategory; }
-        if (subCategory) { proposalFilter.subCategory = subCategory; }
         
         // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()
@@ -103,50 +89,18 @@ export class ProposalController {
 
         // TODO: further validation.
 
-        // The category arrives as a string: [main] - [sub]
-        // Example: "Electronics - Camera"
-        // TODO: pass main category and sub category as separate variables, or at least
-        // refactor this to a method.
-        var categoryString: string = req.body.proposal.category;
-
-        if (!categoryString) {
-            res.status(500).json({
-                "error": "category is required",
-                "error_location": "creating proposal"
-            });
-            return;
-        }
-
-        if (categoryString && categoryString.indexOf(" - ")) {
-            var parts = categoryString.split(" - ")
-            if (parts.length == 2) {
-                proposalData.mainCategory = parts[0];
-                proposalData.subCategory = parts[1];
-            }
-        }
-
         serviceFactory.createProposalService()
-            .then(
-            function (ps) {
-
+            .then(ps => {
                 if (transactionId)
                     // User has submitted backing transaction
                     return ps.processCreate(transactionId, proposalData);
                 else
                     return ps.create(proposalData);
-            },
-            function (initErr) {
-                res.status(500).json({
-                    "error": initErr,
-                    "error_location": "initializing proposal service"
-                });
-                return null;
             })
-            .then(
-            function (proposal) {
+            .then(proposal => {
                 res.json(proposal);
             })
-            .catch(err=> function (createErr) {
+            .catch(createErr => {
                 res.status(500).json({
                     "error": createErr,
                     "error_location": "creating proposal"

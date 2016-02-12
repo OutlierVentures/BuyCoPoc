@@ -93,6 +93,7 @@ export class ProposalService {
                     // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
                     // The calls would then be: addPropertyGetter<string>(getProperties, proposal, p, "productName")
                     // Drawback: properties of IProposal wouldn't be typesafe any more.
+                    getProperties.push(Q.denodeify<string>(proposal.owner)().then(function (o) { p.owner = o; }));
                     getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                     getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
                     getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
