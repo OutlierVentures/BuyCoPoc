@@ -78,6 +78,22 @@ class SellerProposalListController implements ISellerProposalListController {
     public search() {
         this.isSearching = true;
         var proposalFilter = this.isFilterSet ? this.proposalFilter : null;
+
+        // Parse and pass the categories
+        if (proposalFilter) {
+            var catString = (<any>proposalFilter).category;
+            if (catString) {
+                var cat = JSON.parse(catString);
+                if (cat) {
+                    proposalFilter.mainCategory = cat.mainCategory;
+                    proposalFilter.subCategory = cat.subCategory;
+                }
+            } else {
+                proposalFilter.mainCategory = null;
+                proposalFilter.subCategory = null;
+            }
+        }
+
         this.sellerProposalService.getProposals(
             this.$rootScope.userInfo.accessToken,
             proposalFilter
