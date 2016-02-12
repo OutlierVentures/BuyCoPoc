@@ -125,6 +125,7 @@ interface IApplicationInfo {
 // while at the server side it's the Mongo ID.
 interface IProposal {
     contractAddress: string;
+    owner: string;
     productName: string;
     productDescription: string;
     productSku: string;

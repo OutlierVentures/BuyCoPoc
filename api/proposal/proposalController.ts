@@ -5,7 +5,7 @@ import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
 import upholdService = require('../../services/upholdService');
 
-import proposalModel = require ('../../models/proposalModel');
+import proposalModel = require('../../models/proposalModel');
 
 import _ = require('underscore');
 
@@ -98,13 +98,16 @@ export class ProposalController {
 
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
-        var proposalData = <IProposal>req.body;
+        var proposalData = <IProposal>req.body.proposal;
+        var transactionId = <string>req.body.transactionId;
 
-        // TODO: furter validation.
+        // TODO: further validation.
 
         // The category arrives as a string: [main] - [sub]
         // Example: "Electronics - Camera"
-        var categoryString: string = req.body.category;
+        // TODO: pass main category and sub category as separate variables, or at least
+        // refactor this to a method.
+        var categoryString: string = req.body.proposal.category;
 
         if (!categoryString) {
             res.status(500).json({
@@ -125,7 +128,12 @@ export class ProposalController {
         serviceFactory.createProposalService()
             .then(
             function (ps) {
-                return ps.create(proposalData);
+
+                if (transactionId)
+                    // User has submitted backing transaction
+                    return ps.processCreate(transactionId, proposalData);
+                else
+                    return ps.create(proposalData);
             },
             function (initErr) {
                 res.status(500).json({
@@ -137,13 +145,14 @@ export class ProposalController {
             .then(
             function (proposal) {
                 res.json(proposal);
-            }, function (createErr) {
+            })
+            .catch(err=> function (createErr) {
                 res.status(500).json({
                     "error": createErr,
                     "error_location": "creating proposal"
                 });
                 return null;
-            })
+            });
 
     }
 

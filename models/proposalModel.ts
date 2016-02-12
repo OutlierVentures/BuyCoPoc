@@ -28,6 +28,7 @@ export var proposalSchema = new mongoose.Schema({
 
 export interface IProposal {
     contractAddress: string;
+    owner: string;
     productName: string;
     productDescription: string;
     productSku: string;

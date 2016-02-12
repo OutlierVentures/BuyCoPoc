@@ -120,12 +120,16 @@ describe("ProposalController", () => {
         this.timeout(200000);
 
         var newProposalData = {
-            "productName": "A testing product",
-            "productDescription": "From the unit tests",
-            "productSku": "SKU123",
-            "productUnitSize": "1 unit",
-            "category": "Electronics - Camera",
-            "maxPrice": 0.10,
+            proposal: {
+                productName: "A testing product",
+                productDescription: "From the unit tests " + Date(),
+                productSku: "SKU123",
+                productUnitSize: "1 unit",
+                category: "Electronics - Camera",
+                maxPrice: 0.10,
+                //endDate: "2016-12-01",
+                //ultimateDeliveryDate: "2017-12-01"
+            }
         };
 
         var newProposal: proposalModel.IProposal;
@@ -252,12 +256,14 @@ describe("ProposalController", () => {
                 request(theApp)
                     .post('/api/proposal')
                     .send({
-                        "productName": "A testing product", "productDescription": "From the unit tests",
-                        //"productSku": "SKU123",
-                        "category": "Electronics - Camera",
-                        "maxPrice": 0.10,
-                        "endDate": "2016-12-01",
-                        "ultimateDeliveryDate": "2017-12-01",
+                        proposal: {
+                            productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                            productSku: "SKU123",
+                            category: "Electronics - Camera",
+                            maxPrice: 0.10,
+                            endDate: "2016-12-01",
+                            ultimateDeliveryDate: "2017-12-01"
+                        }
                     })
                     .expect('Content-Type', /json/)
                     .expect(200)

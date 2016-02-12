@@ -278,7 +278,7 @@ export class ProposalService {
             });
         }
     }
-    
+
     /**
      * Create a new proposal in the blockchain.
      * @param p the new proposal.
@@ -287,11 +287,7 @@ export class ProposalService {
     create(p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
         var t = this;
 
-        var defer = Q.defer<proposalModel.IProposal>();
-
-        // Normalize amount for contract
-        p.maxPrice = p.maxPrice * 100;
-
+        // Normalize input data
         // Workaround for empty dates in current implementation
         var anyP = <any>p;
         if (!p.endDate)
@@ -303,13 +299,29 @@ export class ProposalService {
         if (!p.productSku) p.productSku = "";
         if (!p.productUnitSize) p.productUnitSize = "";
 
-        var proposalIndexBefore = t.registryContract.proposalIndex().toNumber();
+        // Store owner address for integrity checks.
+        p.owner = web3plus.web3.eth.coinbase;
 
-        this.registryContract.addProposal(p.productName,
+        return t.registryContract.addProposal(p.productName,
             p.mainCategory, p.subCategory,
-            p.maxPrice,
+            p.maxPrice * 100,
             p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 2500000 })
-            .then(web3plus.promiseCommital)
+            .then(txId => {
+                return this.processCreate(txId, p);
+            });
+    }
+        
+    /**
+     * Create a new proposal in the blockchain.
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processCreate(transactionId: string, p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        web3plus.promiseCommital(transactionId)
             .then(function getProposalResult(tx) {
                 // At this point we have no unique reference to the proposal we
                 // just added. As a workaround, we take the newest proposal.
@@ -324,11 +336,6 @@ export class ProposalService {
                 // TODO: get the proposal by tx hash
                 var proposalIndex = t.registryContract.proposalIndex().toNumber();
 
-                if (proposalIndex != proposalIndexBefore + 1) {
-                    defer.reject("Could not add proposal.");
-                    return;
-                }
-
                 var newProposalAddress = t.registryContract.proposals(proposalIndex);
 
                 p.contractAddress = newProposalAddress;
@@ -336,6 +343,15 @@ export class ProposalService {
                 return t.contractService.getProposalContractAt(newProposalAddress);
             })
             .then(proposalContract => {               
+                // Do rudimentary checks to ensure the proposal was added.
+
+                if (proposalContract.owner() != p.owner
+                    || proposalContract.productName() != p.productName
+                    || proposalContract.maxPrice().toNumber() != p.maxPrice * 100) {
+                    defer.reject("Could not add proposal.");
+                    return;
+                }
+
                 // Fill additional properties. This is a separate method because of 
                 // Solidity limitations ("stack too deep").
                 return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize, { gas: 2500000 });
