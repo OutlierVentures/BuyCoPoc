@@ -303,26 +303,14 @@ export class ProposalService {
         // Store owner address for integrity checks.
         p.owner = web3plus.web3.eth.coinbase;
 
-        return t.registryContract.addProposal(p.productName,
-            p.mainCategory, p.subCategory,
-            p.maxPrice * 100,
-            p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 2500000 })
-            .then(txId => {
-                return this.processCreate(txId, p);
-            });
-    }
-        
-    /**
-     * Create a new proposal in the blockchain.
-     * @param p the new proposal.
-     * @return The IProposal with the property "id" set to the contract address.
-     */
-    processCreate(transactionId: string, p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
-        var t = this;
 
         var defer = Q.defer<proposalModel.IProposal>();
 
-        web3plus.promiseCommital(transactionId)
+        t.registryContract.addProposal(p.productName,
+            p.mainCategory, p.subCategory,
+            p.maxPrice * 100,
+            p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 2500000 })
+            .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {
                 // At this point we have no unique reference to the proposal we
                 // just added. As a workaround, we take the newest proposal.
@@ -345,7 +333,6 @@ export class ProposalService {
             })
             .then(proposalContract => {               
                 // Do rudimentary checks to ensure the proposal was added.
-
                 if (proposalContract.owner() != p.owner
                     || proposalContract.productName() != p.productName
                     || proposalContract.maxPrice().toNumber() != p.maxPrice * 100) {
@@ -357,12 +344,32 @@ export class ProposalService {
                 // Solidity limitations ("stack too deep").
                 return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize, { gas: 2500000 });
             })
-            .then(web3plus.promiseCommital)
+            .then(txId => {
+                return this.processCreate(txId, p);
+            })
+            .then(newProposal => {
+                defer.resolve(newProposal);
+            })
+            .catch(err=> {
+                defer.reject(err);
+            });
+
+        return defer.promise;
+
+    }
+        
+    /**
+     * Create a new proposal in the blockchain.
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processCreate(setDetailsTransactionId: string, p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        web3plus.promiseCommital(setDetailsTransactionId)
             .then(function getProposalResult(tx) {
-
-                // Normalize amount for display and caching
-                p.maxPrice = p.maxPrice / 100;
-
                 // Update cache for this proposal only
                 var cps = new cachedProposalService.CachedProposalService();
                 cps.initialize(t)

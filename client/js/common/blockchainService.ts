@@ -3,7 +3,6 @@ var Accounts;
 var HookedWeb3Provider;
 var web3;
 
-
 /**
  * Currently we don't allow users to provide the password for their ethereum accounts. Accounts
  * are encrypted (to prepare for proper security) but we use the same trivial password for all
@@ -109,8 +108,8 @@ class BlockchainService {
                     // We use encrypted account data, but don't allow user to set a password yet.
                     // TODO MVP: introduce proper security for key management.
                     t.accounts.new(DUMMY_PASSWORD);
-                    t.saveAccounts();
                 }
+                t.saveAccounts();
 
                 t.$rootScope.$emit('blockchainConnected');
             }, err => {
@@ -231,7 +230,7 @@ class BlockchainService {
         return this.accounts.get()["selected"];
     }
 
-    getProposalRegistryContract(): ng.IPromise<IProposalRegistryContract> {
+    getProposalRegistryContractAt(): ng.IPromise<IProposalRegistryContract> {
         var t = this;
 
         var defer = t.$q.defer<any>();
@@ -267,7 +266,7 @@ class BlockchainService {
         return defer.promise;
     }
 
-    getProposalContract(address: string): PromiseLike<IProposalContract> {
+    getProposalContractAt(address: string): ng.IPromise<IProposalContract> {
         var t = this;
 
         var defer = t.$q.defer<any>();
@@ -298,6 +297,65 @@ class BlockchainService {
     isConnected(): boolean {
         // TODO
         return false;
+    }
+
+    // WARNING: ADAPTED DUPLICATE FROM web3plus
+    /**
+     * Returns a Promise that resolves when the specified transaction hash has been committed
+     * to the blockchain.
+     * Usage:
+     * myContract.stateChangingMethod(function(err, res) {
+     *  promiseCommittal(res)
+     *      .then(... do stuff after it has been committed ...)
+     *      .catch(... handle errors ...);
+     *  });
+     * Or with a promisified contract method:
+     * myContract.stateChangingMethod()
+     *      .then(... do stuff after it has been committed ...)
+     *      .catch(... handle errors ...);
+     */
+    promiseCommital(transactionHash: string): ng.IPromise<any> {
+        console.log("Waiting til transaction " + transactionHash + " has been committed.");
+
+        var defer = this.$q.defer();
+        var resolve = defer.resolve;
+        var reject = defer.reject;
+
+        // Watch for the tx to be processed.
+        // Tried to use a filter with { topics: [txHash] }, but that never fires.
+        var f = web3.eth.filter("latest");
+
+        f.watch(createCallback(transactionHash));
+
+        function createCallback(txHash: string) {
+            return function (err, res) {
+                if (err)
+                    reject(err);
+                else {
+                    // Check whether the tx has been processed
+                    resolveIfCommitted(txHash);
+                }
+            }
+        }
+
+        // Check at least once in case the filter was placed after processing the tx.
+        resolveIfCommitted(transactionHash);
+
+        /**
+         * Resolve the promise if the tx has been committed.
+         */
+        function resolveIfCommitted(txHash: string) {
+            web3.eth.getTransaction(txHash, function (txErr, txRes) {
+                if (txErr) {
+                    reject(txErr);
+                } else if (txRes.blockNumber) {
+                    if (f) { f.stopWatching(); }
+                    resolve(txRes);
+                }
+            });
+        }
+
+        return defer.promise;
     }
 }
 

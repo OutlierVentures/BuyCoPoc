@@ -171,7 +171,7 @@ class OfferController {
 
         // Call the proposal contract from our own address.
         // TODO: verify that an ethereum account for the user has been configured.
-        this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress)
+        this.blockchainService.getProposalContractAt(t.$scope.proposal.contractAddress)
             .then(proposalContract => {
                 var options: IWeb3TransactionOptions = {
                     // More gas for offer as it creates a contract
