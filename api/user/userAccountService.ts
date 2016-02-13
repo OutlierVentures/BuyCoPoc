@@ -15,7 +15,7 @@ var userRepo = new userModel.UserRepository();
  * with a balance below this (e.g. a new one), we will send it
  * "ether" up to this amount.
  */
-var MINIMUM_USER_ACCOUNT_BALANCE = 10;
+var MINIMUM_USER_ACCOUNT_BALANCE = 30;
 
 /**
  * Get and save information from user accounts
@@ -59,8 +59,22 @@ export class UserAccountService {
                             for (var j = 0; j < user.blockchainAccounts.accounts.length; j++) {
                                 var existingAcct = user.blockchainAccounts.accounts[j];
                                 if (existingAcct.address == acct.address) {
-                                    // Existing address, replace
-                                    user.blockchainAccounts.accounts[j] = acct;
+                                    // Existing address, update
+
+                                    // Replacing the entire element with a non-Mongoose array causes 
+                                    // an application crash with Mongoose validation on user.save().
+                                    // The wrong way:
+                                    // user.blockchainAccounts.accounts[j] = acct;
+
+                                    // The right way: array.set(index, object with values).
+                                    // However the type definitions don't account for index as 
+                                    // number. array[i].set(obj) works just as fine.
+                                    // This is likely due to the fact that our types extend Document,
+                                    // while the set(number, value) is a method of MongooseArray:
+                                    // http://mongoosejs.com/docs/api.html#types_array_MongooseArray.set
+                                    // In any case this syntax works great and is concise.
+                                    user.blockchainAccounts.accounts[j].set(acct);
+
                                     isExisting = true;
                                     break;
                                 }
@@ -96,10 +110,9 @@ export class UserAccountService {
                         // Ensure each of the accounts has enough funds to transact.
                         resolve(t.ensureMinFunds(user));
                     });
-                },
-                err => {
+                }).catch(err => {
                     reject(err);
-                })
+                });
         });
     };
 
@@ -200,8 +213,10 @@ export class UserAccountService {
                         );
 
 
-                },
-                userErr => { reject(userErr) });
+                })
+                .catch(userErr => {
+                    reject(userErr)
+                });
         })
     };
 }

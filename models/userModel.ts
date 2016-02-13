@@ -48,7 +48,7 @@ export interface ICredentials {
     accessToken: string
 }
 
-export interface IBlockchainAccount {
+export interface IBlockchainAccount extends mongoose.Document {
     address: string,
     encrypted: boolean,
     locked: boolean,
@@ -59,8 +59,11 @@ export interface IBlockchainAccount {
     balance: number,
 }
 
-export interface IBlockchainAccountCollection {
-    accounts: IBlockchainAccount[],
+export interface IBlockchainAddressList extends Array<IBlockchainAccount>, mongoose.Document {
+}
+
+export interface IBlockchainAccountCollection extends mongoose.Document {
+    accounts: IBlockchainAddressList,
     selected: string
 }
 
