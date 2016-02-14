@@ -71,7 +71,7 @@ describe("ProposalRegistry offers", () => {
             .then(pc=> {
                 proposalContract = pc;
 
-                return proposalContract.offer(price1, amount1, { gas: 2500000 });
+                return proposalContract.offer(price1, amount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetOffer(tx) {
@@ -80,20 +80,20 @@ describe("ProposalRegistry offers", () => {
                 return contractService.getOfferContractAt(newOfferAddress);
             })
             .then(newOffer => {
-                assert.equal(newOffer.sellerAddress(), sellerAddress1);
+                assert.equal(newOffer.owner(), sellerAddress1);
                 assert.equal(newOffer.price().toNumber(), price1);
                 assert.equal(newOffer.minimumAmount().toNumber(), amount1);
 
                 // Add more "offers". This should update the amount, not add more backers, as we're backing
                 // from the same address.
-                proposalContract.offer(1, 1, { gas: 2500000 });
-                proposalContract.offer(2, 2, { gas: 2500000 });
-                proposalContract.offer(3, 3, { gas: 2500000 });
-                proposalContract.offer(4, 4, { gas: 2500000 });
-                proposalContract.offer(5, 5, { gas: 2500000 });
-                proposalContract.offer(6, 6, { gas: 2500000 });
-                proposalContract.offer(7, 7, { gas: 2500000 });
-                return proposalContract.offer(8, 8, { gas: 2500000 });
+                proposalContract.offer(1, 1, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(2, 2, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(3, 3, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(4, 4, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(5, 5, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(6, 6, "cardId12345", { gas: 2500000 });
+                proposalContract.offer(7, 7, "cardId12345", { gas: 2500000 });
+                return proposalContract.offer(8, 8, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
@@ -106,7 +106,7 @@ describe("ProposalRegistry offers", () => {
                 assert.equal(offerIndex, 1);
 
                 // Backer address should be unchanged.
-                assert.equal(newOffer.sellerAddress(), sellerAddress1);
+                assert.equal(newOffer.owner(), sellerAddress1);
 
                 var newPrice = newOffer.price().toNumber();
                 var newAmount = newOffer.minimumAmount().toNumber();

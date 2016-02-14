@@ -74,13 +74,13 @@ describe("ProposalRegistry closing", () => {
             })
             .then(pc=> {
                 proposalContract = pc;
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
 
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
@@ -127,13 +127,13 @@ describe("ProposalRegistry closing", () => {
             })
             .then(pc=> {
                 proposalContract = pc;
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
 
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
@@ -150,7 +150,7 @@ describe("ProposalRegistry closing", () => {
             })
             .then(acceptedOffer => {
                 // Offer address should be unchanged.
-                assert.equal(acceptedOffer.sellerAddress(), sellerAddress1, "Seller address is registered correctly");
+                assert.equal(acceptedOffer.owner(), sellerAddress1, "Seller address is registered correctly");
 
                 var acceptedPrice = acceptedOffer.price().toNumber();
                 var acceptedAmount = acceptedOffer.minimumAmount().toNumber();

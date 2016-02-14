@@ -74,7 +74,7 @@ export class OfferContractService {
                         
                     o.id = offerAddress;
 
-                    getProperties.push(Q.denodeify<string>(offer.sellerAddress)().then(function (addr) { o.sellerAddress = addr; }));
+                    getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.sellerAddress = addr; }));
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
 
@@ -161,10 +161,6 @@ export class OfferContractService {
     create(proposalId: string, o: offerModel.IOffer): Q.Promise<offerModel.IOffer> {
         var t = this;
 
-        // Normalize amount for contract
-        // TODO: introduce a more stable way to do this,
-        o.price = o.price * 100;
-
         o.sellerAddress = web3plus.web3.coinbase;
 
         var proposalContract: contractInterfaces.IProposalContract;
@@ -174,10 +170,7 @@ export class OfferContractService {
             .then(pc => {
                 proposalContract = pc;
 
-                var offerPromise = proposalContract.offer(o.price, o.minimumAmount, { gas: 2500000 });
-
-                // Normalize amount for display, again
-                o.price = o.price / 100;
+                var offerPromise = proposalContract.offer(o.price * 100, o.minimumAmount, "cardId12345", { gas: 2500000 });
 
                 return offerPromise;
             })
@@ -212,7 +205,7 @@ export class OfferContractService {
                     function (err, offerContract: contractInterfaces.IOfferContract) {
                         if (err) defer.reject(err);
 
-                        var newOfferSellerAddress = offerContract.sellerAddress();
+                        var newOfferSellerAddress = offerContract.owner();
 
                         if (!(newOfferSellerAddress == o.sellerAddress
                             && offerContract.minimumAmount().toNumber() == o.minimumAmount

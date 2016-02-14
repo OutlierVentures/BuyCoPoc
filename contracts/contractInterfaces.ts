@@ -41,9 +41,9 @@ export interface IProposalRegistryContract extends IWeb3Contract {
 export interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
 
-    back(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    back(amount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 
-    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 
     setPaid(backingIndex: number | IBigNumber, paymentType: number | IBigNumber, transactionId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 
@@ -110,9 +110,12 @@ export interface IProposalContract extends IWeb3Contract {
 }
 
 export interface IOfferContract extends IWeb3Contract {
-    sellerAddress(): string;
+    owner(): string;
     price(): IBigNumber;
     minimumAmount(): IBigNumber;
+    cardId(): string;
+
     setPrice(price: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
     setMinimumAmount(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    setCardId(cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 }

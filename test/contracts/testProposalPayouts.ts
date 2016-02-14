@@ -73,12 +73,12 @@ describe("ProposalRegistry payouts", () => {
                 proposalContract = pc;
 
                 // First backer
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Second backer
-                return proposalContract.back(askAmount2, { gas: 2500000 });
+                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -97,7 +97,7 @@ describe("ProposalRegistry payouts", () => {
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
@@ -142,7 +142,7 @@ describe("ProposalRegistry payouts", () => {
         // This is the most elaborate test (and probably the slowest) because it simulates
         // the whole process. This is required to be able to test the end payout functionality
         // starting from a clean slate.
-        this.timeout(240000);
+        this.timeout(300000);
 
         var name1 = "Ethiopia Adado Coop";
         var askPrice = 10100;
@@ -169,12 +169,12 @@ describe("ProposalRegistry payouts", () => {
                 proposalContract = pc;
 
                 // First backer
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Second backer
-                return proposalContract.back(askAmount2, { gas: 2500000 });
+                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -193,7 +193,7 @@ describe("ProposalRegistry payouts", () => {
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {

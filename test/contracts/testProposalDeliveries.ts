@@ -66,7 +66,7 @@ describe("ProposalRegistry deliveries", () => {
             })
             .then(pc=> {
                 proposalContract = pc;
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
@@ -120,17 +120,17 @@ describe("ProposalRegistry deliveries", () => {
                 proposalContract = pc;
 
                 // First backer
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Second backer
-                return proposalContract.back(askAmount2, { gas: 2500000 });
+                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {

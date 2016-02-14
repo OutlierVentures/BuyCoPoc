@@ -82,7 +82,7 @@ describe("ProposalRegistry list", () => {
         // Getting should be fast.
         // TODO: lower this number once performance problems
         // have been solved.
-        this.timeout(20000);
+        this.timeout(40000);
 
         var getProposalDetailsPromises = new Array<Q.Promise<proposalModel.IProposal>>();
 
@@ -238,7 +238,7 @@ describe("ProposalRegistry list", () => {
         // Getting should be fast.
         // TODO: lower this number once performance problems
         // have been solved.
-        this.timeout(20000);
+        this.timeout(40000);
 
         // This test gets the 3 contracts and their properties asynchronously. The properties
         // themselves are still retrieved synchronously. We would expect this method to take

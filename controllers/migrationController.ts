@@ -122,11 +122,11 @@ export class MigrationController {
             .then(pc => {
                 proposalContract = pc;
 
-                proposalContract.back(15, { gas: 2500000 });
-                proposalContract.back(20, { gas: 2500000 });
-                proposalContract.back(35, { gas: 2500000 });
-                proposalContract.back(45, { gas: 2500000 });
-                return proposalContract.back(55, { gas: 2500000 });
+                proposalContract.back(15, "cardId12345", { gas: 2500000 });
+                proposalContract.back(20, "cardId12345", { gas: 2500000 });
+                proposalContract.back(35, "cardId12345", { gas: 2500000 });
+                proposalContract.back(45, "cardId12345", { gas: 2500000 });
+                return proposalContract.back(55, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function finish(tx) {

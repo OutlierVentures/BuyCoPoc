@@ -74,7 +74,7 @@ describe("ProposalRegistry backing", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, "cardId12345", { gas: 2500000 });
                 return backPromise;
             })
             .then(web3plus.promiseCommital)
@@ -85,14 +85,14 @@ describe("ProposalRegistry backing", () => {
                 assert.equal(newBacker[1].toNumber(), amount1);
 
                 // Back it more often. This should add more backers for the same address.
-                proposalContract.back(1, { gas: 2500000 });
-                proposalContract.back(2, { gas: 2500000 });
-                proposalContract.back(3, { gas: 2500000 });
-                proposalContract.back(4, { gas: 2500000 });
-                proposalContract.back(5, { gas: 2500000 });
-                proposalContract.back(6, { gas: 2500000 });
-                proposalContract.back(7, { gas: 2500000 });
-                var lastBacker = proposalContract.back(8, { gas: 2500000 });
+                proposalContract.back(1, "cardId12345", { gas: 2500000 });
+                proposalContract.back(2, "cardId12345", { gas: 2500000 });
+                proposalContract.back(3, "cardId12345", { gas: 2500000 });
+                proposalContract.back(4, "cardId12345", { gas: 2500000 });
+                proposalContract.back(5, "cardId12345", { gas: 2500000 });
+                proposalContract.back(6, "cardId12345", { gas: 2500000 });
+                proposalContract.back(7, "cardId12345", { gas: 2500000 });
+                var lastBacker = proposalContract.back(8, "cardId12345", { gas: 2500000 });
                 return lastBacker;
             })
             .then(web3plus.promiseCommital)
@@ -150,7 +150,7 @@ describe("ProposalRegistry backing", () => {
             .then(pc=> {
                 proposalContract = pc;
 
-                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, "cardId12345", { gas: 2500000 });
                 return backPromise;
             })
             .then(web3plus.promiseCommital)
@@ -235,7 +235,7 @@ describe("ProposalRegistry backing", () => {
             .then(pc=> {
                 proposalContract = pc;
 
-                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, "cardId12345", { gas: 2500000 });
                 return backPromise;
             })
             .then(web3plus.promiseCommital)
@@ -267,7 +267,7 @@ describe("ProposalRegistry backing", () => {
             .then(pc=> {
                 proposalContract = pc;
 
-                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, "cardId12345", { gas: 2500000 });
                 return backPromise;
             })
             .then(web3plus.promiseCommital)
