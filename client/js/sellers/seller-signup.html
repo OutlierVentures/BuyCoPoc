@@ -74,7 +74,8 @@
                                 <select class="form-control" id="region" name="region" ng-model="vm.currentRegionCode">
                                     <option value="" ng-if="vm.currentCountryCode">Select..</option>
                                     <option value="" ng-if="!vm.currentCountryCode">Pick country first..</option>
-                                    <option ng-repeat="region in vm.regions" value="{{ region.code }}">{{ region.name }}</option>
+                                    <option value="" ng-if="!vm.regions">General (no regions listed for this country)</option>
+                                    <option ng-repeat="region in vm.regions" value="{{ region.code }}" ng-disabled="!vm.regions">{{ region.name }}</option>
                                 </select>
                             </div>
                         </div>

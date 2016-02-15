@@ -24,6 +24,7 @@ class SellerSignupController implements ISellerSignUp {
     countries: ICountry[];
     currentCountry: ICountry;
     currentCountryCode: string;
+    currentCountryRegionFilter: string;
     regions: IRegion[];
     currentRegion: IRegion;
     currentRegionCode: string;
@@ -81,7 +82,7 @@ class SellerSignupController implements ISellerSignUp {
             }
         });
         
-        this.$rootScope.$on("loggedOn", (event: any, data: any) => {
+        this.$rootScope.$on('loggedOn', (event: any, data: any) => {
             this.messageType = MessageType.Success;
             this.message=`Welcome ${this.$rootScope.userInfo.name}!`;
         });
@@ -124,6 +125,7 @@ class SellerSignupController implements ISellerSignUp {
             if (oldCountryCode !== this.currentCountry) {
                 // Reset current selected country.
                 this.currentRegionCode = null;
+                this.currentCountryRegionFilter = this.currentCountry.defaultSubdivision;
                 // Get regions for newly selected country.
                 this.getRegions();
             }
@@ -192,11 +194,21 @@ class SellerSignupController implements ISellerSignUp {
         return this.$q((resolve, reject) => {
             // Retrieve the regions (only if the user has selected a country).
             if (this.currentCountry) {
+                // Check if a (.json) filename is specified in the file to get the regions for this country from.
+                if (!this.currentCountry.filename) {
+                    // If no region file is available for this country then set regions to empty (region dropdown will be disabled or given default value in UI).
+                    this.regions = null;
+                    return;
+                }
                 try {
                     this.regionResource = this.dataAccessService.getRegionResource(this.currentCountry.filename);
-                    this.regionResource.query((result: IRegion[]) => {
-                        this.regions = result;
-                        resolve(result);
+                    this.regionResource.query((results: IRegion[]) => {
+                        // Filter out any regions with wrong type from the result if a regionfilter was specified.
+                        if (this.currentCountryRegionFilter) {
+                            results = _.where(results, { 'subdivision': this.currentCountryRegionFilter });
+                        }
+                        this.regions = results;
+                        resolve(results);
                     }, (err: any) => {
                         reject(err);
                     });
@@ -227,8 +239,8 @@ class SellerSignupController implements ISellerSignUp {
             (data: any) => {
                 if (!this.$rootScope.userInfo.preferences) this.$rootScope.userInfo.preferences = <IUserPreferences>{};
 
-                this.$rootScope.userInfo.preferences.perspective = "seller";
-                this.$rootScope.userInfo.sellerId = "pending"; // For UX dependencies
+                this.$rootScope.userInfo.preferences.perspective = 'seller';
+                this.$rootScope.userInfo.sellerId = 'pending'; // For UX dependencies
                 // alert(`success: ${data}`);
                 this.seller = data.seller;
                 this.showMessage('Your seller data was saved successfully.', false);
@@ -241,7 +253,7 @@ class SellerSignupController implements ISellerSignUp {
     
     // TODO BW dd. 2016-01-16: Refactor message box to directive for reuse on other screens.
     resetMessage() {
-        this.message = ""; 
+        this.message = ''; 
     }
  
     /* Return message type as bootstrap class. 
