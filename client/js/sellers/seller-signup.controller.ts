@@ -18,12 +18,15 @@ interface ISellerSignupScope extends ng.IScope {
 }
 
 class SellerSignupController implements ISellerSignUp {
-    displayMode: DisplayMode;
+    isReadMode: boolean;
+    isAddMode: boolean;
+    isEditMode: boolean;
     displayModes: any;
     seller: ISeller;
     countries: ICountry[];
     currentCountry: ICountry;
     currentCountryCode: string;
+    currentCountryRegionFilter: string;
     regions: IRegion[];
     currentRegion: IRegion;
     currentRegionCode: string;
@@ -31,19 +34,20 @@ class SellerSignupController implements ISellerSignUp {
     messageClass: string;
     form: ng.IFormController;
     
+    private displayMode: DisplayMode;
     private messageType: MessageType;
     private sellerResource: ISellerResourceClass;
     private countryResource: ICountryResourceClass;
     private regionResource: IRegionResourceClass;
-    private static defaultCountryCode: string = "GB";
+    private static defaultCountryCode: string = 'GB';
 
     static $inject = [
-        "$scope",
-        "$rootScope",
-        "$q",
-        "types",
-        "dataAccessService",
-        "_"
+        '$scope',
+        '$rootScope',
+        '$q',
+        'types',
+        'dataAccessService',
+        '_'
     ];
 
     constructor(
@@ -54,9 +58,9 @@ class SellerSignupController implements ISellerSignUp {
         private dataAccessService: IDataAccessService,
         private _: UnderscoreStatic
     ) {
-        this.displayMode = DisplayMode.Add;
+        // this.displayMode = DisplayMode.Add;
         this.displayModes = DisplayMode; 
-        let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
+        const creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
         this.sellerResource = this.dataAccessService.getSellerResource(creds);
         this.countryResource = this.dataAccessService.getCountryResource();
         
@@ -67,6 +71,15 @@ class SellerSignupController implements ISellerSignUp {
             }
         });
         
+        this.setDisplayFlags();
+
+        // Watch the displayMode and set the three boolean flags correctly when it changes.
+        this.$scope.$watch(() => { return this.displayMode; }, (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                this.setDisplayFlags();
+            }
+        });
+
         // Also watch the current region code.
         this.$scope.$watch(() => { return this.currentRegionCode; }, (newValue, oldValue) => {
             if (newValue !== oldValue) {
@@ -74,18 +87,13 @@ class SellerSignupController implements ISellerSignUp {
             }
         });
         
-        // And message type, to update the messageClass used in the view.
-        this.$scope.$watch(() => { return this.messageType; }, (newValue, oldValue) => {
-            if ((newValue || newValue===0) && (!this.messageClass || newValue !== oldValue)) {
-                this.messageClass = this.messageTypeAsBsClass(this.messageType);
-            }
-        });
-        
-        this.$rootScope.$on("loggedOn", (event: any, data: any) => {
-            this.messageType = MessageType.Success;
-            this.message=`Welcome ${this.$rootScope.userInfo.name}!`;
-        });
-           
+        //// And watch the message type, to update the messageClass used in the view.
+        //this.$scope.$watch(() => { return this.messageType; }, (newValue, oldValue) => {
+        //    if ((newValue || newValue===0) && (!this.messageClass || newValue !== oldValue)) {
+        //        this.messageClass = this.messageTypeAsBsClass(this.messageType);
+        //    }
+        //});
+                   
         this.getCountries()
         .then(() => {
             return this.getSeller();
@@ -99,7 +107,7 @@ class SellerSignupController implements ISellerSignUp {
     }
     
     /** 
-     * Shows the given message on screens
+     * Shows the given message onscreen.
      * (default is error with Bootstrap style 'danger' if isError=true then style 'success'.)
      **/
     showMessage(message: string, isError = true) {
@@ -124,6 +132,7 @@ class SellerSignupController implements ISellerSignUp {
             if (oldCountryCode !== this.currentCountry) {
                 // Reset current selected country.
                 this.currentRegionCode = null;
+                this.currentCountryRegionFilter = this.currentCountry.defaultSubdivision;
                 // Get regions for newly selected country.
                 this.getRegions();
             }
@@ -166,8 +175,7 @@ class SellerSignupController implements ISellerSignUp {
                     },
                     (httpResponse: any) => {
                         console.log(httpResponse);
-                        let errorMessage = `Error getting seller: ${httpResponse}`;
-                        // throw new Error(errorMessage);
+                        const errorMessage = `Error getting seller: ${httpResponse}`;
                         reject(errorMessage);
                     }
                 );
@@ -192,11 +200,21 @@ class SellerSignupController implements ISellerSignUp {
         return this.$q((resolve, reject) => {
             // Retrieve the regions (only if the user has selected a country).
             if (this.currentCountry) {
+                // Check if a (.json) filename is specified in the file to get the regions for this country from.
+                if (!this.currentCountry.filename) {
+                    // If no region file is available for this country then set regions to empty (region dropdown will be disabled or given default value in UI).
+                    this.regions = null;
+                    return;
+                }
                 try {
                     this.regionResource = this.dataAccessService.getRegionResource(this.currentCountry.filename);
-                    this.regionResource.query((result: IRegion[]) => {
-                        this.regions = result;
-                        resolve(result);
+                    this.regionResource.query((results: IRegion[]) => {
+                        // Filter out any regions with wrong type from the result if a regionfilter was specified.
+                        if (this.currentCountryRegionFilter) {
+                            results = _.where(results, { 'subdivision': this.currentCountryRegionFilter });
+                        }
+                        this.regions = results;
+                        resolve(results);
                     }, (err: any) => {
                         reject(err);
                     });
@@ -227,8 +245,8 @@ class SellerSignupController implements ISellerSignUp {
             (data: any) => {
                 if (!this.$rootScope.userInfo.preferences) this.$rootScope.userInfo.preferences = <IUserPreferences>{};
 
-                this.$rootScope.userInfo.preferences.perspective = "seller";
-                this.$rootScope.userInfo.sellerId = "pending"; // For UX dependencies
+                this.$rootScope.userInfo.preferences.perspective = 'seller';
+                this.$rootScope.userInfo.sellerId = 'pending'; // For UX dependencies
                 // alert(`success: ${data}`);
                 this.seller = data.seller;
                 this.showMessage('Your seller data was saved successfully.', false);
@@ -241,19 +259,24 @@ class SellerSignupController implements ISellerSignUp {
     
     // TODO BW dd. 2016-01-16: Refactor message box to directive for reuse on other screens.
     resetMessage() {
-        this.message = ""; 
+        this.message = ''; 
     }
  
     /* Return message type as bootstrap class. 
     * @param type Enum MessageType, for instance Succes.
     * @returns bootstrap class as string, for instance 'alert-success'.
     */   
-    private messageTypeAsBsClass(type: MessageType) {
-        let typeString = MessageType[type].toString().toLowerCase();
-        let result = `alert-${typeString}`;
-        return result;
-    };
+    //private messageTypeAsBsClass(type: MessageType) {
+    //    let typeString = MessageType[type].toString().toLowerCase();
+    //    let result = `alert-${typeString}`;
+    //    return result;
+    //};
     
+    edit() {
+        this.displayMode = DisplayMode.Edit;
+        return false;
+    }
+
     private saveCountryAndRegionString() {
         this.seller.country = this.currentCountry.name;
         this.seller.countryCode = this.currentCountry.code;
@@ -270,6 +293,12 @@ class SellerSignupController implements ISellerSignUp {
         then((result) => {
             this.setCurrentRegion(this.seller.regionCode);
         });
+    }
+
+    private setDisplayFlags() {
+        this.isReadMode = this.displayMode === DisplayMode.Read;
+        this.isAddMode = this.displayMode === DisplayMode.Add;
+        this.isEditMode = this.displayMode === DisplayMode.Edit;
     }
 }
 
