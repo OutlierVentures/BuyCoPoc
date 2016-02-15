@@ -547,7 +547,7 @@ export class ProposalService {
 
                 // Load seller data for these offers
                 var allSellerAddresses = _(offers).map(o => {
-                    return o.sellerAddress;
+                    return o.owner;
                 });
 
                 return userModel.User
@@ -562,7 +562,7 @@ export class ProposalService {
                     var theSeller = _(usersWithSellers).find(us=> {
                         if (!us.blockchainAccounts) return false;
                         if (!us.blockchainAccounts.accounts) return false;
-                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.sellerAddress);
+                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.owner);
                     });
 
                     if (theSeller) o.sellerName = theSeller.name;

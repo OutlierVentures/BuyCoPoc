@@ -74,7 +74,7 @@ export class OfferContractService {
                         
                     o.id = offerAddress;
 
-                    getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.sellerAddress = addr; }));
+                    getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
                     getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
 
@@ -161,7 +161,7 @@ export class OfferContractService {
     create(proposalId: string, o: offerModel.IOffer): Q.Promise<offerModel.IOffer> {
         var t = this;
 
-        o.sellerAddress = web3plus.web3.coinbase;
+        o.owner = web3plus.web3.coinbase;
 
         var proposalContract: contractInterfaces.IProposalContract;
 
@@ -205,9 +205,9 @@ export class OfferContractService {
                     function (err, offerContract: contractInterfaces.IOfferContract) {
                         if (err) defer.reject(err);
 
-                        var newOfferSellerAddress = offerContract.owner();
+                        var newOfferOwner = offerContract.owner();
 
-                        if (!(newOfferSellerAddress == o.sellerAddress
+                        if (!(newOfferOwner == o.owner
                             && offerContract.minimumAmount().toNumber() == o.minimumAmount
                             && offerContract.price().toNumber() == o.price * 100)) {
                             defer.reject("Offer could not be added to contract.");

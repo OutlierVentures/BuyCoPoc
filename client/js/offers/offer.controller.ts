@@ -180,9 +180,9 @@ class OfferController {
                 };
 
                 // Set the seller address for consistency checks.
-                t.$scope.offer.sellerAddress = t.blockchainService.getCurrentAccount();
+                t.$scope.offer.owner = t.blockchainService.getCurrentAccount();
                 
-                proposalContract.offer(t.$scope.offer.price * 100, t.$scope.offer.minimumAmount, options, function (err, transactionId) {
+                proposalContract.offer(t.$scope.offer.price * 100, t.$scope.offer.minimumAmount, t.$scope.toCard, options, function (err, transactionId) {
                     if (err) {
                         t.$scope.processMessage = undefined;
                         if (err.message) err = err.message;

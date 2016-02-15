@@ -3,7 +3,7 @@
  */
 export interface IOffer {
     id: string;
-    sellerAddress: string;
+    owner: string;
     price: number;
     minimumAmount: number;
     toCard: string;

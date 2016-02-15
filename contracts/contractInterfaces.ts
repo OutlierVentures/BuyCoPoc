@@ -28,6 +28,11 @@ export interface IWeb3TransactionCallback {
 // make them return a Promise. If not, they take a callback, which is not reflected in 
 // these interfaces.
 
+/**
+ * Version of the contracts expected. Compared when getting contracts.
+ */
+export var contractsVersion = "0.8.1";
+
 export interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
     addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number | IBigNumber, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
@@ -36,6 +41,7 @@ export interface IProposalRegistryContract extends IWeb3Contract {
 
     name(): string;
     owner(): string;
+    version(): string;
 }
 
 export interface IProposalContract extends IWeb3Contract {

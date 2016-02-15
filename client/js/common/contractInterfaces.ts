@@ -32,6 +32,11 @@ interface IWeb3TransactionCallback {
 // make them return a Promise. If not, they take a callback, which is not reflected in 
 // these interfaces.
 
+/**
+ * Version of the contracts expected. Compared when getting contracts.
+ */
+var codeContractsVersion = "0.8.0";
+
 interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
     addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number | IBigNumber, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
@@ -40,14 +45,15 @@ interface IProposalRegistryContract extends IWeb3Contract {
 
     name(): string;
     owner(): string;
+    version(): string;
 }
 
 interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    back(amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    back(amount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
-    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
     setPaid(backingIndex: number | IBigNumber, paymentType: number | IBigNumber, transactionId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 
@@ -114,9 +120,12 @@ interface IProposalContract extends IWeb3Contract {
 }
 
 interface IOfferContract extends IWeb3Contract {
-    sellerAddress(): string;
+    owner(): string;
     price(): IBigNumber;
     minimumAmount(): IBigNumber;
+    cardId(): string;
+
     setPrice(price: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
     setMinimumAmount(amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+    setCardId(cardId: string, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
 }

@@ -604,6 +604,14 @@ contract ProposalRegistry {
      */
     address public owner;
 
+    /*
+     * Version of the regstriy for simple version checking. The code is currently
+     * compatible with only a single version of the contracts. After any change,
+     * this number should be increased. The code compares it with a variable in
+     * contractInterfaces.
+     */
+    string public version = "0.8.1";
+
     function ProposalRegistry(string n){
         name = n;
         owner = tx.origin;

@@ -267,7 +267,7 @@ class ProposalController {
                     from: t.blockchainService.getCurrentAccount()
                 };
 
-                proposalContract.back(t.$scope.amount, options, function (err, transactionId) {
+                proposalContract.back(t.$scope.amount, t.$scope.fromCard, options, function (err, transactionId) {
                     if (err) {
                         t.$scope.processMessage = undefined;
                         if (err.message) err = err.message;
@@ -338,7 +338,7 @@ class ProposalController {
         // Call the proposal contract from our own address.
         // TODO: verify that an ethereum account for the user has been configured.
         // TODO: move this to a service; it got too complex.
-        this.blockchainService.getProposalRegistryContractAt()
+        this.blockchainService.getProposalRegistryContract()
             .then(registryContract => {
                 var ownerAddress = t.blockchainService.getCurrentAccount();
                 var options: IWeb3TransactionOptions = {

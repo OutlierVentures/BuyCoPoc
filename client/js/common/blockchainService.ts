@@ -230,10 +230,12 @@ class BlockchainService {
         return this.accounts.get()["selected"];
     }
 
-    getProposalRegistryContractAt(): ng.IPromise<IProposalRegistryContract> {
+    getProposalRegistryContract(): ng.IPromise<IProposalRegistryContract> {
         var t = this;
 
         var defer = t.$q.defer<any>();
+        var reject = defer.reject;
+        var resolve = defer.resolve;
 
         t.$q.all(
             [
@@ -254,13 +256,18 @@ class BlockchainService {
 
                 var contractDef = web3.eth.contract(contractAbi);
 
-                var con = contractDef.at(registryAddress);
+                var con: IProposalRegistryContract = contractDef.at(registryAddress);
 
-                defer.resolve(con);
+                var contractsVersion = con.version();
+                if (contractsVersion != codeContractsVersion) {
+                    reject("Invalid contract version " + contractsVersion + ". The code is built against version " + codeContractsVersion + ".");
+                }
+
+                resolve(con);
             })
             .catch(error => {
                 // Handle error
-                defer.reject(error);
+                reject(error);
             });
 
         return defer.promise;
