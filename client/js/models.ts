@@ -270,15 +270,51 @@ interface ICategoryBase {
 }
 
 /**
- * A sub category of BuyCo's, e.g. "Camera"
+ * A sub category of BuyCos, e.g. "Camera"
  */
 interface ISubCategory extends ICategoryBase {
 
 }
 
 /**
- * A main category of BuyCo's, e.g. "Electronics"
+ * A main category of BuyCos, e.g. "Electronics"
  */
 interface IMainCategory extends ICategoryBase {
     subCategories: ISubCategory[];
 }
+
+
+/*** START from API auditController ***/
+
+interface IBuyCoStatistics {
+    totalDepositsAmount: number,
+    totalPaidOutAmount: number,
+    totalBalance: number,
+}
+
+
+interface IAuditList {
+    items: IAuditListItem[],
+    totals: IBuyCoStatistics
+}
+
+interface IAuditListItem {
+    proposal: IProposal,
+    statistics: IBuyCoStatistics
+}
+
+interface IAuditDetails {
+    proposal: IProposal,
+    statistics: IBuyCoStatistics,
+}
+
+interface IVaultStatistics {
+    balance: number,
+    transactions: IUpholdTransaction[]
+    totals: {
+        debitAmount: number,
+        creditAmount: number
+    }
+}
+
+/*** END from API auditController ***/

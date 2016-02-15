@@ -1,0 +1,142 @@
+﻿<div class="jumbotron">
+    <div class="container">
+        <h5>BuyCo Audit</h5>
+        <p>This public audit allows everyone to inspect the financial streams within BuyCo.</p>
+    </div>
+</div>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3>Audit</h3>
+            <p>The financials of BuyCo are governed by incorruptible smart contracts on a blockchain. You can regard BuyCo as an app made of glass: everybody can see what's going on inside, but no one can act in ways that are not allowed by the contracts. Not even us. All amounts are in GBP.</p>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#help">Help</button>
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#tech-info">Technical info</button>
+            </div>
+            <div id="help" class="collapse panel panel-default" style="margin-top:1em">
+                <div class="panel-heading">
+                    <h3>Help</h3>
+                </div>
+                <div class="panel-body">
+                    <p>This page shows the audit trail of BuyCo. The most important numbers are these:</p>
+                    <ul>
+                        <li><label>Total balance of BuyCos</label>: the combined balance of all BuyCos. Effectively this is the money that is owed by BuyCo to the BuyCo members.</li>
+                        <li><label>Total financial reserves</label>: the financial reserves of BuyCo stored with Bitreserve. These reserves back up the BuyCo balances.</li>
+                    </ul>
+                    <p>In a normal situation, these numbers should be equal.</p>
+                    <h3>BuyCo details</h3>
+                    <p>You can explore the following statistics about all BuyCos.</p>
+                    <ul>
+                        <li><label>BuyCo ID</label>: the unique ID of the BuyCo. BuyCo members can see this ID.</li>
+                        <li><label>Smart contract address</label>: the address of the smart contract that governs this BuyCo. You can learn more about smart contracts under <em>Technical info</em>.</li>
+                        <li><label>Total deposits</label>: the total amount deposited in the BuyCo.</li>
+                        <li><label>Total active loans</label>: the total amount of loans that haven't been repaid.</li>
+                        <li><label>Total repaid loans</label>: the total amount of historical loans, that have been repaid.</li>
+                        <li><label>Total repaid interest</label>: the total amount of interest of that has been repaid with loans.</li>
+                        <li><label>Balance</label>: the total balance of the BuyCo, which is calculated as <strong>Total deposits</strong> - <strong>Total active loans</strong> + <strong>Total repaid interest</strong>.</li>
+                        <li><label>Available balance</label>: the balance that is available for new loans.</li>
+                    </ul>
+                    <h3>Financial transactions</h3>
+                    <p>You can explore all financial transactions going in and out of BuyCo. This concerns deposits, withdrawals, loans and repayments.</p>
+                    <ul>
+                        <li><label>Transaction ID</label>: the Bitreserve transaction ID. Click on the link to see transaction details on the Bitreserve ReserveChain.</li>
+                        <li><label>Date</label>: date/time of the transaction.</li>
+                        <li><label>Debit</label>: the amount debited, i.e. sent from a BuyCo to a member.</li>
+                        <li><label>Credit</label>: the amount credited, i.e. sent from a member to a BuyCo.</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="tech-info" class="collapse panel panel-default" style="margin-top: 1em">
+                <div class="panel-heading">
+                    <h3>Technical information</h3>
+                </div>
+                <div class="panel-body">
+                    <p>BuyCo uses a private blockchain based on <a href="https://www.ethereum.org" target="_blank">Ethereum</a>.</p>
+                    <p>You can inspect the code and data of the smart contracts governing BuyCo yourself. Each of the BuyCos has a smart contract address, listed in the BuyCo details.</p>
+                    <p>You can connect to our blockchain nodes with a recent version of <code>geth</code> or <code>eth</code> to the following address. We allow external nodes to connect and download the blockchain, but don't allow them to commit transactions.</p>
+                    <pre>{{applicationInfo.blockchain.nodeUrl}}</pre>
+                    <p>Use the following genesis block:</p>
+                    <pre>{{applicationInfo.blockchain.genesisBlock | json }}</pre>
+                    <p>In the proof of concept phase we don't release the Solidity source code of the smart contracts.</p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <h3>BuyCo Financials</h3>
+            <div ng-show="!items" style="margin-top:1em;">
+                <p><i>We're calculating the latest numbers, please bear with us...</i></p>
+            </div>
+            <div ng-show="items && items.length==0">
+                <p>There are no BuyCos yet, therefore the audit shows no results.</p>
+            </div>
+            <div ng-show="items && items.length>0" style="margin-top:1em;">
+                <p><strong>Total BuyCo balance:</strong> {{totals.balance | number : 2}} GBP</p>
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#BuyCo-list">Show BuyCo details</button>
+                <table class="table table-striped collapse" id="BuyCo-list">
+                    <thead>
+                        <tr>
+                            <th>BuyCo ID</th>
+                            <th>Smart contract address</th>
+                            <th>Total amount deposited</th>
+                            <th>Total amount paid out</th>
+                            <th>Total escrow balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="stat in items track by stat.proposal._id">
+                            <td><code>{{stat.proposal._id}}</code></td>
+                            <td><code>{{stat.proposal.contractAddress}}</code></td>
+                            <td>{{stat.statistics.totalDepositAmount | number : 2}}</td>
+                            <td>{{stat.statistics.totalPaidOutAmount | number : 2}}</td>
+                            <td>{{stat.statistics.totalBalance | number : 2}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td></td>
+                            <td>{{totals.totalDepositAmount | number : 2}}</td>
+                            <td>{{totals.totalPaidOutAmount | number : 2}}</td>
+                            <td>{{totals.totalBalance | number : 2}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- /.col-lg-4 (nested) -->
+            </div>
+            <br>
+            <h3>Financial reserves</h3>
+            <div ng-show="!vaultStatistics">
+                <p><i>Loading financial reserves data...</i></p>
+            </div>
+            <div ng-show="vaultStatistics">
+                <p><strong>Total financial reserves:</strong> {{vaultStatistics.balance | number: 2}} GBP</p>
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#vault-transactions">Show all transactions</button>
+                <br>
+                <div class="collapse" id="vault-transactions">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Date</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="transaction in vaultStatistics.transactions track by transaction.id">
+                                <td><code><a target="_blank" href="https://uphold.com/reserve/transactions/{{transaction.id}}">{{transaction.id}}</a></code></td>
+                                <td>{{transaction.createdAt}}</td>
+                                <td>{{transaction.debitAmount | number : 2}}</td>
+                                <td>{{transaction.creditAmount | number : 2}}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td></td>
+                                <td>{{vaultStatistics.totals.debitAmount | number : 2}}</td>
+                                <td>{{vaultStatistics.totals.creditAmount | number : 2}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

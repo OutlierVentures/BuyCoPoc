@@ -4,12 +4,12 @@
     <div class="text-center info" ng-show="!mainCategory.subCategories">
         <img src="/images/ajax-loader.gif">
         <h3>Loading</h3>
-        <p>Loading the BuyCo's...</p>
+        <p>Loading the BuyCos...</p>
     </div>
     <div class="text-center info" ng-show="mainCategory.subCategories.length==0">
         <i class="fa fa-times"></i>
-        <h3>No active BuyCo's</h3>
-        <p>There are no active BuyCo's in {{mainCategory.name}}.</p>
+        <h3>No active BuyCos</h3>
+        <p>There are no active BuyCos in {{mainCategory.name}}.</p>
     </div>
     <div class="row" ng-show="mainCategory.subCategories.length>0">
         <div class="col-lg-4 col-md-6" ng-repeat="category in mainCategory.subCategories track by category.name">
@@ -20,7 +20,7 @@
                     </a>
                     <br />
                     <p class="pull-left"><a href="/proposal/category/{{mainCategory.name}}/{{category.name}}">{{category.name}}</a></p>
-                    <p class="pull-right">{{category.totalProposalCount}} BuyCo's</p>
+                    <p class="pull-right">{{category.totalProposalCount}} BuyCos</p>
                 </div>
             </div>
         </div>

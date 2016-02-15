@@ -21,6 +21,7 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
         .when('/buyer/signup', { controller: BuyerSignupController, controllerAs: "vm", templateUrl: 'js/buyers/buyer-signup.html' })
         .when('/seller/signup', { controller: SellerSignupController, controllerAs: "vm", templateUrl: 'js/sellers/seller-signup.html' })
         .when('/seller-proposal/list', { controller: SellerProposalListController, controllerAs: "vm", templateUrl: 'js/seller-proposals/seller-proposal-list.html' })
+        .when('/audit', { controller: AuditListController, controllerAs: "vm", templateUrl: 'js/audit/audit-list.html' })
         .otherwise({ templateUrl: 'views/not-found.html' });
     $locationProvider.html5Mode(true);
     $locationProvider.hashPrefix('!');

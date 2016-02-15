@@ -11,6 +11,7 @@ import configController = require('../api/configuration/configurationController'
 import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
 import userAccountController = require('../api/user/userAccountController');
+import auditController = require('../api/audit/auditController');
 
 /**
  * Configure the routes for all API functions on an Express app.
@@ -90,6 +91,12 @@ export function configure(app: express.Express) {
     var cacheCon = new cacheController.CacheController();
     apiRouter.route("/data/cache/update").post(cacheCon.update);
     apiRouter.route("/data/cache/refresh").post(cacheCon.fullRefresh);
+
+    
+    var ac = new auditController.AuditController();
+    apiRouter.get("/audit/buyco", ac.getList);
+    apiRouter.get("/audit/vault", ac.getVaultData);
+    apiRouter.get("/audit/info", ac.getInfo);
 
     // Catch non-existing api calls.
     apiRouter.route("*").all(function (req, res) {
