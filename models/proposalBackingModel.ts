@@ -5,6 +5,7 @@ export var proposalBackingSchema = new mongoose.Schema({
     id: String,
     userId: String,
     address: String,
+    cardId: String,
     amount: Number,
     startPaymentTransactionId: String,
     startPaymentAmount: Number,
@@ -26,6 +27,11 @@ export interface IProposalBacking {
      * Blockchain address of this user.
      */
     address: string;
+
+    /**
+     * Uphold card ID used for payments.
+     */
+    cardId: string;
 
     /**
      * Backer index within the proposal.

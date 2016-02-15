@@ -199,22 +199,26 @@ export class ProposalService {
                 var numBackers = proposalContract.backerIndex().toNumber();
 
                 for (var i = 1; i <= numBackers; i++) {
-                    var defer = Q.defer<proposalBackingModel.IProposalBacking>();
+                    //var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
-                    getBackerDetailsPromises.push(defer.promise);
+                    getBackerDetailsPromises.push(t.getBacker(proposalContract, i));
 
-                    // The getter for the backers can cause exceptions deep down in the belly
-                    // of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
-                    // We wrap it in a domain to prevent this from crashing the whole app.
+                    // AvA 20160215: disabled error catching below because of restructuring of 
+                    // function getBackers(). 
+                    // TODO: Check if error returns.
 
-                    var d = domain.create()
-                    d.on('error', function (err) {
-                        // Handle the error safely, reject the promise with the error message.
-                        if (err.message) err = err.message;
-                        defer.reject(err);
-                    })
+                    //// The getter for the backers can cause exceptions deep down in the belly
+                    //// of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
+                    //// We wrap it in a domain to prevent this from crashing the whole app.
 
-                    d.run(t.createGetBackerFunction(defer, proposalContract, i))
+                    //var d = domain.create()
+                    //d.on('error', function (err) {
+                    //    // Handle the error safely, reject the promise with the error message.
+                    //    if (err.message) err = err.message;
+                    //    defer.reject(err);
+                    //})
+
+                    //d.run(t.createGetBackerFunction(defer, proposalContract, i));
                 }
 
                 Q.all(getBackerDetailsPromises)
@@ -223,20 +227,26 @@ export class ProposalService {
                     }, function (allBackersErr) {
                         deferred.reject(allBackersErr);
                     });
-            }, err=> deferred.reject(err));
+            })
+            .catch(err=> deferred.reject(err));
 
 
         return deferred.promise;
     }
 
-    createGetBackerFunction(defer: Q.Deferred<proposalBackingModel.IProposalBacking>, proposalContract, index: number) {
+    getBacker(proposalContract: contractInterfaces.IProposalContract, index: number): Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
-        return function () {
+        return Promise<proposalBackingModel.IProposalBacking>((resolve, reject) => {
             proposalContract.backers(index, function (backerErr, backer) {
                 if (backerErr) {
-                    defer.reject(backerErr);
+                    reject(backerErr);
                     return;
                 }
+
+                // Because backers are stored as a struct in the Solidity contract, we 
+                // get its property as an array, we can't access them by name. 
+                // WARNING: The array indexes break whenever a property is added in the middle.
+
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
@@ -264,11 +274,14 @@ export class ProposalService {
                 if (backer[7])
                     endPaymentAmount = backer[7].toNumber();
 
-                defer.resolve({
+                var cId = backer[10];
+
+                resolve({
                     address: backerAddress,
                     backerIndex: index,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
+                    cardId: cId,
                     pledgePaymentTransactionId: pledgeTx,
                     pledgePaymentAmount: pledgePaymentAmount,
                     startPaymentTransactionId: startTx,
@@ -277,7 +290,7 @@ export class ProposalService {
                     endPaymentAmount: endPaymentAmount,
                 });
             });
-        }
+        });
     }
 
     /**
@@ -481,33 +494,17 @@ export class ProposalService {
                                         }
 
                                         // Store transaction with backing after it's finished
-                                        // paymentType 1 = initial payment
+                                        // paymentType 1 = initial (pledge) payment
                                         proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
                                             paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
-                                                // Test correct storage
-                                                var backing = proposalContract.backers(newBackerIndex);
-                                                if (!backing[2]) {
-                                                    defer.reject("Error saving transaction ID");
-                                                    return;
-                                                }
-
-                                                // TODO: convert to "backing to IProposalBacking" function
-                                                defer.resolve({
-                                                    address: backingAddress,
-                                                    backerIndex: newBackerIndex,
-                                                    amount: amount,
-                                                    userId: backingUser.id,
-                                                    pledgePaymentTransactionId: committedTransaction.id,
-                                                    pledgePaymentAmount: paymentAmount,
-                                                    startPaymentTransactionId: undefined,
-                                                    startPaymentAmount: undefined,
-                                                    endPaymentTransactionId: undefined,
-                                                    endPaymentAmount: undefined,
-                                                });
-                                            },
-                                            function (setPaidError) {
+                                                return t.getBacker(proposalContract, newBackerIndex);
+                                            })
+                                            .then(backer => {
+                                                defer.resolve(backer);
+                                            })
+                                            .catch(setPaidError=> {
                                                 defer.reject(setPaidError);
                                             });
                                     });

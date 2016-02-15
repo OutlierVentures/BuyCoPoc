@@ -200,6 +200,11 @@ interface IProposalBacking {
     address: string;
 
     /**
+     * Uphold card ID used for payments.
+     */
+    cardId: string;
+
+    /**
      * Backer index within the proposal.
      */
     backerIndex: number;
