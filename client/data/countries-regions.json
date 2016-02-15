@@ -904,7 +904,8 @@
         "name": "Netherlands",
         "code": "NL",
         "continent": "Europe",
-        "filename": "netherlands"
+        "filename": "netherlands",
+        "defaultSubdivision": "Province"
     },
     {
         "name": "Netherlands Antilles",
@@ -1352,7 +1353,9 @@
         "name": "United Kingdom",
         "code": "GB",
         "continent": "Europe",
-        "filename": "united-kingdom"
+        "filename": "united-kingdom",
+        "defaultSubdivision": "two-tier county",
+        "defaultSubdivision_": "unitary authority"
     },
     {
         "name": "United States",

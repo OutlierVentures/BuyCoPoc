@@ -41,12 +41,12 @@ class Seller implements ISeller {
 }
 
 // TODO BW dd 2016-01-17: Move to `common/country-region.js` for possible reuse.
-
 interface ICountry {
     name: string;
-    filename: string;
+    filename?: string;
     code: string;
     continent: string;
+    defaultSubdivision?: string;
 }
 
 

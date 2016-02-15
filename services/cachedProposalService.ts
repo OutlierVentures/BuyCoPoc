@@ -147,13 +147,10 @@ export class CachedProposalService {
     }
 
     private addProposalBackingTotals(proposal: IProposal): Promise<IProposal> {
-        // console.log(`addProposalBackingTotals: got ${proposals.length} proposals from blockchain to add backing totals to.`);
 
         var t = this;
         return Q.Promise<IProposal>((resolve, reject) => {
             try {
-                //console.log('proposal.contractAddress: ');
-                //console.log(proposal.contractAddress);
                 return t.proposalService.getBackers(proposal.contractAddress)
                     .then((proposalBackings) => {
                         console.log(`addProposalBackingTotals: got ${proposalBackings.length} proposalbackings for proposal ${proposal.contractAddress}.`);
@@ -172,32 +169,6 @@ export class CachedProposalService {
                 reject(err);
             }
         });
-
-        //return Q.all<IProposal>(proposals.map((proposal) => {
-        //    //console.log('proposal: ');
-        //    //console.log(proposal);
-        //    return Q.Promise<IProposal>((resolve, reject) => {
-        //        console.log('proposal.contractAddress: ');
-        //        console.log(proposal.contractAddress);
-        //        this.proposalService.getBackers(proposal.contractAddress)
-        //        .then((proposalBackings) => {
-        //            console.log(`addProposalBackingTotals: got ${proposals.length} proposalbackings for proposal ${proposal.contractAddress}.`);
-        //            console.log('proposal.contractAddress: ');
-        //            console.log(proposal.contractAddress);
-        //            let sum = 0;
-        //            _.each(proposalBackings, (backing) => { sum += backing.amount; });
-        //            proposal.totalAmount = sum;
-        //            proposal.nrOfBackings = proposalBackings.length;
-        //            proposal.nrOfBackers = _.unique(_.pluck(proposalBackings, 'userId')).length;
-        //            resolve(proposal);
-        //        });
-        //    });
-        //}));
-        
-        // Simple form of Promise:
-        //return Promise<Array<IProposal>>((resolve, reject) => {
-        //    resolve(proposals);
-        //});
     };
 
 
