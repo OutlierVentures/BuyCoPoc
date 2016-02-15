@@ -5,6 +5,7 @@ import { Promise } from "q";
 export var proposalSchema = new mongoose.Schema({
     id: String,
     contractAddress: String,
+    owner: String,
     productName: String,
     productDescription: String,
     productSku: String,
@@ -28,6 +29,7 @@ export var proposalSchema = new mongoose.Schema({
 
 export interface IProposal {
     contractAddress: string;
+    owner: string;
     productName: string;
     productDescription: string;
     productSku: string;

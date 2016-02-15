@@ -5,7 +5,7 @@ contract Offer {
     /*
      * The seller who made this offer.
      */
-    address public sellerAddress;
+    address public owner;
 
     /*
      * Price offered at the minimum amount.
@@ -17,24 +17,38 @@ contract Offer {
      */
     uint public minimumAmount;
 
+    /*
+     * Card ID used for payouts
+     */
+    string public cardId;
+
     function setPrice(uint p){
-        if(tx.origin != sellerAddress)
+        if(tx.origin != owner)
             return;
 
         price = p;
     }
 
     function setMinimumAmount(uint a){
-        if(tx.origin != sellerAddress)
+        if(tx.origin != owner)
             return;
 
         minimumAmount = a;
     }
 
-    function Offer(address sa, uint p, uint ma){
-        sellerAddress = sa;
+    function setCardId(string cId){
+        if(tx.origin != owner)
+            return;
+
+        cardId = cId;
+    }
+
+    function Offer(uint p, uint ma, string cId) {
+        owner = tx.origin;
+
         price = p;
         minimumAmount = ma;
+        cardId = cId;
     }
 }
 
@@ -157,6 +171,11 @@ contract Proposal {
          * are discussed outside of the contract.
          */
         bool isDeliveryCorrect;
+
+        /*
+         * Uphold card ID used for payments.
+         */
+        string paymentCardId;
     }
 
     /*
@@ -253,7 +272,7 @@ contract Proposal {
     /*
      * Back the proposal, i.e. pledge to buy a certain amount.
      */
-    function back(uint am) {
+    function back(uint am, string cardId) {
         if(am == 0) return;
 
         // No backing after closing.
@@ -264,10 +283,14 @@ contract Proposal {
 
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
+        backers[backerIndex].paymentCardId = cardId;
     }
 
     /*
-     * Register a payment for a backer.
+     * Register a payment for a backer. To be called by the registry owner. The
+     * call should only be made after the payment has been verified as having
+     * the correct amount, source and destination.
+     *
      * @param backerIndex the backer index
      * @param paymentType 1=pledge, 2=start, 3=end
      * @param transactionID the external transaction ID of the payment
@@ -340,7 +363,7 @@ contract Proposal {
     /*
      * Make an offer
      */
-    function offer(uint price, uint minimumAmount) returns (Offer o){
+    function offer(uint price, uint minimumAmount, string cardId) returns (Offer o){
         // No free offers allowed. Also for safety purposes (empty might end up as 0).
         if(price == 0) return;
         if(price > maxPrice) return;
@@ -353,6 +376,7 @@ contract Proposal {
             // TODO: check if there are default setters, maybe set_price() or similar?
             offers[offerIndexByAddress[tx.origin]].setPrice(price);
             offers[offerIndexByAddress[tx.origin]].setMinimumAmount(minimumAmount);
+            offers[offerIndexByAddress[tx.origin]].setCardId(cardId);
             return;
         }
 
@@ -360,7 +384,7 @@ contract Proposal {
 
         offerIndexByAddress[tx.origin] = offerIndex;
 
-        o = new Offer(tx.origin, price, minimumAmount);
+        o = new Offer(price, minimumAmount, cardId);
         offers[offerIndex] = o;
 
         return o;
@@ -579,6 +603,14 @@ contract ProposalRegistry {
      * The owner of the registry, e.g. BuyCo Ltd
      */
     address public owner;
+
+    /*
+     * Version of the regstriy for simple version checking. The code is currently
+     * compatible with only a single version of the contracts. After any change,
+     * this number should be increased. The code compares it with a variable in
+     * contractInterfaces.
+     */
+    string public version = "0.8.1";
 
     function ProposalRegistry(string n){
         name = n;

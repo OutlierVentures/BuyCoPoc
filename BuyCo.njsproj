@@ -93,7 +93,7 @@
     <TypeScriptCompile Include="client\js\common\dataAccess.service.ts" />
     <TypeScriptCompile Include="client\js\services.ts" />
     <TypeScriptCompile Include="client\js\sellers\seller.ts" />
-    <TypeScriptCompile Include="client\js\user\blockchainService.ts" />
+    <TypeScriptCompile Include="client\js\common\blockchainService.ts" />
     <TypeScriptCompile Include="client\js\user\userAccountController.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-resource.d.ts" />
     <TypeScriptCompile Include="client\typings\angularjs\angular-route.d.ts" />
@@ -380,6 +380,9 @@
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\testProposalList.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="test\contracts\testContractDeployment.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\contracts\testProposalRegistry.ts">

@@ -125,6 +125,7 @@ interface IApplicationInfo {
 // while at the server side it's the Mongo ID.
 interface IProposal {
     contractAddress: string;
+    owner: string;
     productName: string;
     productDescription: string;
     productSku: string;
@@ -199,6 +200,11 @@ interface IProposalBacking {
     address: string;
 
     /**
+     * Uphold card ID used for payments.
+     */
+    cardId: string;
+
+    /**
      * Backer index within the proposal.
      */
     backerIndex: number;
@@ -245,7 +251,7 @@ interface IProposalBacking {
  */
 interface IOffer {
     id: string;
-    sellerAddress: string;
+    owner: string;
     price: number;
     minimumAmount: number;
     toCard: string;

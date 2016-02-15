@@ -74,7 +74,7 @@ describe("ProposalRegistry calculation", () => {
                 assert.equal(proposalContract.productName(), name1);
                 assert.equal(proposalContract.maxPrice().toNumber(), price1);
 
-                var backPromise = proposalContract.back(amount1, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount1, "cardId12345", { gas: 2500000 });
                 return backPromise;
             })
             .then(web3plus.promiseCommital)
@@ -128,7 +128,7 @@ describe("ProposalRegistry calculation", () => {
             })
             .then(pc=> {
                 proposalContract = pc;
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {

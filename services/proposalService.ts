@@ -93,6 +93,7 @@ export class ProposalService {
                     // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
                     // The calls would then be: addPropertyGetter<string>(getProperties, proposal, p, "productName")
                     // Drawback: properties of IProposal wouldn't be typesafe any more.
+                    getProperties.push(Q.denodeify<string>(proposal.owner)().then(function (o) { p.owner = o; }));
                     getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
                     getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
                     getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
@@ -198,22 +199,26 @@ export class ProposalService {
                 var numBackers = proposalContract.backerIndex().toNumber();
 
                 for (var i = 1; i <= numBackers; i++) {
-                    var defer = Q.defer<proposalBackingModel.IProposalBacking>();
+                    //var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
-                    getBackerDetailsPromises.push(defer.promise);
+                    getBackerDetailsPromises.push(t.getBacker(proposalContract, i));
 
-                    // The getter for the backers can cause exceptions deep down in the belly
-                    // of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
-                    // We wrap it in a domain to prevent this from crashing the whole app.
+                    // AvA 20160215: disabled error catching below because of restructuring of 
+                    // function getBackers(). 
+                    // TODO: Check if error returns.
 
-                    var d = domain.create()
-                    d.on('error', function (err) {
-                        // Handle the error safely, reject the promise with the error message.
-                        if (err.message) err = err.message;
-                        defer.reject(err);
-                    })
+                    //// The getter for the backers can cause exceptions deep down in the belly
+                    //// of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
+                    //// We wrap it in a domain to prevent this from crashing the whole app.
 
-                    d.run(t.createGetBackerFunction(defer, proposalContract, i))
+                    //var d = domain.create()
+                    //d.on('error', function (err) {
+                    //    // Handle the error safely, reject the promise with the error message.
+                    //    if (err.message) err = err.message;
+                    //    defer.reject(err);
+                    //})
+
+                    //d.run(t.createGetBackerFunction(defer, proposalContract, i));
                 }
 
                 Q.all(getBackerDetailsPromises)
@@ -222,20 +227,26 @@ export class ProposalService {
                     }, function (allBackersErr) {
                         deferred.reject(allBackersErr);
                     });
-            }, err=> deferred.reject(err));
+            })
+            .catch(err=> deferred.reject(err));
 
 
         return deferred.promise;
     }
 
-    createGetBackerFunction(defer: Q.Deferred<proposalBackingModel.IProposalBacking>, proposalContract, index: number) {
+    getBacker(proposalContract: contractInterfaces.IProposalContract, index: number): Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
-        return function () {
+        return Promise<proposalBackingModel.IProposalBacking>((resolve, reject) => {
             proposalContract.backers(index, function (backerErr, backer) {
                 if (backerErr) {
-                    defer.reject(backerErr);
+                    reject(backerErr);
                     return;
                 }
+
+                // Because backers are stored as a struct in the Solidity contract, we 
+                // get its property as an array, we can't access them by name. 
+                // WARNING: The array indexes break whenever a property is added in the middle.
+
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
@@ -263,11 +274,14 @@ export class ProposalService {
                 if (backer[7])
                     endPaymentAmount = backer[7].toNumber();
 
-                defer.resolve({
+                var cId = backer[10];
+
+                resolve({
                     address: backerAddress,
                     backerIndex: index,
                     amount: amount,
                     userId: "unknown", // TODO: get this from mongoDB by address
+                    cardId: cId,
                     pledgePaymentTransactionId: pledgeTx,
                     pledgePaymentAmount: pledgePaymentAmount,
                     startPaymentTransactionId: startTx,
@@ -276,9 +290,9 @@ export class ProposalService {
                     endPaymentAmount: endPaymentAmount,
                 });
             });
-        }
+        });
     }
-    
+
     /**
      * Create a new proposal in the blockchain.
      * @param p the new proposal.
@@ -287,11 +301,7 @@ export class ProposalService {
     create(p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
         var t = this;
 
-        var defer = Q.defer<proposalModel.IProposal>();
-
-        // Normalize amount for contract
-        p.maxPrice = p.maxPrice * 100;
-
+        // Normalize input data
         // Workaround for empty dates in current implementation
         var anyP = <any>p;
         if (!p.endDate)
@@ -303,11 +313,15 @@ export class ProposalService {
         if (!p.productSku) p.productSku = "";
         if (!p.productUnitSize) p.productUnitSize = "";
 
-        var proposalIndexBefore = t.registryContract.proposalIndex().toNumber();
+        // Store owner address for integrity checks.
+        p.owner = web3plus.web3.eth.coinbase;
 
-        this.registryContract.addProposal(p.productName,
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        t.registryContract.addProposal(p.productName,
             p.mainCategory, p.subCategory,
-            p.maxPrice,
+            p.maxPrice * 100,
             p.endDate.toString(), p.ultimateDeliveryDate.toString(), { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function getProposalResult(tx) {
@@ -324,11 +338,6 @@ export class ProposalService {
                 // TODO: get the proposal by tx hash
                 var proposalIndex = t.registryContract.proposalIndex().toNumber();
 
-                if (proposalIndex != proposalIndexBefore + 1) {
-                    defer.reject("Could not add proposal.");
-                    return;
-                }
-
                 var newProposalAddress = t.registryContract.proposals(proposalIndex);
 
                 p.contractAddress = newProposalAddress;
@@ -336,16 +345,44 @@ export class ProposalService {
                 return t.contractService.getProposalContractAt(newProposalAddress);
             })
             .then(proposalContract => {               
+                // Do rudimentary checks to ensure the proposal was added.
+                if (proposalContract.owner() != p.owner
+                    || proposalContract.productName() != p.productName
+                    || proposalContract.maxPrice().toNumber() != p.maxPrice * 100) {
+                    defer.reject("Could not add proposal.");
+                    return;
+                }
+
                 // Fill additional properties. This is a separate method because of 
                 // Solidity limitations ("stack too deep").
                 return proposalContract.setDetails(p.productDescription, p.productSku, p.productUnitSize, { gas: 2500000 });
             })
-            .then(web3plus.promiseCommital)
+            .then(txId => {
+                return this.processCreate(txId, p);
+            })
+            .then(newProposal => {
+                defer.resolve(newProposal);
+            })
+            .catch(err=> {
+                defer.reject(err);
+            });
+
+        return defer.promise;
+
+    }
+        
+    /**
+     * Create a new proposal in the blockchain.
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processCreate(setDetailsTransactionId: string, p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var defer = Q.defer<proposalModel.IProposal>();
+
+        web3plus.promiseCommital(setDetailsTransactionId)
             .then(function getProposalResult(tx) {
-
-                // Normalize amount for display and caching
-                p.maxPrice = p.maxPrice / 100;
-
                 // Update cache for this proposal only
                 var cps = new cachedProposalService.CachedProposalService();
                 cps.initialize(t)
@@ -373,11 +410,10 @@ export class ProposalService {
     back(p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
 
-        var defer = Q.defer<proposalBackingModel.IProposalBacking>();
         return t.contractService.getProposalContractAt(p.contractAddress)
             .then(proposalContract => {
 
-                var backPromise = proposalContract.back(amount, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount, "cardId12345", { gas: 2500000 });
 
                 return backPromise;
             })
@@ -396,7 +432,6 @@ export class ProposalService {
      */
     processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
         var defer = Q.defer<proposalBackingModel.IProposalBacking>();
-
 
         var proposalContract: contractInterfaces.IProposalContract;
 
@@ -459,33 +494,17 @@ export class ProposalService {
                                         }
 
                                         // Store transaction with backing after it's finished
-                                        // paymentType 1 = initial payment
+                                        // paymentType 1 = initial (pledge) payment
                                         proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
                                             paymentAmount * 100)
                                             .then(web3plus.promiseCommital)
                                             .then(function (setPaidResult) {
-                                                // Test correct storage
-                                                var backing = proposalContract.backers(newBackerIndex);
-                                                if (!backing[2]) {
-                                                    defer.reject("Error saving transaction ID");
-                                                    return;
-                                                }
-
-                                                // TODO: convert to "backing to IProposalBacking" function
-                                                defer.resolve({
-                                                    address: backingAddress,
-                                                    backerIndex: newBackerIndex,
-                                                    amount: amount,
-                                                    userId: backingUser.id,
-                                                    pledgePaymentTransactionId: committedTransaction.id,
-                                                    pledgePaymentAmount: paymentAmount,
-                                                    startPaymentTransactionId: undefined,
-                                                    startPaymentAmount: undefined,
-                                                    endPaymentTransactionId: undefined,
-                                                    endPaymentAmount: undefined,
-                                                });
-                                            },
-                                            function (setPaidError) {
+                                                return t.getBacker(proposalContract, newBackerIndex);
+                                            })
+                                            .then(backer => {
+                                                defer.resolve(backer);
+                                            })
+                                            .catch(setPaidError=> {
                                                 defer.reject(setPaidError);
                                             });
                                     });
@@ -525,7 +544,7 @@ export class ProposalService {
 
                 // Load seller data for these offers
                 var allSellerAddresses = _(offers).map(o => {
-                    return o.sellerAddress;
+                    return o.owner;
                 });
 
                 return userModel.User
@@ -540,7 +559,7 @@ export class ProposalService {
                     var theSeller = _(usersWithSellers).find(us=> {
                         if (!us.blockchainAccounts) return false;
                         if (!us.blockchainAccounts.accounts) return false;
-                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.sellerAddress);
+                        return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.owner);
                     });
 
                     if (theSeller) o.sellerName = theSeller.name;

@@ -56,5 +56,12 @@ export class ConfigurationController implements IConfigurationController {
 
         res.send(url);
     };
+
+    getProposalRegistryAddress = (req: express.Request, res: express.Response) => {
+        var url: string;
+
+        res.send(this.config.ethereum.contracts.proposalRegistry);
+    };
+
 }
 

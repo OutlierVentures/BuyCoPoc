@@ -62,7 +62,7 @@ class ProposalController {
     }
 
     create() {
-        this.getCategoryData((err, res) => {});
+        this.getCategoryData((err, res) => { });
     }
 
     private getCategoryData(cb: any) {
@@ -258,8 +258,8 @@ class ProposalController {
 
         // Call the proposal contract from our own address.
         // TODO: verify that an ethereum account for the user has been configured.
-        this.blockchainService.getProposalContract(t.$scope.proposal.contractAddress).then(
-            proposalContract => {
+        this.blockchainService.getProposalContractAt(t.$scope.proposal.contractAddress)
+            .then(proposalContract => {
                 var options: IWeb3TransactionOptions = {
                     // Still unclear how much gas should really be used. 250000 works at this point.
                     // If too low, it will be shown in the UX.
@@ -267,7 +267,7 @@ class ProposalController {
                     from: t.blockchainService.getCurrentAccount()
                 };
 
-                proposalContract.back(t.$scope.amount, options, function (err, transactionId) {
+                proposalContract.back(t.$scope.amount, t.$scope.fromCard, options, function (err, transactionId) {
                     if (err) {
                         t.$scope.processMessage = undefined;
                         if (err.message) err = err.message;
@@ -320,24 +320,104 @@ class ProposalController {
             }, err => {
                 t.$scope.processMessage = undefined;
                 t.$scope.errorMessage = err;
-            }
-        );
+            });
 
     }
 
     processCreate() {
         // TODO: check for validity
         var t = this;
+        var p = t.$scope.proposal;
+        var cat = JSON.parse((<any>p).category);
 
-        // Process creating a new Proposal.
-        t.$scope.processMessage = "Creating Proposal... this may take a while because we're creating the smart contract that guarantees the correct and incorruptible functioning of your Proposal.";
+        p.mainCategory = cat.mainCategory;
+        p.subCategory = cat.subCategory;
+
+        t.$scope.processMessage = "Submitting proposal... this may take a while because we're creating the smart contract that guarantees the correct and incorruptible functioning of your BuyCo.";
+
+        // Call the proposal contract from our own address.
+        // TODO: verify that an ethereum account for the user has been configured.
+        // TODO: move this to a service; it got too complex.
+        this.blockchainService.getProposalRegistryContract()
+            .then(registryContract => {
+                var ownerAddress = t.blockchainService.getCurrentAccount();
+                var options: IWeb3TransactionOptions = {
+                    gas: 2500000,
+                    from: ownerAddress,
+                };
+
+                // Set owner address for integrity checks
+                p.owner = ownerAddress;
+
+                registryContract.addProposal(p.productName,
+                    p.mainCategory,
+                    p.subCategory,
+                    p.maxPrice * 100,
+                    p.endDate.toString(), p.ultimateDeliveryDate.toString(), options,
+                    function (err, transactionId) {
+                        if (err) {
+                            t.$scope.processMessage = undefined;
+                            if (err.message) err = err.message;
+                            t.$scope.errorMessage = err;
+                            // Unless we do $scope.$apply, the error message doesn't appear. I still don't fully
+                            // understand when this is and when this isn't necessary. It can lead to errors
+                            // when calling it at points where it should not be called.
+                            t.$scope.$apply();
+                            return;
+                        }
+
+                        t.blockchainService.promiseCommital(transactionId)
+                            .then(tx=> {
+                                var proposalIndex = registryContract.proposalIndex().toNumber();
+                                var newProposalAddress = registryContract.proposals(proposalIndex);
+
+                                p.contractAddress = newProposalAddress;
+
+                                return t.blockchainService.getProposalContractAt(newProposalAddress);
+                            })
+                            .then(proposalContract => {               
+                                // Do rudimentary checks to ensure the proposal was added.
+                                if (proposalContract.owner() != p.owner
+                                    || proposalContract.productName() != p.productName
+                                    || proposalContract.maxPrice().toNumber() != p.maxPrice * 100) {
+                                    throw ("Could not add proposal.");
+                                    return;
+                                }
+
+                                proposalContract.setDetails(p.productDescription,
+                                    p.productSku,
+                                    p.productUnitSize,
+                                    options,
+                                    function (err, transactionId) {
+                                        t.processCreateBackend(transactionId);
+                                    });
+                            }).catch(err => {
+                                throw (err);
+                            });
+                    });
+            });
+    }
+
+    /**
+     * Signal the backend that a new proposal has been created so it can carry out its actions 
+     * to follow this up
+     * @param setDetailsTxId transaction ID of the call to the setDetails contract function.
+     */
+    processCreateBackend(setDetailsTxId: string) {
+        var t = this;
+
+        // Backend processing for new proposals
+        t.$scope.processMessage = "Processing proposal... this may take a while because we're creating the smart contract that guarantees the correct and incorruptible functioning of your BuyCo.";
         t.$scope.errorMessage = undefined;
         t.$scope.successMessage = undefined;
 
-        this.$http({
+        t.$http({
             method: 'POST',
             url: apiUrl + '/proposal',
-            data: t.$scope.proposal,
+            data: {
+                proposal: t.$scope.proposal,
+                transactionId: setDetailsTxId
+            },
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: IProposal) {
             t.$scope.processMessage = undefined;
@@ -367,3 +447,6 @@ class ProposalController {
         });
     }
 }
+
+
+

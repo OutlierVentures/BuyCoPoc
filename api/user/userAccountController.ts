@@ -25,8 +25,8 @@ export class UserAccountController {
         var accessToken = req.header("AccessToken");
 
         userRepo.getUserByAccessToken2(accessToken)
-            .then(u => res.json(u),
-            err => res.status(500).json({
+            .then(u => res.json(u))
+            .catch(err => res.status(500).json({
                 "error": err,
                 "error_location": "getting user data"
             }));
@@ -47,8 +47,8 @@ export class UserAccountController {
                             "error_location": "getting accounts"
                         });
                     });
-            },
-            err => {
+            })
+            .catch(err => {
                 res.status(500).json({
                     "error": err,
                     "error_location": "initializing user accounts service"
@@ -64,22 +64,22 @@ export class UserAccountController {
         var t = this;
         serviceFactory.createUserAccountService()
             .then(uas => {
-                uas.saveAccounts(accessToken, accounts)
-                    .then(user => {
-                        res.json(user);
-                    }, err => {
-                        res.status(500).json({
-                            "error": err,
-                            "error_location": "saving accounts"
-                        });
-                    });
-            },
-            err => {
+                return uas.saveAccounts(accessToken, accounts);
+            }, err => {
                 res.status(500).json({
                     "error": err,
                     "error_location": "initializing user accounts service"
                 });
                 return null;
+            })
+            .then(user => {
+                res.json(user);
+            })
+            .catch(err => {
+                res.status(500).json({
+                    "error": err,
+                    "error_location": "saving accounts"
+                });
             });
     };
 }

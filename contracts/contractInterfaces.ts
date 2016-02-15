@@ -28,6 +28,11 @@ export interface IWeb3TransactionCallback {
 // make them return a Promise. If not, they take a callback, which is not reflected in 
 // these interfaces.
 
+/**
+ * Version of the contracts expected. Compared when getting contracts.
+ */
+export var contractsVersion = "0.8.1";
+
 export interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
     addProposal(productName: string, productCategory: string, productSubCategory: string, maxPrice: number | IBigNumber, endDate: string, ultimateDeliveryDate: string, options?: IWeb3TransactionOptions): Promise<string>;
@@ -36,14 +41,15 @@ export interface IProposalRegistryContract extends IWeb3Contract {
 
     name(): string;
     owner(): string;
+    version(): string;
 }
 
 export interface IProposalContract extends IWeb3Contract {
     setDetails(productDescription: string, productSku: string, productUnitSpecification: string, options?: IWeb3TransactionOptions): Promise<string>;
 
-    back(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    back(amount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 
-    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    offer(price: number | IBigNumber, minimumAmount: number | IBigNumber, cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 
     setPaid(backingIndex: number | IBigNumber, paymentType: number | IBigNumber, transactionId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
 
@@ -110,9 +116,12 @@ export interface IProposalContract extends IWeb3Contract {
 }
 
 export interface IOfferContract extends IWeb3Contract {
-    sellerAddress(): string;
+    owner(): string;
     price(): IBigNumber;
     minimumAmount(): IBigNumber;
+    cardId(): string;
+
     setPrice(price: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
     setMinimumAmount(amount: number | IBigNumber, options?: IWeb3TransactionOptions): Promise<string>;
+    setCardId(cardId: string, options?: IWeb3TransactionOptions): Promise<string>;
 }

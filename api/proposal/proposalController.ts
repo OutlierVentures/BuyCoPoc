@@ -5,7 +5,7 @@ import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
 import upholdService = require('../../services/upholdService');
 
-import proposalModel = require ('../../models/proposalModel');
+import proposalModel = require('../../models/proposalModel');
 
 import _ = require('underscore');
 
@@ -29,20 +29,6 @@ export class ProposalController {
         // Only the maincategory and subcategory are in the URL part itself.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
-
-        var categoryString = req.query.category;
-
-        if (categoryString && categoryString.indexOf(" - ")) {
-            var parts = categoryString.split(" - ")
-            if (parts.length == 2) {
-                proposalFilter.mainCategory = parts[0];
-                proposalFilter.subCategory = parts[1];
-            }
-            (<any>proposalFilter).category = undefined;
-        }
-
-        if (mainCategory) { proposalFilter.mainCategory = mainCategory; }
-        if (subCategory) { proposalFilter.subCategory = subCategory; }
         
         // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()
@@ -98,52 +84,29 @@ export class ProposalController {
 
     create = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
-        var proposalData = <IProposal>req.body;
+        var proposalData = <IProposal>req.body.proposal;
+        var transactionId = <string>req.body.transactionId;
 
-        // TODO: furter validation.
-
-        // The category arrives as a string: [main] - [sub]
-        // Example: "Electronics - Camera"
-        var categoryString: string = req.body.category;
-
-        if (!categoryString) {
-            res.status(500).json({
-                "error": "category is required",
-                "error_location": "creating proposal"
-            });
-            return;
-        }
-
-        if (categoryString && categoryString.indexOf(" - ")) {
-            var parts = categoryString.split(" - ")
-            if (parts.length == 2) {
-                proposalData.mainCategory = parts[0];
-                proposalData.subCategory = parts[1];
-            }
-        }
+        // TODO: further validation.
 
         serviceFactory.createProposalService()
-            .then(
-            function (ps) {
-                return ps.create(proposalData);
-            },
-            function (initErr) {
-                res.status(500).json({
-                    "error": initErr,
-                    "error_location": "initializing proposal service"
-                });
-                return null;
+            .then(ps => {
+                if (transactionId)
+                    // User has submitted backing transaction
+                    return ps.processCreate(transactionId, proposalData);
+                else
+                    return ps.create(proposalData);
             })
-            .then(
-            function (proposal) {
+            .then(proposal => {
                 res.json(proposal);
-            }, function (createErr) {
+            })
+            .catch(createErr => {
                 res.status(500).json({
                     "error": createErr,
                     "error_location": "creating proposal"
                 });
                 return null;
-            })
+            });
 
     }
 

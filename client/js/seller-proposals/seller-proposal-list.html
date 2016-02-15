@@ -20,12 +20,12 @@
                     <select class="form-control" ng-model="vm.proposalFilter.category" name="category" id="filterCategory" >
                         <option value="">[any category]</option>
                         <optgroup ng-repeat="mainCat in vm.allCategories track by mainCat.name" label="{{mainCat.name}}">
-                            <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value="{{mainCat.name}} - {{subCat.name}}">{{subCat.name}}</option>
+                            <option ng-repeat="subCat in mainCat.subCategories track by subCat.name" value='{ "mainCategory": "{{mainCat.name}}", "subCategory": "{{subCat.name}}"}'>{{subCat.name}}</option>
                         </optgroup>
                     </select>
                 </div>
                 <div class="col-md-2 form-group">
-                    <label for="filterPartNumber">Part number</label>
+                    <label for="filterPartNumber">Product SKU</label>
                     <input class="form-control" type="text" name="partNumber" ng-model="vm.proposalFilter.partNumber" id="filterPartNumber">
                 </div>
                 <div class="col-md-2 form-group" ng-class="{ 'has-error': vm.form.minimumTotalAmount.$invalid }">

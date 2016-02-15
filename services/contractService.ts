@@ -12,22 +12,42 @@ export class ContractService {
     registryContract: contractInterfaces.IProposalRegistryContract;
     proposalContractDefinition;
 
-    initialize(c: configModel.IApplicationConfig): Promise<boolean>{
+    initialize(c: configModel.IApplicationConfig): Promise<boolean> {
         this.config = c;
         var t = this;
         return Promise<boolean>((resolve, reject) => {
             web3plus.loadContractFromFile('ProposalRegistry.sol',
-                'ProposalRegistry', t.config.ethereum.contracts.proposalRegistry, true, function (loadContractError, con) {
+                'ProposalRegistry', t.config.ethereum.contracts.proposalRegistry, true, function (loadContractError, con: contractInterfaces.IProposalRegistryContract) {
                     if (loadContractError) {
                         reject(loadContractError);
                         return;
                     }
                     t.registryContract = con;
                     t.proposalContractDefinition = t.registryContract.allContractTypes.Proposal.contractDefinition;
-                
+
                     resolve(true);
                 });
         });
+    }
+
+    /**
+     * Check the version of the configured contracts in the blockchain against our code.
+     */
+    checkContractsVersion(): boolean {
+        var t = this;
+        var codeContractsVersion = contractInterfaces.contractsVersion;
+        var contractsVersion = "";
+        try {
+            contractsVersion = t.registryContract.version();
+        }
+        catch (e) { }
+
+        if (contractsVersion != codeContractsVersion) {
+            console.error("Invalid contract version " + contractsVersion + ". The code is built against version " + codeContractsVersion + ".");
+            return false;
+        }
+
+        return true;
     }
 
     getProposalContractAt(address: string): Promise<contractInterfaces.IProposalContract> {

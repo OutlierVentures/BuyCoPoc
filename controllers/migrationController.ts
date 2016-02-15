@@ -7,8 +7,11 @@ import fs = require('fs');
 
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import contractInterfaces = require('../contracts/contractInterfaces');
+import tools = require('../lib/tools');
+
 import _ = require('underscore');
 import Q = require('q');
+import { Promise } from 'q';
 
 /**
  * Controller for migration between versions.
@@ -32,32 +35,28 @@ export class MigrationController {
         }
 
         if (!registryCode || registryCode == "0x") {
-            var deferDeployRegistry = Q.defer<any>();
-
-            web3plus.deployContractFromFile("ProposalRegistry.sol", "ProposalRegistry", true, function (deployErr, deployRes) {
-                if (deployErr) {
-                    deferDeployRegistry.reject(deployErr);
-                    return;
-                }
-
-                // Return the contract address so it can be added to the configuration file.
-                // COULD DO: write config file here, or provide result values in a
-                // format that can be easily incorporated in the config file.
-                // ... or use a/the namereg contract...
-                console.log("MigrationController.update", "ProposalRegistry deployed at " + deployRes.address);
-                deferDeployRegistry.resolve({ "registryContract": deployRes });
-            });
-
-            promises.push(deferDeployRegistry.promise);
+            promises.push(this.deployRegistry());
         } else {
             var deferShowRegistry = Q.defer<any>();
             promises.push(deferShowRegistry.promise);
 
-            setTimeout(() => {
-                deferShowRegistry.resolve({
-                    "address": this.config.ethereum.contracts.proposalRegistry
+            serviceFactory.getContractService()
+                .then(cs => {
+                    if (cs.checkContractsVersion())
+                        deferShowRegistry.resolve({ "address": this.config.ethereum.contracts.proposalRegistry });
+                    else {
+                        console.log("Version mismatch. Deploying new registry.");
+                        return this.deployRegistry();
+                    }
                 })
-            }, 0);
+                .then(newRegistryAddress => {
+                    if(!deferShowRegistry.promise.isFulfilled())
+                        deferShowRegistry.resolve({ "address": newRegistryAddress });
+                })
+                .catch(err => {
+                    // An error occurred, just return it.
+                    deferShowRegistry.reject(err);
+                });
         }
 
         Q.all(promises)
@@ -75,6 +74,25 @@ export class MigrationController {
                         "error": err
                     });
             });
+    }
+
+    private deployRegistry(): Q.Promise<string> {
+        return Promise<string>((resolve, reject) => {
+
+            web3plus.deployContractFromFile("ProposalRegistry.sol", "ProposalRegistry", true, function (deployErr, deployRes) {
+                if (deployErr) {
+                    reject(deployErr);
+                    return;
+                }
+
+                // Return the contract address so it can be added to the configuration file.
+                // COULD DO: write config file here, or provide result values in a
+                // format that can be easily incorporated in the config file.
+                // ... or use a/the namereg contract...
+                console.log("MigrationController.update", "ProposalRegistry deployed at " + deployRes.address);
+                resolve(deployRes.address);
+            });
+        });
     }
 
     /**
@@ -122,11 +140,11 @@ export class MigrationController {
             .then(pc => {
                 proposalContract = pc;
 
-                proposalContract.back(15, { gas: 2500000 });
-                proposalContract.back(20, { gas: 2500000 });
-                proposalContract.back(35, { gas: 2500000 });
-                proposalContract.back(45, { gas: 2500000 });
-                return proposalContract.back(55, { gas: 2500000 });
+                proposalContract.back(15, tools.newGuid(true), { gas: 2500000 });
+                proposalContract.back(20, tools.newGuid(true), { gas: 2500000 });
+                proposalContract.back(35, tools.newGuid(true), { gas: 2500000 });
+                proposalContract.back(45, tools.newGuid(true), { gas: 2500000 });
+                return proposalContract.back(55, tools.newGuid(true), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function finish(tx) {
