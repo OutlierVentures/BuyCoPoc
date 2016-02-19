@@ -43,6 +43,7 @@ export function configure(app: express.Express) {
 
     apiRouter.route("/proposal/:id").get(pc.getOne);
     apiRouter.route("/proposal/:id/back").post(pc.back);
+    apiRouter.route("/proposal/:id/close").post(pc.close);
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
     apiRouter.route("/proposal").post(pc.create);

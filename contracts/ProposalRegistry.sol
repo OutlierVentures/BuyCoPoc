@@ -434,25 +434,19 @@ contract Proposal {
         // To be called by the registry owner.
         if(tx.origin != registry.owner()) return;
 
-        // TODO: check whether endDate has passed. The only time source that
-        // the contract has access to is the block number. This is not a
-        // dependable time, especially not on a private chain. Once we have
-        // some sort of solution for this, the proposal should be closed even
-        // if no valid offer was found.
+        // Checking whether the end time is the responsibility of the registry
+        // owner. We currently have no way to deal with time within the contract.
 
-        // COULD DO: there might be backers who haven't completed payment. And
-        // even without those, we might still have a deal. We should remove the
-        // backers that haven't paid at this point, and then do matching.
+        // The proposal gets closed no matter whether there's a valid offer or
+        // not.
 
         // Get the best offer.
         uint bestOfferIndex = getBestOfferIndex();
 
         // Did we find a valid offer?
-        if (bestOfferIndex == 0) return;
-
-        // Ensure that all start payments hae been registered.
-
-        acceptedOffer = offers[bestOfferIndex];
+        if (bestOfferIndex > 0) {
+            acceptedOffer = offers[bestOfferIndex];
+        }
         isClosed = true;
     }
 
@@ -610,7 +604,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.1";
+    string public version = "0.8.2";
 
     function ProposalRegistry(string n){
         name = n;

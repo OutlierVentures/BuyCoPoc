@@ -1,5 +1,6 @@
 ﻿/// <reference path="typings/tsd.d.ts" />
 import express = require('express');
+import expressValidator = require('express-validator');
 import morgan = require('morgan');
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
@@ -103,6 +104,9 @@ export class Server {
 
         var app = express();
         app.use(bodyParser.json());
+
+        // Validation
+        app.use(expressValidator());
 
         // Logging
         app.use(morgan('dev'));

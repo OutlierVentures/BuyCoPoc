@@ -75,48 +75,56 @@ export class ProposalService {
             }
 
             t.contractService.getProposalContractAt(proposalAddress)
-                .then(proposal=> {
-                    console.log(Date() + " Got contract object at " + proposalAddress);
-
-                    var getProperties = new Array<Q.Promise<void>>();
-
-                    var p = <proposalModel.IProposal>{};
-
-                    // We get each of the properties of the proposal async, all with a separate promise.
-                    // This leads to unreadable code, but it's the only known way of delivering
-                    // reasonable performance. See testProposalList.ts for more info.
-                        
-                    p.contractAddress = proposalAddress;
-
-                    // These could be written more compactly as both the property of proposal and of
-                    // p are named identical.
-                    // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
-                    // The calls would then be: addPropertyGetter<string>(getProperties, proposal, p, "productName")
-                    // Drawback: properties of IProposal wouldn't be typesafe any more.
-                    getProperties.push(Q.denodeify<string>(proposal.owner)().then(function (o) { p.owner = o; }));
-                    getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
-                    getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
-                    getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
-                    getProperties.push(Q.denodeify<string>(proposal.productUnitSize)().then(function (unitSize) { p.productUnitSize = unitSize; }));
-                    getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
-                    getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
-                    getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
-                    getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
-                    getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
-
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.minimumReportedCorrectDeliveryPercentage)().then(function (rp) { p.minimumReportedCorrectDeliveryPercentage = rp.toNumber(); }));
-
-                    Q.all(getProperties)
-                        .then(function () {
-                            d.resolve(p);
-                        }, err => {
-                            d.reject(err);
-                        });
-                }, err=> d.reject(err));
+                .then(proposalContract => {
+                    return t.proposalContractToObject(proposalContract);
+                })
+                .then(proposalObject => {
+                    d.resolve(proposalObject);
+                })
+                .catch(err => d.reject(err));
         };
+    }
+
+    proposalContractToObject(proposal: contractInterfaces.IProposalContract): Promise<proposalModel.IProposal> {
+        return Promise<proposalModel.IProposal>((resolve, reject) => {
+            var getProperties = new Array<Q.Promise<void>>();
+
+            var p = <proposalModel.IProposal>{};
+
+            // We get each of the properties of the proposal async, all with a separate promise.
+            // This leads to unreadable code, but it's the only known way of delivering
+            // reasonable performance. See testProposalList.ts for more info.
+                        
+            p.contractAddress = proposal.address;
+
+            // These could be written more compactly as both the property of proposal and of
+            // p are named identical.
+            // addPropertyGetter<T>(propertyPromises Array<Q.Promise<void>>, contract, targetobject, propertyName) {...}
+            // The calls would then be: addPropertyGetter<string>(getProperties, proposal, p, "productName")
+            // Drawback: properties of IProposal wouldn't be typesafe any more.
+            getProperties.push(Q.denodeify<string>(proposal.owner)().then(function (o) { p.owner = o; }));
+            getProperties.push(Q.denodeify<string>(proposal.productName)().then(function (name) { p.productName = name; }));
+            getProperties.push(Q.denodeify<string>(proposal.productDescription)().then(function (description) { p.productDescription = description; }));
+            getProperties.push(Q.denodeify<string>(proposal.productSku)().then(function (sku) { p.productSku = sku; }));
+            getProperties.push(Q.denodeify<string>(proposal.productUnitSize)().then(function (unitSize) { p.productUnitSize = unitSize; }));
+            getProperties.push(Q.denodeify<string>(proposal.mainCategory)().then(function (mainCat) { p.mainCategory = mainCat; }));
+            getProperties.push(Q.denodeify<string>(proposal.subCategory)().then(function (subCat) { p.subCategory = subCat; }));
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
+            getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
+            getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
+            getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
+
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.minimumReportedCorrectDeliveryPercentage)().then(function (rp) { p.minimumReportedCorrectDeliveryPercentage = rp.toNumber(); }));
+
+            Q.all(getProperties)
+                .then(function () {
+                    resolve(p);
+                }, err => {
+                    reject(err);
+                });
+        });
     }
 
     /**
@@ -368,7 +376,47 @@ export class ProposalService {
             });
 
         return defer.promise;
+    }
 
+    /**
+     * Close a proposal in the blockchain.
+     * @param proposalId the address of the proposal
+     * @return The proposal
+     */
+    close(proposalId: string): Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var proposalContract: contractInterfaces.IProposalContract;
+        return Promise<proposalModel.IProposal>((resolve, reject) => {
+            t.contractService.getProposalContractAt(proposalId)
+                .then(p => {
+                    proposalContract = p;
+                    // Is it time to close?
+                    // TODO: check whether date comparison works correctly here
+                    // TODO: account for time zones (dates in contracts are UTC)
+                    var proposalEndDate = new Date(proposalContract.endDate());
+                    var now = new Date();
+
+                    if (proposalEndDate > now) {
+                        reject(proposalContract);
+                        return;
+                    }
+
+                    return proposalContract.close({ gas: 3000000 });
+                })
+                .then(web3plus.promiseCommital)
+                .then(closeResult => {
+                    // Check if it was indeed closed, or perhaps there was a reason
+                    // why the contract didn't allow it.
+                    if (!proposalContract.isClosed()) {
+                        reject("Proposal couldn't be closed");
+                        return;
+                    }
+                    else
+                        resolve(t.proposalContractToObject(proposalContract));
+                })
+                .catch(err => { reject(err); });
+        });
     }
         
     /**

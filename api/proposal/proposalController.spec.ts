@@ -125,7 +125,8 @@ describe("ProposalController", () => {
                 productDescription: "From the unit tests " + Date(),
                 productSku: "SKU123",
                 productUnitSize: "1 unit",
-                category: "Electronics - Camera",
+                mainCategory: "Electronics",
+                subCategory: "Camera",
                 maxPrice: 0.10,
                 //endDate: "2016-12-01",
                 //ultimateDeliveryDate: "2017-12-01"
@@ -259,7 +260,8 @@ describe("ProposalController", () => {
                         proposal: {
                             productName: "A testing product", "productDescription": "From the unit tests " + Date(),
                             productSku: "SKU123",
-                            category: "Electronics - Camera",
+                            mainCategory: "Electronics",
+                            subCategory: "Camera",
                             maxPrice: 0.10,
                             endDate: "2016-12-01",
                             ultimateDeliveryDate: "2017-12-01"
@@ -332,6 +334,87 @@ describe("ProposalController", () => {
             })
             .end(function (err, res) {
                 done(err);
+            });
+    });
+
+    it("should not close a proposal with end date in the future on POST /api/proposal/:id/close", function (done) {
+        this.timeout(100000);
+
+        var twoYearsAhead = (new Date()).getFullYear() + 2;
+
+        // Create a proposal with an end date far in the future
+        request(theApp)
+            .post('/api/proposal')
+            .send({
+                proposal: {
+                    productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                    productSku: "SKU123",
+                    mainCategory: "Electronics",
+                    subCategory: "Camera",
+                    maxPrice: 0.10,
+                    endDate: twoYearsAhead + "-11-01",
+                    ultimateDeliveryDate: twoYearsAhead + "-12-01"
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function (err, res) {
+                if (err) done(err);
+
+                var proposal = <proposalModel.IProposal>res.body;
+                var cardId = getTestUserCardId();
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    // Ideally this would be 400, as it's a bad request. The proposal isn't ready 
+                    // to close, yet we request closing it. However because the controller delegates
+                    // everything to the service, it can't determine whether there was a validation
+                    // error or something else. Hence everything arrives as a 500.
+                    .expect(500)
+                    .end(function (err, res) {
+                        done(err);
+                    });
+            });
+    });
+
+    it("should close a proposal with end date in the past on POST /api/proposal/:id/close", function (done) {
+        this.timeout(100000);
+
+        var lastYear = (new Date()).getFullYear() - 1;
+
+        // Create a proposal with an end date in the past
+        request(theApp)
+            .post('/api/proposal')
+            .send({
+                proposal: {
+                    productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                    productSku: "SKU123",
+                    mainCategory: "Electronics",
+                    subCategory: "Camera",
+                    maxPrice: 0.10,
+                    endDate: lastYear + "-11-01",
+                    ultimateDeliveryDate: lastYear + "-12-01"
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function (err, res) {
+                if (err) done(err);
+
+                var proposal = <proposalModel.IProposal>res.body;
+                var cardId = getTestUserCardId();
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    .expect(200)
+                    .expect(function (res) {
+                        var proposal = <proposalModel.IProposal>res.body;
+                                                
+                        assert.ok(proposal.isClosed, "Proposal is closed");
+                    })
+                    .end(function (err, res) {
+                        done(err);
+                    });
             });
     });
 

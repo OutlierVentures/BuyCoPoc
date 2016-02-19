@@ -10,6 +10,7 @@ interface IBigNumber {
 
 interface IWeb3TransactionOptions {
     gas?: number;
+    gasPrice?: number;
     to?: string;
     from?: string;
 }

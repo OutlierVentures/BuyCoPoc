@@ -1,9 +1,13 @@
 ﻿import express = require("express");
+import util = require('util');
+import expressValidator = require('express-validator');
+
 import { UserRepository } from "../../models/userModel";
 import configModel = require('../../models/configModel');
 import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
 import upholdService = require('../../services/upholdService');
+
 
 import proposalModel = require('../../models/proposalModel');
 
@@ -87,7 +91,14 @@ export class ProposalController {
         var proposalData = <IProposal>req.body.proposal;
         var transactionId = <string>req.body.transactionId;
 
-        // TODO: further validation.
+        req.checkBody('proposal.mainCategory', "Main category").notEmpty();
+        req.checkBody('proposal.subCategory', "Sub category").notEmpty();
+
+        var errors = req.validationErrors();
+        if (errors) {
+            res.status(400).send('There have been validation errors: ' + util.inspect(errors));
+            return;
+        }
 
         serviceFactory.createProposalService()
             .then(ps => {
@@ -248,6 +259,37 @@ export class ProposalController {
                 return null;
             });
     }
+
+    close = (req: express.Request, res: express.Response) => {
+        var token = req.headers["accesstoken"];
+
+        var proposalId = req.params.id;
+
+        // Create a proposal service and query it for proposals within the determined filter - if any.
+        serviceFactory.createProposalService()
+            .then(
+            function (ps) {
+                return ps.close(proposalId);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing proposals service"
+                });
+                return null;
+            })
+            .then(
+            function (proposal) {
+                res.json(proposal);
+            }, function (proposalsErr) {
+                res.status(500).json({
+                    "error": proposalsErr,
+                    "error_location": "closing proposal"
+                });
+                return null;
+            });
+    }
+
 
 
 }

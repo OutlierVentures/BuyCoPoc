@@ -52,6 +52,9 @@
     },
     "chai/chai.d.ts": {
       "commit": "81b951f1ac437d1eb5ff5171a0bfa6c467634b13"
+    },
+    "express-validator/express-validator.d.ts": {
+      "commit": "95b7178e0ef33b4b88327676418b4cc3ad61df0f"
     }
   }
 }

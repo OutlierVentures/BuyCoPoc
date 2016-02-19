@@ -15,7 +15,7 @@ var userRepo = new userModel.UserRepository();
  * with a balance below this (e.g. a new one), we will send it
  * "ether" up to this amount.
  */
-var MINIMUM_USER_ACCOUNT_BALANCE = 30;
+var MINIMUM_USER_ACCOUNT_BALANCE = 20;
 
 /**
  * Get and save information from user accounts
