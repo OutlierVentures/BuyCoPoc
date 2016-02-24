@@ -59,6 +59,7 @@ describe("ProposalController fulfilment", () => {
         var proposalContract: contractInterfaces.IProposalContract;
         var testUserToken: string;
         var newOffer: offerModel.IOffer;
+        var startPayoutTransactionId: string;
 
         async.series([
             function getToken(cb) {
@@ -205,11 +206,30 @@ describe("ProposalController fulfilment", () => {
                         assert.ok(backer[4], "Start payment of backer 1 has been registered");
                         assert.equal(backer[5].toNumber(), 9, "Start payment amount of backer 1 is correct");
 
+                        startPayoutTransactionId = proposalContract.startPayoutTransactionID();
                         assert.ok(proposalContract.startPayoutTransactionID(), "Start payout transaction ID has been set");
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
                     })
                     .end(cb);
-            }
+            },
+            function processPaymentsAgain(cb) {
+                // Call process-payments again and ensure that it's now fast and nothing has changed
+                
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {                        
+                        var backer = proposalContract.backers(1);
+
+                        assert.ok(backer[4], "Start payment of backer 1 has been registered");
+                        assert.equal(backer[5].toNumber(), 9, "Start payment amount of backer 1 is correct");
+
+                        assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTransactionId, "Start payout transaction ID has not changed");
+                        assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
+                    })
+                    .end(cb);
+            },
         ], done);
     });
 });

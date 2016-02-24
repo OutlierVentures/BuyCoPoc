@@ -73,49 +73,42 @@ export class FulfilmentService {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
-            // Not closed? Nothing to do here.
-            if (!proposalContract.isClosed())
-                resolve(proposalContract);
-
-            // Is the start payment already complete? THen there's nothing to do here.
-            if (proposalContract.isStartPaymentComplete())
-                resolve(proposalContract);
-
-            // Is there an accepted offer?
-            if (proposalContract.acceptedOffer() != "0x") {
-
-                var paymentPromises = new Array<Promise<upholdService.IUpholdTransaction>>()
-                
-                // Start payments should be taken. Go through all the backers, check if they paid,
-                // if not, pay.
-                for (let i = 1; i <= proposalContract.backerIndex().toNumber(); i++) {
-                    let backer = proposalContract.backers(i);
-
-                    // Has this backer paid the start payment?
-                    if (backer[4])
-                        continue;
-
-                    paymentPromises.push(t.executeStartPayment(proposalContract, i));
-                }
-
-                // We use allSettled() to ensure all promise functions are completed, even if 
-                // one of them would fail.
-                Q.allSettled(paymentPromises)
-                    .then(paymentResults => {
-                        // TODO: report on any errors in a more detailed manner. The paymentsResults
-                        // array contains details on the results of each executeStartPayment run.
-                        resolve(proposalContract);
-                    })
-                    .catch(err => reject(err));
-
-
-            } else {
-                // Closed but no deal
+            // Checks preventing the start payment
+            if (
+                // Not closed? Nothing to do here.
+                !proposalContract.isClosed()
+                // Is the start payment already complete? Then there's nothing to do here.
+                || proposalContract.isStartPaymentComplete()
+                // No accepted offer? Closed but no deal.
                 // TODO: refund payments
-                // Out of scope for POC.
+                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000") {
                 resolve(proposalContract);
+                return;
+            }
+                
+            // Start payments should be taken. Go through all the backers, check if they paid,
+            // if not, pay.
+            var paymentPromises = new Array<Promise<upholdService.IUpholdTransaction>>()
+
+            for (let i = 1; i <= proposalContract.backerIndex().toNumber(); i++) {
+                let backer = proposalContract.backers(i);
+
+                // Has this backer paid the start payment?
+                if (backer[4])
+                    continue;
+
+                paymentPromises.push(t.executeStartPayment(proposalContract, i));
             }
 
+            // We use allSettled() to ensure all promise functions are completed, even if 
+            // one of them would fail.
+            Q.allSettled(paymentPromises)
+                .then(paymentResults => {
+                    // TODO: report on any errors in a more detailed manner. The paymentsResults
+                    // array contains details on the results of each executeStartPayment run.
+                    resolve(proposalContract);
+                })
+                .catch(err => reject(err));
         });
     }
 
@@ -128,38 +121,29 @@ export class FulfilmentService {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
-            // TODO: the structure of this method seems fishy. On many occasions we do
-            // resolve(propoosalContract). That seems wrong.
-
-            // Not closed? Nothing to do here.
-            if (!proposalContract.isClosed())
-                resolve(proposalContract);
-
-            // Already paid out?
-            if (proposalContract.startPayoutTransactionID())
-                resolve(proposalContract);
-
-            if (proposalContract.acceptedOffer() != "0x") {
-                // Has an accepted offer
-
+            // Carry out checks that are reasons not to carry out the payout.            
+            if (
+                // Not closed? Nothing to do here.
+                !proposalContract.isClosed()
+                // Already paid out?
+                || proposalContract.startPayoutTransactionID()
+                // No accepted offer?
+                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000"
                 // Not ready for start payment? We're done.
-                if (!proposalContract.isReadyForStartPayout())
-                    resolve(proposalContract);
+                || !proposalContract.isReadyForStartPayout()) {
 
-                // Time for payout. Execute it.
-                t.executeStartPayout(proposalContract)
-                    .then(payoutTx => {
-                        resolve(proposalContract);
-                    })
-                    .catch(err => {
-                        reject(err);
-                    });
-            }
-            else {
-                // No accepted offer. We can't execute the start payout.
-                // COULD DO: reject here
                 resolve(proposalContract);
+                return;
             }
+
+            // Time for payout. Execute it.
+            t.executeStartPayout(proposalContract)
+                .then(payoutTx => {
+                    resolve(proposalContract);
+                })
+                .catch(err => {
+                    reject(err);
+                });
 
         });
     }

@@ -208,9 +208,10 @@ export class UserAccountService {
                                 };
                             }
                             resolve(user.blockchainAccounts);
-                        },
-                        err => { }
-                        );
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
 
 
                 })

@@ -320,6 +320,9 @@ contract Proposal {
         if (paymentType == 1) {
             // Pledge payment
 
+            // Can only register once
+            if(b.pledgePaymentAmount != 0) return;
+
             // Validate correct amount
             if(amount != int(getPledgePaymentAmount(backerIndex)))
                 return;
@@ -331,8 +334,10 @@ contract Proposal {
             // Start payment
 
             // Validate that the BuyCo was closed
-            if(!isClosed)
-                return;
+            if(!isClosed) return;
+
+            // Can only register once
+            if(b.startPaymentAmount != 0) return;
 
             // There should be an accepted offer. If not, the pledge payments
             // should be refunded.
@@ -353,8 +358,10 @@ contract Proposal {
             // End payment
 
             // Validate that start payment was registered
-            if(b.startPaymentAmount == 0)
-                return;
+            if(b.startPaymentAmount == 0) return;
+
+            // Can only register once
+            if(b.endPaymentAmount != 0) return;
 
             // Validate correct amount
             if(amount != getEndPaymentAmount(backerIndex))
@@ -545,9 +552,10 @@ contract Proposal {
      * Returns whether the start payout to the seller may be done.
      */
     function isReadyForEndPayout() constant returns (bool isReady) {
-        isReady = isClosed && isPaymentComplete() && isDeliveryComplete();
+        isReady = isClosed && isPaymentComplete() && isDeliveryComplete()
+            // Start payout has to be done before end payout.
+            && startPayoutAmount != 0;
     }
-
 
     function getStartPayoutAmount() constant returns (uint amount) {
         amount = acceptedOffer.price() * getTotalBackedAmount()
@@ -566,6 +574,9 @@ contract Proposal {
         // Payments are confirmed by the registry owner.
         if(tx.origin != registry.owner()) return;
 
+        // Can only register once
+        if(startPayoutAmount != 0) return;
+
         if(!isReadyForStartPayout()) return;
         if(amount != getStartPayoutAmount()) return;
 
@@ -579,6 +590,9 @@ contract Proposal {
     function registerEndPayout(string txId, uint amount) {
         // Payments are confirmed by the registry owner.
         if(tx.origin != registry.owner()) return;
+
+        // Can only register once
+        if(endPayoutAmount != 0) return;
 
         if(!isReadyForEndPayout()) return;
         if(amount != getEndPayoutAmount()) return;
@@ -609,7 +623,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.2";
+    string public version = "0.8.3";
 
     function ProposalRegistry(string n){
         name = n;
