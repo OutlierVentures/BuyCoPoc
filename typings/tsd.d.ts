@@ -15,3 +15,4 @@
 /// <reference path="supertest/supertest.d.ts" />
 /// <reference path="underscore/underscore.d.ts" />
 /// <reference path="express-validator/express-validator.d.ts" />
+/// <reference path="async/async.d.ts" />

@@ -290,6 +290,37 @@ export class ProposalController {
             });
     }
 
+    /**
+     * Execute any outstanding payments to sellers, owners or buyers.
+     */
+    processPayments = (req: express.Request, res: express.Response) => {
+        var proposalId = req.params.id;
+
+        // Create a proposal service and query it for proposals within the determined filter - if any.
+        serviceFactory.createFulfilmentService()
+            .then(
+            function (fuls) {
+                return fuls.executePayments(proposalId);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing fulfilment service"
+                });
+                return null;
+            })
+            .then(
+            function (proposal) {
+                res.json(proposal);
+            }, function (proposalsErr) {
+                res.status(500).json({
+                    "error": proposalsErr,
+                    "error_location": "processing proposal payments"
+                });
+                return null;
+            });
+    }
+
 
 
 }

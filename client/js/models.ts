@@ -137,6 +137,7 @@ interface IProposal {
     ultimateDeliveryDate: Date;
 
     isClosed?: boolean;
+    acceptedOffer?: string;
 
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings

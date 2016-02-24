@@ -7,6 +7,7 @@ import Q = require('q');
 
 import web3config = require('../../test/contracts/web3config');
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 import proposalModel = require('../../models/proposalModel');
 import proposalBackingModel = require('../../models/proposalBackingModel');
@@ -210,38 +211,9 @@ describe("ProposalController", () => {
 
     });
 
-    /**
-     * Get a token of any user in the database. Returns a promise that resolves
-     * with the token.
-     */
-    function getTestUserToken(): Q.Promise<string> {
-        var defer = Q.defer<string>();
-        // TODO: make test user configurable
-        userModel.User.findOne().where("externalId").equals("RonnieDoubleA").exec()
-            .then(function (user) {
-                if (user)
-                    defer.resolve(user.accessToken);
-                else
-                    defer.reject("No user found");
-            },
-            function (userErr) {
-                defer.reject(userErr);
-            });
-
-        return defer.promise;
-    }
-
-    /**
-     * Returns the card ID of the test user to use for sourcing funds in tests.
-     */
-    function getTestUserCardId(): string {
-        // TODO: make test card configurable
-        // "GBP card for unit tests"
-        return "9edd1208-8948-4b7a-b54d-3215a8a34de9";
-    }
 
     it("should back a proposal on POST /api/proposal/:id/back", function (done) {
-        this.timeout(100000);
+        this.timeout(300000);
 
         var proposal: proposalModel.IProposal;
         var amount = 1;
@@ -250,7 +222,7 @@ describe("ProposalController", () => {
         var sourceAddress = web3.eth.coinbase;
 
         // Find a valid user token to simulate the originating user
-        getTestUserToken()
+        testHelper.getTestUserToken()
             .then(function (testUserToken) {
 
                 // Create a proposal with a low amount to keep the transfer amount low
@@ -273,7 +245,7 @@ describe("ProposalController", () => {
                         if (err) done(err);
 
                         var proposal = <proposalModel.IProposal>res.body;
-                        var cardId = getTestUserCardId();
+                        var cardId = testHelper.getTestUserCardId();
 
                         request(theApp)
                             .post('/api/proposal/' + proposal.contractAddress + '/back')
@@ -362,7 +334,7 @@ describe("ProposalController", () => {
                 if (err) done(err);
 
                 var proposal = <proposalModel.IProposal>res.body;
-                var cardId = getTestUserCardId();
+                var cardId = testHelper.getTestUserCardId();
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
@@ -402,7 +374,7 @@ describe("ProposalController", () => {
                 if (err) done(err);
 
                 var proposal = <proposalModel.IProposal>res.body;
-                var cardId = getTestUserCardId();
+                var cardId = testHelper.getTestUserCardId();
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')

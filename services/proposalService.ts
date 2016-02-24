@@ -112,7 +112,9 @@ export class ProposalService {
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.maxPrice)().then(function (mp) { p.maxPrice = mp.toNumber() / 100; }));
             getProperties.push(Q.denodeify<string>(proposal.endDate)().then(function (ed) { p.endDate = new Date(ed); }));
             getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
+
             getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
+            getProperties.push(Q.denodeify<string>(proposal.acceptedOffer)().then(function (ao) { p.acceptedOffer = ao; }));
 
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
@@ -284,19 +286,26 @@ export class ProposalService {
 
                 var cId = backer[10];
 
-                resolve({
-                    address: backerAddress,
-                    backerIndex: index,
-                    amount: amount,
-                    userId: "unknown", // TODO: get this from mongoDB by address
-                    cardId: cId,
-                    pledgePaymentTransactionId: pledgeTx,
-                    pledgePaymentAmount: pledgePaymentAmount,
-                    startPaymentTransactionId: startTx,
-                    startPaymentAmount: startPaymentAmount,
-                    endPaymentTransactionId: endTx,
-                    endPaymentAmount: endPaymentAmount,
-                });
+                userRepo.getUserByBlockchainAddress(backerAddress)
+                    .then(user => {
+                        var uId: string;
+                        if (user)
+                            uId = user.id;
+
+                        resolve({
+                            address: backerAddress,
+                            backerIndex: index,
+                            amount: amount,
+                            userId: uId,
+                            cardId: cId,
+                            pledgePaymentTransactionId: pledgeTx,
+                            pledgePaymentAmount: pledgePaymentAmount,
+                            startPaymentTransactionId: startTx,
+                            startPaymentAmount: startPaymentAmount,
+                            endPaymentTransactionId: endTx,
+                            endPaymentAmount: endPaymentAmount,
+                        });
+                    }, err => reject(err));
             });
         });
     }
@@ -420,34 +429,42 @@ export class ProposalService {
     }
         
     /**
-     * Create a new proposal in the blockchain.
+     * Process the creation of a new proposal in the blockchain.
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    processCreate(setDetailsTransactionId: string, p: proposalModel.IProposal): Q.Promise<proposalModel.IProposal> {
+    processCreate(setDetailsTransactionId: string, p: proposalModel.IProposal): Promise<proposalModel.IProposal> {
         var t = this;
 
-        var defer = Q.defer<proposalModel.IProposal>();
-
-        web3plus.promiseCommital(setDetailsTransactionId)
+        return web3plus.promiseCommital(setDetailsTransactionId)
             .then(function getProposalResult(tx) {
                 // Update cache for this proposal only
-                var cps = new cachedProposalService.CachedProposalService();
-                cps.initialize(t)
-                    .then(res => {
-                        return cps.ensureCacheProposal(p);
-                    })
-                    .then(res => {
-                        defer.resolve(p);
-                    }, err => {
-                        defer.reject("Error while updating proposal cache: " + err);
-                    });
-
-            }, function getProposalErr(err) {
-                defer.reject(err);
+                return t.ensureCacheProposal(p);
             });
+    }
 
-        return defer.promise;
+    /**
+     * Ensure the cache is updated for a single IProposal.
+     * @param p
+     */
+    private ensureCacheProposal(p: proposalModel.IProposal): Promise<proposalModel.IProposal> {
+        var t = this;
+
+        return t.contractService.getProposalContractAt(p.contractAddress)
+            .then(pc => {
+                return t.ensureCacheProposalContract(pc);
+            });
+    }
+
+    /**
+     * Ensure the cache is updated for a single IProposalContract.
+     * @param p
+     */
+    private ensureCacheProposalContract(pc: contractInterfaces.IProposalContract): Promise<proposalModel.IProposal> {
+        return serviceFactory.createCachedProposalService()
+            .then(cps => {
+                return cps.ensureCacheProposalContract(pc);
+            });
     }
 
     /**
@@ -478,7 +495,7 @@ export class ProposalService {
      * @param p the new proposal.
      * @return The IProposal with the property "id" set to the contract address.
      */
-    processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Q.Promise<proposalBackingModel.IProposalBacking> {
+    processBacking(transactionId: string, p: proposalModel.IProposal, amount: number, backingUser: userModel.IUser, fromCard: string): Promise<proposalBackingModel.IProposalBacking> {
         var defer = Q.defer<proposalBackingModel.IProposalBacking>();
 
         var proposalContract: contractInterfaces.IProposalContract;
@@ -523,40 +540,36 @@ export class ProposalService {
                         // Do payment and store it
                         var upholdService = serviceFactory.createUpholdService(backingUser.accessToken);
 
-                        // Amounts are specified in cents, hence / 100.
+                        // Amounts in contracts are specified in cents, hence / 100.
                         var paymentAmount = proposalContract.getPledgePaymentAmount(newBackerIndex).toNumber() / 100;
-                        
+
+                        var backer: proposalBackingModel.IProposalBacking;
+
                         // Create transaction
-                        upholdService.createTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress,
-                            function (txErr, paymentTransaction) {
-                                if (txErr) {
-                                    defer.reject(txErr);
-                                    return;
-                                }
-
-                                upholdService.commitTransaction(paymentTransaction,
-                                    function (commitErr, committedTransaction) {
-                                        if (commitErr) {
-                                            defer.reject(txErr);
-                                            return;
-                                        }
-
-                                        // Store transaction with backing after it's finished
-                                        // paymentType 1 = initial (pledge) payment
-                                        proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
-                                            paymentAmount * 100)
-                                            .then(web3plus.promiseCommital)
-                                            .then(function (setPaidResult) {
-                                                return t.getBacker(proposalContract, newBackerIndex);
-                                            })
-                                            .then(backer => {
-                                                defer.resolve(backer);
-                                            })
-                                            .catch(setPaidError=> {
-                                                defer.reject(setPaidError);
-                                            });
+                        upholdService.createAndCommitTransaction(fromCard, paymentAmount, "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress)
+                            .then(committedTransaction => {
+                                // Store transaction with backing after it's finished
+                                // paymentType 1 = initial (pledge) payment
+                                proposalContract.setPaid(newBackerIndex, 1, tools.guidRemoveDashes(committedTransaction.id),
+                                    paymentAmount * 100)
+                                    .then(web3plus.promiseCommital)
+                                    .then(function (setPaidResult) {
+                                        return t.ensureCacheProposalContract(proposalContract);
+                                    })
+                                    .then(p=> {
+                                        return t.getBacker(proposalContract, newBackerIndex);
+                                    })
+                                    .then(b => {
+                                        defer.resolve(b);
+                                    })
+                                    .catch(setPaidError=> {
+                                        defer.reject(setPaidError);
                                     });
+                            })
+                            .catch(commitErr => {
+                                defer.reject(commitErr);
                             });
+
                     });
             }, function (err) {
                 defer.reject(err);
@@ -579,14 +592,13 @@ export class ProposalService {
 
         // Load the proposal contract
         t.contractService.getProposalContractAt(proposalId)
-            .then(pc=> {
+            .then(pc => {
                 proposalContract = pc;
                 return serviceFactory.createOfferContractService();
-            }, err => { defer.reject(err); return null; })
+            })
             .then(os => {
                 return os.getAll(proposalContract);
-            },
-            createServiceError => { defer.reject(createServiceError); return null; })
+            })
             .then(off => {
                 offers = off;
 
@@ -598,7 +610,7 @@ export class ProposalService {
                 return userModel.User
                     .find({ "blockchainAccounts.accounts.address": { "$in": allSellerAddresses } })
                     .populate({ path: "sellerId" }).exec();
-            }, offersErr => { defer.reject(offersErr); return null; })
+            })
             .then(usersWithSellers=> {
                 // Match the seller name with the offer.
                 // There must be a far more efficient and concise way to do this with mongo and/or underscore.
@@ -615,8 +627,8 @@ export class ProposalService {
                 }
 
                 defer.resolve(offers);
-            }, err=> { defer.reject(err); return null; });
-        ;
+            }).catch(err=> { defer.reject(err); return null; });
+
 
         return defer.promise;
     }

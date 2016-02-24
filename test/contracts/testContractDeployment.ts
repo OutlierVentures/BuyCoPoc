@@ -14,7 +14,7 @@ describe("ContractDeployment", () => {
     var timeAfterDeployment: number;
 
     before(function (done) {
-        //this.timeout(10000);
+        this.timeout(10000);
         web3config.createWeb3();
 
         done();

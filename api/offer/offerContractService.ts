@@ -11,6 +11,7 @@ import contractService = require('../../services/contractService');
 import contractInterfaces = require('../../contracts/contractInterfaces');
 
 import Q = require('q');
+import { Promise } from 'q';
 
 /**
  * Service for dealing with offers to buying proposals on the blockchain. All functions
@@ -49,7 +50,7 @@ export class OfferContractService {
      * proposal address.
      * @param d A Deferred that is resolved with the new IProposal when it's complete.
      */
-    buildGetOfferCallback(d: Q.Deferred<offerModel.IOffer>) {
+    private buildGetOfferCallback(d: Q.Deferred<offerModel.IOffer>) {
         var t = this;
         return function (offerErr, offerAddress) {
             if (offerErr) {
@@ -57,33 +58,44 @@ export class OfferContractService {
                 return;
             }
 
-            serviceFactory.getContractService()
-                .then(cs=> {
-                    return cs.getOfferContractAt(offerAddress);
+            t.contractService.getOfferContractAt(offerAddress)
+                .then(offer => {
+                    return t.offerContractToObject(offer);
                 })
-                .then(offer=> {
-                    console.log(Date() + " Got contract object at " + offerAddress);
-
-                    var getProperties = new Array<Q.Promise<void>>();
-
-                    var o = <offerModel.IOffer>{};
-
-                    // We get each of the properties of the offer async, all with a separate promise.
-                    // This leads to unreadable code, but it's the only known way of delivering
-                    // reasonable performance. See testProposalList.ts for more info.
-                        
-                    o.id = offerAddress;
-
-                    getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
-                    getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
-
-                    Q.all(getProperties)
-                        .then(function () {
-                            d.resolve(o);
-                        });
+                .then(o => {
+                    d.resolve(o);
+                })
+                .catch(err => {
+                    d.reject(err);
                 });
         };
+    }
+
+    offerContractToObject(offer: contractInterfaces.IOfferContract): Promise<offerModel.IOffer> {
+        return Promise<offerModel.IOffer>((resolve, reject) => {
+            var getProperties = new Array<Q.Promise<void>>();
+
+            var o = <offerModel.IOffer>{};
+
+            // We get each of the properties of the offer async, all with a separate promise.
+            // This leads to unreadable code, but it's the only known way of delivering
+            // reasonable performance. See testProposalList.ts for more info.
+                        
+            o.id = offer.address;
+
+            getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
+            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
+            getProperties.push(Q.denodeify<string>(offer.cardId)().then(function (cid) { o.toCard = cid; }));
+
+            Q.all(getProperties)
+                .then(function () {
+                    resolve(o);
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        });
     }
 
     /**
@@ -161,16 +173,15 @@ export class OfferContractService {
     create(proposalId: string, o: offerModel.IOffer): Q.Promise<offerModel.IOffer> {
         var t = this;
 
-        o.owner = web3plus.web3.coinbase;
+        o.owner = web3plus.web3.eth.coinbase;
 
         var proposalContract: contractInterfaces.IProposalContract;
-
 
         return t.contractService.getProposalContractAt(proposalId)
             .then(pc => {
                 proposalContract = pc;
 
-                var offerPromise = proposalContract.offer(o.price * 100, o.minimumAmount, "cardId12345", { gas: 2500000 });
+                var offerPromise = proposalContract.offer(o.price * 100, o.minimumAmount, tools.guidRemoveDashes(o.toCard), { gas: 2500000 });
 
                 return offerPromise;
             })
@@ -193,7 +204,7 @@ export class OfferContractService {
         var proposalContract: contractInterfaces.IProposalContract;
 
         t.contractService.getProposalContractAt(proposalId)
-            .then(pr=> {
+            .then(pr => {
                 proposalContract = pr;
                 return web3plus.promiseCommital(transactionId);
             })
@@ -201,10 +212,8 @@ export class OfferContractService {
                 var offerIndex = proposalContract.offerIndex().toNumber();
                 var newOfferAddress = proposalContract.offers(offerIndex);
 
-                web3plus.loadContractFromFile("ProposalRegistry.sol", "Offer", newOfferAddress, true,
-                    function (err, offerContract: contractInterfaces.IOfferContract) {
-                        if (err) defer.reject(err);
-
+                t.contractService.getOfferContractAt(newOfferAddress)
+                    .then(offerContract => {
                         var newOfferOwner = offerContract.owner();
 
                         if (!(newOfferOwner == o.owner
@@ -216,7 +225,17 @@ export class OfferContractService {
 
                         o.id = newOfferAddress;
 
+                        // Ensure that proposal cache is updated
+                        return serviceFactory.createCachedProposalService();
+                    })
+                    .then(cps => {
+                        return cps.ensureCacheProposalContract(proposalContract);
+                    })
+                    .then(p => {
                         defer.resolve(o);
+                    })
+                    .catch(err => {
+                        defer.reject(err);
                     });
 
             }).catch(err => {

@@ -151,6 +151,20 @@ export class UserRepository {
     };
 
     /**
+    * Get a user by any of their blockchain addresses.
+    */
+    public getUserByBlockchainAddress(blockchainAddress: string): PromiseLike<IUser> {
+        return this.getUserByBlockchainAddresses([blockchainAddress]);
+    };
+
+    /**
+    * Get a user by any of their blockchain addresses.
+    */
+    public getUserByBlockchainAddresses(blockchainAddresses: Array<string>): PromiseLike<IUser> {
+        return User.findOne({ "blockchainAccounts.accounts.address": { "$in": blockchainAddresses } }).exec();
+    };
+
+    /**
     * Get a user by their externalId. 
     */
     public getUserByExternalId(externalId: string): Promise<IUser> {

@@ -5,12 +5,15 @@ import userModel = require('../models/userModel');
 import { IProposal, Proposal, IProposalDocument, IProposalFilter } from '../models/proposalModel';
 import {IMainCategory, ISubCategory} from '../models/categoryModel';
 import offerModel = require('../models/offerModel');
+import proposalModel = require('../models/proposalModel');
+import contractInterfaces = require('../contracts/contractInterfaces');
 
 import serviceFactory = require('../services/serviceFactory');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
 import tools = require('../lib/tools');
 import configurationService = require('./configurationService');
 import proposalService = require('./proposalService');
+import contractService = require('./contractService');
 
 import _ = require('underscore');
 
@@ -27,26 +30,34 @@ interface IBigNumber {
  */
 export class CachedProposalService {
     proposalService: proposalService.ProposalService;
+    contractService: contractService.ContractService;
 
     constructor() {
     }
 
-    initialize(psParam?: proposalService.ProposalService): IPromise<boolean> {
+    initialize(psParam?: proposalService.ProposalService): Promise<boolean> {
+        var t = this;
+
         return Promise<boolean>((resolve, reject) => {
-            if (psParam) {
-                this.proposalService = psParam;
-                resolve(true);
-            }
-            else {
-                serviceFactory.createProposalService()
-                    .then((ps) => {
-                        this.proposalService = ps;
+            serviceFactory.getContractService()
+                .then(cs => {
+                    t.contractService = cs;
+
+                    if (psParam) {
+                        this.proposalService = psParam;
                         resolve(true);
-                    })
-                    .catch((err) => {
-                        reject(err);
-                    });
-            }
+                    }
+                    else {
+                        serviceFactory.createProposalService()
+                            .then((ps) => {
+                                this.proposalService = ps;
+                                resolve(true);
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            });
+                    }
+                });
         });
     }
 
@@ -173,12 +184,35 @@ export class CachedProposalService {
 
 
     /**
+     * Ensure the cache is updated for a single IProposalContract.
+     * @param p
+     */
+    ensureCacheProposalContract(pc: contractInterfaces.IProposalContract): Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var proposal: proposalModel.IProposal;
+
+        return Promise<proposalModel.IProposal>((resolve, reject) => {
+            t.proposalService.proposalContractToObject(pc)
+                .then(p => {
+                    return t.ensureCacheProposal(p);
+                })
+                .then(p => {
+                    resolve(p);
+                })
+                .catch(err => {
+                    reject("Error while updating proposal cache: " + err);
+                });
+        });
+    }
+
+    /**
      * Ensure that this proposal is present and up to date in the Mongo cache.
      * @param p
      */
-    ensureCacheProposal(p: IProposal): Promise<IProposal> {
+    private ensureCacheProposal(p: proposalModel.IProposal): Promise<proposalModel.IProposal> {
         var t = this;
-        return Promise<IProposal>((resolve, reject) => {
+        return Promise<proposalModel.IProposal>((resolve, reject) => {
             // Add backing stats
             t.addProposalBackingTotals(p)
                 .then(p => {
@@ -208,10 +242,12 @@ export class CachedProposalService {
                         currentProposal.productSku = p.productSku;
                         currentProposal.productUnitSize = p.productUnitSize;
 
+                        currentProposal.maxPrice = p.maxPrice;
                         currentProposal.endDate = p.endDate;
                         currentProposal.ultimateDeliveryDate = p.ultimateDeliveryDate;
 
-                        currentProposal.maxPrice = p.maxPrice;
+                        currentProposal.isClosed = p.isClosed;
+                        currentProposal.acceptedOffer = p.acceptedOffer;
 
                         currentProposal.nrOfBackings = p.nrOfBackings;
                         currentProposal.nrOfBackers = p.nrOfBackers;

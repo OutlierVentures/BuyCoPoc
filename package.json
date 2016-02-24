@@ -34,6 +34,7 @@
     "web3plus": "git+https://4c2b0edc3e30d3d1e28479782f8f1ee64f4ca812:x-oauth-basic@github.com/OutlierVentures/web3plus.git"
   },
   "devDependencies": {
+    "async": "^1.5.2",
     "chai": "^3.4.1",
     "grunt": "^0.4.5",
     "grunt-concurrent": "^2.0.3",

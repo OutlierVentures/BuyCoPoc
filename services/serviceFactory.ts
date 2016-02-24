@@ -2,8 +2,10 @@
 import stubUpholdService = require('./stubUpholdService');
 import configurationService = require('./configurationService');
 import contractService = require('./contractService');
+import userModel = require('../models/userModel');
 
 import proposalService = require('./proposalService');
+import fulfilmentService = require('./fulfilmentService');
 import cachedProposalService = require('./cachedProposalService');
 import offerService = require('../api/offer/offerContractService');
 import userAccountService = require('../api/user/userAccountService');
@@ -12,6 +14,8 @@ import Q = require('q');
 import { Promise } from "q";
 
 import configModel = require('../models/configModel');
+
+let userRepo = new userModel.UserRepository();
 
 export interface IUpholdService {
     getCards: (callback: upholdService.IUpholdCardsCallback) => void;
@@ -23,6 +27,12 @@ export interface IUpholdService {
         currency: string,
         recipient: string,
         callback: upholdService.IUpholdTransactionCallback) => void;
+
+    createAndCommitTransaction: (
+        fromCard: string,
+        amount: number,
+        currency: string,
+        recipient: string) => Promise<upholdService.IUpholdTransaction>;
 
     commitTransaction: (transaction: upholdService.IUpholdTransaction, callback: upholdService.IUpholdTransactionCallback) => void
     getCardTransactions: (cardiId: string, callback: upholdService.IUpholdTransactionsCallback) => void;
@@ -49,6 +59,24 @@ export function createUpholdService(token: string): IUpholdService {
     }
 }
 
+/**
+ * Create an initialized Uphold service for the vault account.
+ */
+export function createVaultUpholdService(): Promise<IUpholdService> {
+    return Promise<IUpholdService>((resolve, reject) => {
+        var c = getConfiguration();
+
+        // Get the vault user
+        userRepo.getUserByExternalId(c.uphold.vaultAccount.userName)
+            .then(vu => {
+                resolve(createUpholdService(vu.accessToken));
+            })
+            .catch(err => {
+                reject(err);
+            });
+    });
+}
+
 export function createProposalService(): Promise<proposalService.ProposalService> {
     return Promise<proposalService.ProposalService>((resolve, reject) => {
         var ps = new proposalService.ProposalService();
@@ -62,6 +90,21 @@ export function createProposalService(): Promise<proposalService.ProposalService
             });
     });
 }
+
+export function createFulfilmentService(): Promise<fulfilmentService.FulfilmentService> {
+    return Promise<fulfilmentService.FulfilmentService>((resolve, reject) => {
+        var fuls = new fulfilmentService.FulfilmentService();
+
+        fuls.initialize()
+            .then(() => {
+                resolve(fuls);
+            })
+            .catch(initializeErr => {
+                reject(initializeErr);
+            });
+    });
+}
+
 
 // TODO: refactor the similar services to an IService with a .initialize() and 
 // introduce a createService< IService > to DRY.
@@ -81,7 +124,7 @@ export function createCachedProposalService(): Promise<cachedProposalService.Cac
 
 var cachedContractService: contractService.ContractService;
 
-export function getContractService(): Promise<contractService.ContractService> {        
+export function getContractService(): Promise<contractService.ContractService> {
     return Promise<contractService.ContractService>((resolve, reject) => {
         if (cachedContractService) {
             resolve(cachedContractService);
