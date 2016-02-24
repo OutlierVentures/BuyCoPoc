@@ -128,6 +128,9 @@ export class FulfilmentService {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
+            // TODO: the structure of this method seems fishy. On many occasions we do
+            // resolve(propoosalContract). That seems wrong.
+
             // Not closed? Nothing to do here.
             if (!proposalContract.isClosed())
                 resolve(proposalContract);
@@ -144,7 +147,18 @@ export class FulfilmentService {
                     resolve(proposalContract);
 
                 // Time for payout. Execute it.
-                return t.executeStartPayout(proposalContract);
+                t.executeStartPayout(proposalContract)
+                    .then(payoutTx => {
+                        resolve(proposalContract);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+            }
+            else {
+                // No accepted offer. We can't execute the start payout.
+                // COULD DO: reject here
+                resolve(proposalContract);
             }
 
         });
