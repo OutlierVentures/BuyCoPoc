@@ -17,6 +17,8 @@ import categoryModel = require('../../models/categoryModel');
 import userModel = require('../../models/userModel');
 
 import serviceFactory = require('../../services/serviceFactory');
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import cs  = require('../../services/contractService');
 
 import _ = require('underscore');
 
@@ -26,14 +28,21 @@ var web3 = web3plus.web3;
 describe("ProposalController fulfilment", () => {
     var theServer: server.Server;
     var theApp: express.Express;
+    var contractService: cs.ContractService;
 
     before(function (done) {
-        this.timeout(10000);
+        this.timeout(100000);
         theServer = new server.Server();
         theServer.basePath = path.resolve(path.dirname(__filename), "../../") + "/";
         theApp = theServer.createApp();
-
-        done();
+        serviceFactory.getContractService()
+            .then(c => {
+                contractService = c;
+                done();
+            })
+            .catch(err => {
+                done(err);
+            });
     });
 
     after(function (done) {
@@ -47,6 +56,7 @@ describe("ProposalController fulfilment", () => {
         var lastYear = (new Date()).getFullYear() - 1;
 
         var proposal: proposalModel.IProposal;
+        var proposalContract: contractInterfaces.IProposalContract;
         var testUserToken: string;
         var newOffer: offerModel.IOffer;
 
@@ -55,6 +65,17 @@ describe("ProposalController fulfilment", () => {
                 testHelper.getTestUserToken()
                     .then(t => {
                         testUserToken = t;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    });
+            },
+            function ensureCoinbase(cb) {
+                // For this test it's essential that the coinbase address used for all the web3 
+                // transactions is stored with a test user. Ensure that.
+                testHelper.ensureTestUserHasCoinbaseAddress()
+                    .then(u => {
                         cb();
                     })
                     .catch(err => {
@@ -82,6 +103,17 @@ describe("ProposalController fulfilment", () => {
                         proposal = <proposalModel.IProposal>res.body;
                     })
                     .end(cb);
+            },
+            function getProposalContract(cb) {
+                // Get the proposal contract for assertions
+                contractService.getProposalContractAt(proposal.contractAddress)
+                    .then(pc => {
+                        proposalContract = pc;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    })
             },
             function createBacking(cb) {
                 // Back a sufficient amount
@@ -168,9 +200,13 @@ describe("ProposalController fulfilment", () => {
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        //var freshProposal = <proposalModel.IProposal>res.body;
+                        var backer = proposalContract.backers(1);
 
-                        // TODO: load proposal contract object here to query start payment.
+                        assert.ok(backer[4], "Start payment of backer 1 has been registered");
+                        assert.equal(backer[5].toNumber(), 9, "Start payment amount of backer 1 is correct");
+
+                        assert.ok(proposalContract.startPayoutTransactionID(), "Start payout transaction ID has been set");
+                        assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
                     })
                     .end(cb);
             }

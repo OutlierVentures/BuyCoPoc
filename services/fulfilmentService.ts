@@ -113,6 +113,7 @@ export class FulfilmentService {
                 // Closed but no deal
                 // TODO: refund payments
                 // Out of scope for POC.
+                resolve(proposalContract);
             }
 
         });
@@ -176,9 +177,16 @@ export class FulfilmentService {
                 .then(tx => {
                     upholdTransaction = tx;
 
-                    return proposalContract.registerStartPayout(upholdTransaction.id, upholdTransaction.denomination.amount * 100);
+                    return proposalContract.registerStartPayout(tools.guidRemoveDashes(upholdTransaction.id),
+                        upholdTransaction.denomination.amount * 100, { gas: 2500000 });
                 })
+                .then(web3plus.promiseCommital)
                 .then(contractTx => {
+                    // Check whether the start payout was registered correctly.
+                    if (proposalContract.startPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
+                        || proposalContract.startPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
+                        throw ("Error registering start payout.");
+
                     resolve(upholdTransaction);
                 })
                 .catch(err => {
@@ -225,7 +233,7 @@ export class FulfilmentService {
                     uService = us;
                     // Create and commit transaction
                     return us.createAndCommitTransaction(backer.cardId,
-                        proposalContract.getStartPaymentAmount(backerIndex).toNumber(),
+                        proposalContract.getStartPaymentAmount(backerIndex).toNumber() / 100,
                         "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress);
                 })
                 .then(tx => {
@@ -236,7 +244,15 @@ export class FulfilmentService {
                     return proposalContract.setPaid(backerIndex, 2,
                         tools.guidRemoveDashes(upholdTransaction.id), upholdTransaction.denomination.amount * 100);
                 })
+                .then(web3plus.promiseCommital)
                 .then(contractTx => {
+                    // Check whether it was registered correctly.
+                    var backer = proposalContract.backers(backerIndex);
+
+                    if (backer[4] != tools.guidRemoveDashes(upholdTransaction.id)
+                        || backer[5].toNumber() != upholdTransaction.denomination.amount * 100)
+                        throw ("Start payment for backer " + backerIndex + " wasn't registered correctly");
+
                     resolve(upholdTransaction);
                 }, setPaidErr => {
                     // The uphold transaction has succeeded, but we haven't been able to

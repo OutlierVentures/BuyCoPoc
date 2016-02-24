@@ -1,12 +1,14 @@
 import userModel = require('../models/userModel');
 import { Promise } from 'q';
+import _ = require('underscore');
+import web3plus = require('../node_modules/web3plus/lib/web3plus');
 
 export function replaceLastUrlPart(url: string, newPart: string): string {
     if (!url || !newPart) {
         throw new Error("Parameters should be non null.");
     }
     const split = url.split("/");
-    if (!split || split.length<2) {
+    if (!split || split.length < 2) {
         throw new Error("Url parameter doesn't look like a url.");
     }
     split.splice(-1, 1, newPart);
@@ -27,19 +29,36 @@ export function getTestUserCardId(): string {
     return "9edd1208-8948-4b7a-b54d-3215a8a34de9";
 }
 
+function getTestUserId(): string {
+    // TODO: make test user configurable
+    return "RonnieDoubleA";
+}
+
+export function getTestUser(): Promise<userModel.IUser> {
+    return Promise<userModel.IUser>((resolve, reject) => {
+        userModel.User.findOne().where("externalId").equals(getTestUserId()).exec()
+            .then(user => {
+                if (user)
+                    resolve(user);
+                else
+                    reject("No user found");
+            },
+            function (userErr) {
+                reject(userErr);
+            });
+    });
+
+}
+
 /**
  * Get an Uphold token of a test user in the database. Returns a promise that resolves
  * with the token.
  */
 export function getTestUserToken(): Promise<string> {
     return Promise<string>((resolve, reject) => {
-        // TODO: make test user configurable
-        userModel.User.findOne().where("externalId").equals("RonnieDoubleA").exec()
-            .then(function (user) {
-                if (user)
-                    resolve(user.accessToken);
-                else
-                    reject("No user found");
+        getTestUser()
+            .then(user => {
+                resolve(user.accessToken);
             },
             function (userErr) {
                 reject(userErr);
@@ -53,13 +72,32 @@ export function getTestUserToken(): Promise<string> {
  */
 export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
     return Promise<userModel.IUser>((resolve, reject) => {
+        getTestUser()
+            .then(user => {
+                if (!_(user.blockchainAccounts.accounts).any(a => a.address == web3plus.web3.eth.coinbase)) {
+                    user.blockchainAccounts.accounts.push(
+                        <userModel.IBlockchainAccount>{
+                            address: web3plus.web3.eth.coinbase
+                        });
+                    user.save(function (err, res) {
+                        if (err) reject(err);
+                        else resolve(user);
+                    });
+                }
+                else
+                    resolve(user);
+            },
+            function (userErr) {
+                reject(userErr);
+            });
     });
 }
 
 /**
  * Ensure that the test user has a seller profile 
  */
-export function ensureTestUserIsSeller(): Promise<userModel.IUser>{
-    return Promise<userModel.IUser>((resolve, reject) => {
-    });
-}
+// TODO, as well as ensure...Buyer
+//export function ensureTestUserIsSeller(): Promise<userModel.IUser> {
+//    return Promise<userModel.IUser>((resolve, reject) => {
+//    });
+//}
