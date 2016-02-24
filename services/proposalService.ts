@@ -421,10 +421,20 @@ export class ProposalService {
                         reject("Proposal couldn't be closed");
                         return;
                     }
-                    else
-                        resolve(t.proposalContractToObject(proposalContract));
+                    else {
+                        t.ensureCacheProposalContract(proposalContract)
+                            .then(p => {
+                                resolve(p);
+                            })
+                            .catch(err => {
+                                reject(err);
+                            });
+                    }
                 })
-                .catch(err => { reject(err); });
+                .catch(err => {
+                    reject(err);
+                });
+            ;
         });
     }
         

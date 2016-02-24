@@ -77,15 +77,12 @@ export class FulfilmentService {
             if (!proposalContract.isClosed())
                 resolve(proposalContract);
 
+            // Is the start payment already complete? THen there's nothing to do here.
             if (proposalContract.isStartPaymentComplete())
                 resolve(proposalContract);
 
+            // Is there an accepted offer?
             if (proposalContract.acceptedOffer() != "0x") {
-                // Has an accepted offer
-
-                // Not ready for start payment? We're done.
-                if (!proposalContract.isReadyForStartPayout())
-                    resolve(proposalContract);
 
                 var paymentPromises = new Array<Promise<upholdService.IUpholdTransaction>>()
                 
@@ -105,7 +102,8 @@ export class FulfilmentService {
                 // one of them would fail.
                 Q.allSettled(paymentPromises)
                     .then(paymentResults => {
-                        // TODO: report on any errors in a more detailed manner.                        
+                        // TODO: report on any errors in a more detailed manner. The paymentsResults
+                        // array contains details on the results of each executeStartPayment run.
                         resolve(proposalContract);
                     })
                     .catch(err => reject(err));
@@ -213,7 +211,12 @@ export class FulfilmentService {
                     return userRepo.getUserByBlockchainAddress(backer.address);
                 })
                 .then(u => {
-                    user = u;
+                    if (!u) {
+                        // Throw a specific error to skip the rest of the promise chain.
+                        throw ("Can't find user for blockchain address " + backer.address);
+                    }
+
+                    user = u;                    
                     
                     // Create uphold service
                     return serviceFactory.createUpholdService(user.accessToken);
@@ -231,10 +234,23 @@ export class FulfilmentService {
                     // We've seen the correct Uphold transaction. Confirm to the contract that
                     // it has been paid.
                     return proposalContract.setPaid(backerIndex, 2,
-                        upholdTransaction.id, upholdTransaction.denomination.amount * 100);
+                        tools.guidRemoveDashes(upholdTransaction.id), upholdTransaction.denomination.amount * 100);
                 })
                 .then(contractTx => {
                     resolve(upholdTransaction);
+                }, setPaidErr => {
+                    // The uphold transaction has succeeded, but we haven't been able to
+                    // store it. This is a problem as we'll lose information.
+                    
+                    // TODO: handle this. One approach is to decouple the "oracle functionality" of
+                    // watching Uphold transactions and storing them in the smart contracts from
+                    // the business logic of triggering payments according to the instructions of
+                    // those smart contracts. The detection of a payment should be run in an 
+                    // idempotent manner. I.e. a payment from a particular Uphold account to 
+                    // a particular card (the card for this specific BuyCo) with a particular amount
+                    // can be considered the start payment for this backer always, as long as
+                    // it hasn't been already registered for another backing.
+                    reject(setPaidErr);
                 })
                 .catch(err => {
                     reject(err);
@@ -256,22 +272,36 @@ export class FulfilmentService {
                 .then(p => {
                     proposalContract = p;
 
-                    t.ensureStartPayment(p)
-                        .then(pRes => {
-                            t.ensureStartPayout(p);
-                        });
-
-
-                    // Ready for end payout? Execute end payout.
-                    //if (proposalContract.isReadyForEndPayout() && !proposalContract.isPaymentComplete()) {
-                    //    // TODO: Execute end payout
-                        
-                    //}
-
-                    // Ready for end payout? Execute end payout.
-
+                    // The real meat of the method. We process two chains of events in parallel:
+                    // 1. Closing of the deal: start payments / start payout
+                    // 2. After delivery: end payments / end payout
+                    // The methods called check whether the conditions for payments apply, execute
+                    // payments as neccesary and update the contracts.
+                    // As the events in the lifecycle of the contract are mutually exclusive, we
+                    // can safely execute them in parallel for optimal performance. For any 
+                    // BuyCo contract, either one of them will provide some activity or none at all.
+                    return Q.all([
+                        t.ensureStartPayment(p)
+                            .then(pRes => {
+                                return t.ensureStartPayout(p);
+                            })  
+                        // TODO: process end payments in parallel.                      
+                        //, t.ensureEndPayment(p)
+                        //.then(pRes => {
+                        //    return t.ensureEndPayout(p);
+                        //})
+                    ]);
                 })
-                .catch(err => { reject(err); });
+                .then(pRes => {
+                    // All done. Convert to object and resolve.
+                    return t.proposalService.proposalContractToObject(proposalContract);
+                })
+                .then(po => {
+                    resolve(po);
+                })
+                .catch(err => {
+                    reject(err);
+                });
         });
     }
 

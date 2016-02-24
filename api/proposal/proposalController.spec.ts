@@ -146,7 +146,7 @@ describe("ProposalController", () => {
                 
                 // Assert stuff on the result
                 assert.notEqual(newProposal.contractAddress, "0x", "New proposal has an ID");
-                assert.equal(newProposal.endDate, "", "New proposal has an empty string as end date");
+                assert.ok(!newProposal.endDate, "New proposal has an empty end date");
                 assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
                 assert.equal(newProposal.productUnitSize, "1 unit", "New proposal has correct unit size");
                 assert.equal(newProposal.mainCategory, "Electronics", "New proposal has correct main category");

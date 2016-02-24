@@ -330,6 +330,15 @@ contract Proposal {
         else if (paymentType == 2) {
             // Start payment
 
+            // Validate that the BuyCo was closed
+            if(!isClosed)
+                return;
+
+            // There should be an accepted offer. If not, the pledge payments
+            // should be refunded.
+            if(address(acceptedOffer) == 0x0)
+                return;
+
             // Validate pledge payment
             if(b.pledgePaymentAmount == 0)
                 return;
@@ -342,10 +351,6 @@ contract Proposal {
         }
         else if (paymentType == 3) {
             // End payment
-
-            // Validate that the BuyCo was closed
-            if(!isClosed)
-                return;
 
             // Validate that start payment was registered
             if(b.startPaymentAmount == 0)

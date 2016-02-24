@@ -46,3 +46,20 @@ export function getTestUserToken(): Promise<string> {
             });
     });
 }
+
+/**
+ * Ensure that the test user has web3.eth.coinbase as a blockchain address,
+ * so that requests for the user owning that address will work.
+ */
+export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
+    return Promise<userModel.IUser>((resolve, reject) => {
+    });
+}
+
+/**
+ * Ensure that the test user has a seller profile 
+ */
+export function ensureTestUserIsSeller(): Promise<userModel.IUser>{
+    return Promise<userModel.IUser>((resolve, reject) => {
+    });
+}

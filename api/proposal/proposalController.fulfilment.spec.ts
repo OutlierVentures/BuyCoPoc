@@ -47,8 +47,8 @@ describe("ProposalController fulfilment", () => {
         var lastYear = (new Date()).getFullYear() - 1;
 
         var proposal: proposalModel.IProposal;
-        var proposalContract
         var testUserToken: string;
+        var newOffer: offerModel.IOffer;
 
         async.series([
             function getToken(cb) {
@@ -103,6 +103,7 @@ describe("ProposalController fulfilment", () => {
                 // Create a valid offer for it
                 var cardId = testHelper.getTestUserCardId();
                 var offerPrice = 0.09;
+                var minAmount = 2;
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/offer')
@@ -110,39 +111,66 @@ describe("ProposalController fulfilment", () => {
                     .send({
                         "offer": {
                             "price": offerPrice,
-                            "minimumAmount": 2,
-                            "fromCard": cardId,
+                            "minimumAmount": minAmount,
+                            "toCard": cardId,
                         }
                     })
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
-                        var newOffer = <offerModel.IOffer>res.body;
+                        newOffer = <offerModel.IOffer>res.body;
                 
                         // Assert stuff on the result
                         assert.notEqual(newOffer.id, "0x", "New offer has an ID");
                         assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");
                         assert.equal(newOffer.price, offerPrice, "New offer has the correct price");
-                        assert.equal(newOffer.minimumAmount, 456, "New offer has the correct minimum amount");
+                        assert.equal(newOffer.minimumAmount, minAmount, "New offer has the correct minimum amount");
 
                         // TODO: add test to GET ../offers for this proposal and ensure this one is included
                         // TODO: apply different ethereum accounts in the tests when available, to be 
                         // able to make multiple offers etc.
                     })
-                    .end(function (err, res) {
-                        done(err);
-                    });
+                    .end(cb);
             },
             function closeProposal(cb) {
                 // Close the proposal. We expect the offer to be accepted.
+                // Create a valid offer for it
+                var cardId = testHelper.getTestUserCardId();
+                var offerPrice = 0.09;
+                var minAmount = 2;
 
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                    })
+                    .end(cb);
+            },
+            function testIsClosed(cb) {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress)
                     .expect('Content-Type', /json/)
                     .expect(200)
-                    .expect(function (res:proposalModel.IProposal) {
+                    .expect(function (res) {
+                        var freshProposal = <proposalModel.IProposal>res.body;
+
                         // Assert that the proposal has been closed and that there's an accepted offer.
-                        assert.ok(res.isClosed, "Proposal is closed");
+                        assert.ok(freshProposal.isClosed, "Proposal is closed");
+                        assert.equal(freshProposal.acceptedOffer, newOffer.id, "Offer is accepted");
+                    })
+                    .end(cb);
+            },
+            function processPayments(cb) {
+                // Call process-payments to make the start payment be paid
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        //var freshProposal = <proposalModel.IProposal>res.body;
+
+                        // TODO: load proposal contract object here to query start payment.
                     })
                     .end(cb);
             }
