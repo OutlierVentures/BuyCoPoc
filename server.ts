@@ -5,7 +5,6 @@ import morgan = require('morgan');
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
 import web3config = require('./lib/web3config');
-import assert = require('assert');
 import http = require('http');
 import https = require('https');
 import uriJs = require('urijs');

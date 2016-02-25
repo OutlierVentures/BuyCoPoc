@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import fs = require('fs');
 import request = require('supertest');
@@ -44,7 +44,7 @@ describe("CategoryController", () => {
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
-                assert.ok(list.length > 0, "At least one category");
+                assert.isAbove(list.length, 0, "At least one category");
                 var first = list[0];
                 assert.ok(first.name, "First category has a name");
                 assert.ok(!first.totalProposalCount, "No proposal info");
