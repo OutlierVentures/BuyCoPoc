@@ -88,15 +88,14 @@ export class FulfilmentService {
                     // can safely execute them in parallel for optimal performance. For any 
                     // BuyCo contract, either one of them will provide some activity or none at all.
                     return Q.all([
-                        t.ensureStartPayment(p)
+                        t.processStartPayment(p)
                             .then(pRes => {
-                                return t.ensureStartPayout(p);
-                            })  
-                        // TODO: process end payments in parallel.                      
-                        //, t.ensureEndPayment(p)
-                        //.then(pRes => {
-                        //    return t.ensureEndPayout(p);
-                        //})
+                                return t.processStartPayout(p);
+                            }),
+                        t.processEndPayments(p)
+                            .then(pRes => {
+                                return t.processEndPayout(p);
+                            })
                     ]);
                 })
                 .then(pRes => {
@@ -117,7 +116,7 @@ export class FulfilmentService {
      *
      * @param proposalContract
      */
-    ensureStartPayment(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
+    processStartPayment(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
@@ -145,7 +144,7 @@ export class FulfilmentService {
                 if (backer[4])
                     continue;
 
-                paymentPromises.push(t.executeStartPayment(proposalContract, i));
+                paymentPromises.push(t.executeStartPayments(proposalContract, i));
             }
 
             // We use allSettled() to ensure all promise functions are completed, even if 
@@ -168,7 +167,7 @@ export class FulfilmentService {
      * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
      * with error details.
      */
-    executeStartPayment(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
+    executeStartPayments(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
         var t = this;
         var uService: serviceFactory.IUpholdService;
         var user: userModel.IUser;
@@ -239,11 +238,11 @@ export class FulfilmentService {
     }
 
     /**
- * Ensure that a start payout which should be paid, is paid.
- *
- * @param proposalContract
- */
-    ensureStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
+     * Ensure that a start payout which should be paid, is paid.
+     *
+     * @param proposalContract
+     */
+    processStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
@@ -273,6 +272,8 @@ export class FulfilmentService {
 
         });
     }
+
+    /**** BEGIN START PAYMENT AND PAYOUT ****/
 
     /**
      * Try to execute the start payout, and mark it as paid in the contract.
@@ -318,5 +319,233 @@ export class FulfilmentService {
                 });
         });
     }
+
+    /**** END START PAYMENTS AND PAYOUT ****/
+
+
+
+
+    /**** BEGIN END PAYMENT AND PAYOUT ****/
+
+    /**
+     * Ensure that the end payments which should be paid, are paid.
+     *
+     * @param proposalContract
+     */
+    processEndPayments(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
+        var t = this;
+
+        return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
+            // Checks preventing the end payment
+            if (
+                // Not closed? Nothing to do here.
+                !proposalContract.isClosed()
+                // Is the end payment already complete? Then there's nothing to do here.
+                || proposalContract.isPaymentComplete()
+                // Start payment not complete yet?
+                || !proposalContract.isStartPaymentComplete()
+                // No accepted offer? Closed but no deal.
+                // TODO: allow passing through this method for BuyCo's that are
+                // closed without an accepted offer, and have no start payment.
+                // For those the end payment will be a refund of the payments of
+                // the backers, i.e. a payment from the BuyCo vault to the backers
+                // which is stored as a negative amount in the contract.
+                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000") {
+                resolve(proposalContract);
+                return;
+            }
+                
+            // End payments should be taken. Go through all the backers, check if they paid,
+            // if not, pay.
+            var paymentPromises = new Array<Promise<upholdService.IUpholdTransaction>>()
+
+            for (let i = 1; i <= proposalContract.backerIndex().toNumber(); i++) {
+                let backer = proposalContract.backers(i);
+
+                // Has this backer paid the end payment?
+                if (backer[6])
+                    continue;
+
+                if (proposalContract.getEndPaymentAmount(i).toNumber() < 0) {
+                    // This backer would require a refund.
+                    // TODO
+                    continue;
+                }
+
+                paymentPromises.push(t.executeEndPayment(proposalContract, i));
+            }
+
+            // We use allSettled() to ensure all promise functions are completed, even if 
+            // one of them would fail.
+            Q.allSettled(paymentPromises)
+                .then(paymentResults => {
+                    // TODO: report on any errors in a more detailed manner. The paymentsResults
+                    // array contains details on the results of each executeEndPayment run.
+                    resolve(proposalContract);
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    /**
+     * Try to execute the end payment for a specific backer, and mark it as paid in the contract.
+     *
+     * @param proposalContract
+     * @param backerIndex
+     * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
+     * with error details.
+     */
+    executeEndPayment(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
+        var t = this;
+        var uService: serviceFactory.IUpholdService;
+        var user: userModel.IUser;
+        var backer: proposalBackingModel.IProposalBacking;
+        var upholdTransaction: upholdService.IUpholdTransaction;
+
+        return Promise<upholdService.IUpholdTransaction>((resolve, reject) => {
+            t.proposalService.getBacker(proposalContract, backerIndex)
+                .then(b => {
+                    backer = b;
+                    // Get user info
+                    return userRepo.getUserByBlockchainAddress(backer.address);
+                })
+                .then(u => {
+                    if (!u) {
+                        // Throw a specific error to skip the rest of the promise chain.
+                        throw ("Can't find user for blockchain address " + backer.address);
+                    }
+
+                    user = u;                    
+                    
+                    // Create uphold service
+                    return serviceFactory.createUpholdService(user.accessToken);
+                })
+                .then(us => {
+                    uService = us;
+                    // Create and commit transaction
+                    return us.createAndCommitTransaction(backer.cardId,
+                        proposalContract.getEndPaymentAmount(backerIndex).toNumber() / 100,
+                        "GBP", t.config.uphold.vaultAccount.cardBitcoinAddress);
+                })
+                .then(tx => {
+                    upholdTransaction = tx;
+
+                    // We've seen the correct Uphold transaction. Confirm to the contract that
+                    // it has been paid.
+                    return proposalContract.setPaid(backerIndex, 2,
+                        tools.guidRemoveDashes(upholdTransaction.id), upholdTransaction.denomination.amount * 100);
+                })
+                .then(web3plus.promiseCommital)
+                .then(contractTx => {
+                    // Check whether it was registered correctly.
+                    var backer = proposalContract.backers(backerIndex);
+
+                    if (backer[6] != tools.guidRemoveDashes(upholdTransaction.id)
+                        || backer[7].toNumber() != upholdTransaction.denomination.amount * 100)
+                        throw ("End payment for backer " + backerIndex + " wasn't registered correctly");
+
+                    resolve(upholdTransaction);
+                }, setPaidErr => {
+                    // The uphold transaction has succeeded, but we haven't been able to
+                    // store it. This is a problem as we'll lose information.
+                    
+                    // TODO: handle this. One approach is to decouple the "oracle functionality" of
+                    // watching Uphold transactions and storing them in the smart contracts from
+                    // the business logic of triggering payments according to the instructions of
+                    // those smart contracts. The detection of a payment should be run in an 
+                    // idempotent manner. I.e. a payment from a particular Uphold account to 
+                    // a particular card (the card for this specific BuyCo) with a particular amount
+                    // can be considered the end payment for this backer always, as long as
+                    // it hasn't been already registered for another backing.
+                    reject(setPaidErr);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
+    /**
+     * Ensure that a end payout which should be paid, is paid.
+     *
+     * @param proposalContract
+     */
+    processEndPayout(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
+        var t = this;
+
+        return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
+            // Carry out checks that are reasons not to carry out the payout.            
+            if (
+                // Not closed? Nothing to do here.
+                !proposalContract.isClosed()
+                // Already paid out?
+                || proposalContract.endPayoutTransactionID()
+                // No accepted offer?
+                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000"
+                // Not ready for end payment? We're done.
+                || !proposalContract.isReadyForEndPayout()) {
+
+                resolve(proposalContract);
+                return;
+            }
+
+            // Time for payout. Execute it.
+            t.executeEndPayout(proposalContract)
+                .then(payoutTx => {
+                    resolve(proposalContract);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+
+        });
+    }
+
+    /**
+     * Try to execute the end payout, and mark it as paid in the contract.
+     *
+     * @param proposalContract
+     * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
+     * with error details.
+     */
+    executeEndPayout(proposalContract: contractInterfaces.IProposalContract): Promise<upholdService.IUpholdTransaction> {
+        var t = this;
+
+        var upholdTransaction: upholdService.IUpholdTransaction;
+        var winningOfferContract: contractInterfaces.IOfferContract;
+
+        return Promise<upholdService.IUpholdTransaction>((resolve, reject) => {
+
+            t.contractService.getOfferContractAt(proposalContract.acceptedOffer())
+                .then(oc => {
+                    winningOfferContract = oc;
+                    return serviceFactory.createVaultUpholdService();
+                })
+                .then(vs => {
+                    return vs.createAndCommitTransaction(t.config.uphold.vaultAccount.cardId,
+                        proposalContract.getEndPayoutAmount().toNumber() / 100, "GBP", winningOfferContract.owner());
+                })
+                .then(tx => {
+                    upholdTransaction = tx;
+
+                    return proposalContract.registerEndPayout(tools.guidRemoveDashes(upholdTransaction.id),
+                        upholdTransaction.denomination.amount * 100, { gas: 2500000 });
+                })
+                .then(web3plus.promiseCommital)
+                .then(contractTx => {
+                    // Check whether the end payout was registered correctly.
+                    if (proposalContract.endPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
+                        || proposalContract.endPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
+                        throw ("Error registering end payout.");
+
+                    resolve(upholdTransaction);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
+    /**** END END PAYMENTS AND PAYOUT ****/
 
 }

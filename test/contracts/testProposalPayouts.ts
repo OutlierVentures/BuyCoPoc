@@ -1,6 +1,6 @@
-﻿import assert = require('assert');
-import web3config = require('./web3config');
+﻿import web3config = require('./web3config');
 import fs = require('fs');
+import chai = require('chai'); var assert = chai.assert;
 
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
@@ -259,7 +259,10 @@ describe("ProposalRegistry payouts", () => {
                 assert.ok(!proposalContract.isPaymentComplete(), "End payment not complete");
 
                 // Set first end paid
-                return proposalContract.setPaid(1, 3, tools.newGuid(true), proposalContract.getEndPaymentAmount(1), { gas: 2500000 });
+                var endPaymentAmount = proposalContract.getEndPaymentAmount(1);
+                // (sell price * amount) - (Ask price * amount * 0.5)
+                assert.equal(endPaymentAmount.toNumber(), 2722500, "End payment amount for backer 1");
+                return proposalContract.setPaid(1, 3, tools.newGuid(true), endPaymentAmount, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {

@@ -50,7 +50,7 @@ describe("ProposalController fulfilment", () => {
         done();
     });
 
-    it("should take start payment on proposal with accepted offer on POST /api/proposal/:id/process-payments", function (done) {
+    it("should execute start payments and payout on proposal with accepted offer on POST /api/proposal/:id/process-payments", function (done) {
         this.timeout(300000);
 
         var lastYear = (new Date()).getFullYear() - 1;
@@ -59,6 +59,7 @@ describe("ProposalController fulfilment", () => {
         var proposalContract: contractInterfaces.IProposalContract;
         var testUserToken: string;
         var newOffer: offerModel.IOffer;
+
         var startPayoutTransactionId: string;
 
         async.series([
@@ -209,11 +210,14 @@ describe("ProposalController fulfilment", () => {
                         startPayoutTransactionId = proposalContract.startPayoutTransactionID();
                         assert.ok(proposalContract.startPayoutTransactionID(), "Start payout transaction ID has been set");
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
+
+                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
                     })
                     .end(cb);
             },
             function processPaymentsAgain(cb) {
-                // Call process-payments again and ensure that it's now fast and nothing has changed
+                // Call process-payments again. Ensure that nothing has changed on the start payments.
+                // The end payments should still not be executed because delivery hasn't been reported.
                 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
@@ -227,6 +231,12 @@ describe("ProposalController fulfilment", () => {
 
                         assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTransactionId, "Start payout transaction ID has not changed");
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
+
+                        assert.ok(!backer[6], "End payment of backer 1 has not been registered");
+                        assert.equal(backer[5].toNumber(), 0, "End payment amount of backer 1 is 0");
+                        
+                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
+                        assert.equal(proposalContract.endPayoutAmount().toNumber(), 9, "End payout amount is correct");
                     })
                     .end(cb);
             },

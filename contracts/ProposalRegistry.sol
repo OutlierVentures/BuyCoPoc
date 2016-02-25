@@ -263,10 +263,12 @@ contract Proposal {
         // We can only compute this once there is an accepted offer. However when
         // there is none, the end payment will be minus the currently paid amount,
         // hence a full reimbursement.
-        amount = int(backers[backerIndex].amount)
-            * (int(acceptedOffer.price())
-            - int(getPledgePaymentAmount(backerIndex))
-            - int(getStartPaymentAmount(backerIndex)));
+        amount = (int(backers[backerIndex].amount) * int(acceptedOffer.price())) // Total amount to be paid
+            // Minus the amount already paid by this backer. We use the
+            // actually registered amounts to handle any cases where e.g.
+            // a single backer hasn't paid the start payment.
+            - int(backers[backerIndex].pledgePaymentAmount)
+            - int(backers[backerIndex].startPaymentAmount);
     }
 
     /*
@@ -623,7 +625,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.3";
+    string public version = "0.8.4";
 
     function ProposalRegistry(string n){
         name = n;
