@@ -233,10 +233,10 @@ describe("ProposalController fulfilment", () => {
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
 
                         assert.ok(!backer[6], "End payment of backer 1 has not been registered");
-                        assert.equal(backer[5].toNumber(), 0, "End payment amount of backer 1 is 0");
+                        assert.equal(backer[7].toNumber(), 0, "End payment amount of backer 1 is 0");
                         
-                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
-                        assert.equal(proposalContract.endPayoutAmount().toNumber(), 9, "End payout amount is correct");
+                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");                        
+                        assert.equal(proposalContract.endPayoutAmount().toNumber(), 0, "End payout amount is correct");
                     })
                     .end(cb);
             },

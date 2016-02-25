@@ -565,6 +565,13 @@ contract Proposal {
     }
 
     function getEndPayoutAmount() constant returns (uint amount) {
+        // TODO: Handle refunds. If the ultimateDeliveryDate has passed, there
+        // can be two situations:
+        // 1. isDeliveryComplete == true: end payment should be made to seller
+        // 2. isDeliveryComplete == false: end payout should be negative (refund)
+        //  and end payment to backers should be negative (refund).
+        // Currently refunds are not supported; any BuyCo is assumed to be
+        // successfully fulfilled within the ultimateDeliveryDate.
         amount = acceptedOffer.price() * getTotalBackedAmount()
             - getStartPayoutAmount();
     }
