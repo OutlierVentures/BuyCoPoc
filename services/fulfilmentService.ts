@@ -64,6 +64,54 @@ export class FulfilmentService {
         return defer.promise;
     }
 
+
+    /*
+     * Execute any pending payments for a proposal in the blockchain.
+     * @param proposalId the address of the proposal
+     * @return The proposal
+     */
+    executePayments(proposalId: string): Promise<proposalModel.IProposal> {
+        var t = this;
+
+        var proposalContract: contractInterfaces.IProposalContract;
+        return Promise<proposalModel.IProposal>((resolve, reject) => {
+            t.contractService.getProposalContractAt(proposalId)
+                .then(p => {
+                    proposalContract = p;
+
+                    // The real meat of the method. We process two chains of events in parallel:
+                    // 1. Closing of the deal: start payments / start payout
+                    // 2. After delivery: end payments / end payout
+                    // The methods called check whether the conditions for payments apply, execute
+                    // payments as neccesary and update the contracts.
+                    // As the events in the lifecycle of the contract are mutually exclusive, we
+                    // can safely execute them in parallel for optimal performance. For any 
+                    // BuyCo contract, either one of them will provide some activity or none at all.
+                    return Q.all([
+                        t.ensureStartPayment(p)
+                            .then(pRes => {
+                                return t.ensureStartPayout(p);
+                            })  
+                        // TODO: process end payments in parallel.                      
+                        //, t.ensureEndPayment(p)
+                        //.then(pRes => {
+                        //    return t.ensureEndPayout(p);
+                        //})
+                    ]);
+                })
+                .then(pRes => {
+                    // All done. Convert to object and resolve.
+                    return t.proposalService.proposalContractToObject(proposalContract);
+                })
+                .then(po => {
+                    resolve(po);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
     /**
      * Ensure that the start payments which should be paid, are paid.
      *
@@ -111,88 +159,6 @@ export class FulfilmentService {
                 .catch(err => reject(err));
         });
     }
-
-    /**
-     * Ensure that a start payout which should be paid, is paid.
-     *
-     * @param proposalContract
-     */
-    ensureStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
-        var t = this;
-
-        return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
-            // Carry out checks that are reasons not to carry out the payout.            
-            if (
-                // Not closed? Nothing to do here.
-                !proposalContract.isClosed()
-                // Already paid out?
-                || proposalContract.startPayoutTransactionID()
-                // No accepted offer?
-                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000"
-                // Not ready for start payment? We're done.
-                || !proposalContract.isReadyForStartPayout()) {
-
-                resolve(proposalContract);
-                return;
-            }
-
-            // Time for payout. Execute it.
-            t.executeStartPayout(proposalContract)
-                .then(payoutTx => {
-                    resolve(proposalContract);
-                })
-                .catch(err => {
-                    reject(err);
-                });
-
-        });
-    }
-
-    /**
-     * Try to execute the start payout, and mark it as paid in the contract.
-     *
-     * @param proposalContract
-     * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
-     * with error details.
-     */
-    executeStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<upholdService.IUpholdTransaction> {
-        var t = this;
-
-        var upholdTransaction: upholdService.IUpholdTransaction;
-        var winningOfferContract: contractInterfaces.IOfferContract;
-
-        return Promise<upholdService.IUpholdTransaction>((resolve, reject) => {
-
-            t.contractService.getOfferContractAt(proposalContract.acceptedOffer())
-                .then(oc => {
-                    winningOfferContract = oc;
-                    return serviceFactory.createVaultUpholdService();
-                })
-                .then(vs => {
-                    return vs.createAndCommitTransaction(t.config.uphold.vaultAccount.cardId,
-                        proposalContract.getStartPayoutAmount().toNumber() / 100, "GBP", winningOfferContract.owner());
-                })
-                .then(tx => {
-                    upholdTransaction = tx;
-
-                    return proposalContract.registerStartPayout(tools.guidRemoveDashes(upholdTransaction.id),
-                        upholdTransaction.denomination.amount * 100, { gas: 2500000 });
-                })
-                .then(web3plus.promiseCommital)
-                .then(contractTx => {
-                    // Check whether the start payout was registered correctly.
-                    if (proposalContract.startPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
-                        || proposalContract.startPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
-                        throw ("Error registering start payout.");
-
-                    resolve(upholdTransaction);
-                })
-                .catch(err => {
-                    reject(err);
-                });
-        });
-    }
-
 
     /**
      * Try to execute the start payment for a specific backer, and mark it as paid in the contract.
@@ -272,52 +238,85 @@ export class FulfilmentService {
         });
     }
 
-    /*
-     * Execute any pending payments for a proposal in the blockchain.
-     * @param proposalId the address of the proposal
-     * @return The proposal
-     */
-    executePayments(proposalId: string): Promise<proposalModel.IProposal> {
+    /**
+ * Ensure that a start payout which should be paid, is paid.
+ *
+ * @param proposalContract
+ */
+    ensureStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
         var t = this;
 
-        var proposalContract: contractInterfaces.IProposalContract;
-        return Promise<proposalModel.IProposal>((resolve, reject) => {
-            t.contractService.getProposalContractAt(proposalId)
-                .then(p => {
-                    proposalContract = p;
+        return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
+            // Carry out checks that are reasons not to carry out the payout.            
+            if (
+                // Not closed? Nothing to do here.
+                !proposalContract.isClosed()
+                // Already paid out?
+                || proposalContract.startPayoutTransactionID()
+                // No accepted offer?
+                || proposalContract.acceptedOffer() == "0x0000000000000000000000000000000000000000"
+                // Not ready for start payment? We're done.
+                || !proposalContract.isReadyForStartPayout()) {
 
-                    // The real meat of the method. We process two chains of events in parallel:
-                    // 1. Closing of the deal: start payments / start payout
-                    // 2. After delivery: end payments / end payout
-                    // The methods called check whether the conditions for payments apply, execute
-                    // payments as neccesary and update the contracts.
-                    // As the events in the lifecycle of the contract are mutually exclusive, we
-                    // can safely execute them in parallel for optimal performance. For any 
-                    // BuyCo contract, either one of them will provide some activity or none at all.
-                    return Q.all([
-                        t.ensureStartPayment(p)
-                            .then(pRes => {
-                                return t.ensureStartPayout(p);
-                            })  
-                        // TODO: process end payments in parallel.                      
-                        //, t.ensureEndPayment(p)
-                        //.then(pRes => {
-                        //    return t.ensureEndPayout(p);
-                        //})
-                    ]);
+                resolve(proposalContract);
+                return;
+            }
+
+            // Time for payout. Execute it.
+            t.executeStartPayout(proposalContract)
+                .then(payoutTx => {
+                    resolve(proposalContract);
                 })
-                .then(pRes => {
-                    // All done. Convert to object and resolve.
-                    return t.proposalService.proposalContractToObject(proposalContract);
+                .catch(err => {
+                    reject(err);
+                });
+
+        });
+    }
+
+    /**
+     * Try to execute the start payout, and mark it as paid in the contract.
+     *
+     * @param proposalContract
+     * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
+     * with error details.
+     */
+    executeStartPayout(proposalContract: contractInterfaces.IProposalContract): Promise<upholdService.IUpholdTransaction> {
+        var t = this;
+
+        var upholdTransaction: upholdService.IUpholdTransaction;
+        var winningOfferContract: contractInterfaces.IOfferContract;
+
+        return Promise<upholdService.IUpholdTransaction>((resolve, reject) => {
+
+            t.contractService.getOfferContractAt(proposalContract.acceptedOffer())
+                .then(oc => {
+                    winningOfferContract = oc;
+                    return serviceFactory.createVaultUpholdService();
                 })
-                .then(po => {
-                    resolve(po);
+                .then(vs => {
+                    return vs.createAndCommitTransaction(t.config.uphold.vaultAccount.cardId,
+                        proposalContract.getStartPayoutAmount().toNumber() / 100, "GBP", winningOfferContract.owner());
+                })
+                .then(tx => {
+                    upholdTransaction = tx;
+
+                    return proposalContract.registerStartPayout(tools.guidRemoveDashes(upholdTransaction.id),
+                        upholdTransaction.denomination.amount * 100, { gas: 2500000 });
+                })
+                .then(web3plus.promiseCommital)
+                .then(contractTx => {
+                    // Check whether the start payout was registered correctly.
+                    if (proposalContract.startPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
+                        || proposalContract.startPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
+                        throw ("Error registering start payout.");
+
+                    resolve(upholdTransaction);
                 })
                 .catch(err => {
                     reject(err);
                 });
         });
     }
-
 
 }
