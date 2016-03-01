@@ -144,7 +144,7 @@ export class FulfilmentService {
                 if (backer[4])
                     continue;
 
-                paymentPromises.push(t.executeStartPayments(proposalContract, i));
+                paymentPromises.push(t.executeSingleStartPayment(proposalContract, i));
             }
 
             // We use allSettled() to ensure all promise functions are completed, even if 
@@ -167,7 +167,7 @@ export class FulfilmentService {
      * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
      * with error details.
      */
-    executeStartPayments(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
+    executeSingleStartPayment(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
         var t = this;
         var uService: serviceFactory.IUpholdService;
         var user: userModel.IUser;
@@ -308,7 +308,7 @@ export class FulfilmentService {
                 .then(web3plus.promiseCommital)
                 .then(contractTx => {
                     // Check whether the start payout was registered correctly.
-                    if (proposalContract.startPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
+                    if (proposalContract.startPayoutAmount().toNumber() != Math.round(upholdTransaction.denomination.amount * 100)
                         || proposalContract.startPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
                         throw ("Error registering start payout.");
 
@@ -372,7 +372,7 @@ export class FulfilmentService {
                     continue;
                 }
 
-                paymentPromises.push(t.executeEndPayment(proposalContract, i));
+                paymentPromises.push(t.executeSingleEndPayment(proposalContract, i));
             }
 
             // We use allSettled() to ensure all promise functions are completed, even if 
@@ -395,7 +395,7 @@ export class FulfilmentService {
      * @return A promise of the transaction if it succeeded. If anything fails, the promise will be rejected 
      * with error details.
      */
-    executeEndPayment(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
+    executeSingleEndPayment(proposalContract: contractInterfaces.IProposalContract, backerIndex: number): Promise<upholdService.IUpholdTransaction> {
         var t = this;
         var uService: serviceFactory.IUpholdService;
         var user: userModel.IUser;
@@ -432,7 +432,7 @@ export class FulfilmentService {
 
                     // We've seen the correct Uphold transaction. Confirm to the contract that
                     // it has been paid.
-                    return proposalContract.setPaid(backerIndex, 2,
+                    return proposalContract.setPaid(backerIndex, 3,
                         tools.guidRemoveDashes(upholdTransaction.id), upholdTransaction.denomination.amount * 100);
                 })
                 .then(web3plus.promiseCommital)
@@ -534,7 +534,7 @@ export class FulfilmentService {
                 .then(web3plus.promiseCommital)
                 .then(contractTx => {
                     // Check whether the end payout was registered correctly.
-                    if (proposalContract.endPayoutAmount().toNumber() != upholdTransaction.denomination.amount * 100
+                    if (proposalContract.endPayoutAmount().toNumber() != Math.round(upholdTransaction.denomination.amount * 100)
                         || proposalContract.endPayoutTransactionID() != tools.guidRemoveDashes(upholdTransaction.id))
                         throw ("Error registering end payout.");
 
