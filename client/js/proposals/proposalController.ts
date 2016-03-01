@@ -141,7 +141,7 @@ class ProposalController {
                     t.$scope.proposalContract = pc;
 
                     // Add some properties with information about the state of the proposal.
-
+                    // TODO: move to server side, cache.
                     anyP.isDeliveryComplete = pc.isDeliveryComplete();
                     anyP.isPaymentComplete = pc.isPaymentComplete();
                     anyP.isPayoutComplete = pc.endPayoutTransactionID() ? true : false;
@@ -299,7 +299,7 @@ class ProposalController {
     processPayments() {
         var t = this;
 
-        t.$scope.processMessage = "Requesting the BuyCo service to process any pending payments...";
+        t.$scope.processMessage = "Requesting the BuyCo service to process any pending payments. This can take a very long time. You can wait for the result or come back here later.";
 
         t.$http({
             method: 'POST',

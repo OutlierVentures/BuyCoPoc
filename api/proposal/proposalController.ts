@@ -33,6 +33,9 @@ export class ProposalController {
         // Only the maincategory and subcategory are in the URL part itself.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
+
+        proposalFilter.mainCategory = mainCategory;
+        proposalFilter.subCategory = subCategory;
         
         // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()

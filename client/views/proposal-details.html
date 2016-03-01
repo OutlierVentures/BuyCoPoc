@@ -77,16 +77,26 @@
             Fulfilment
         </div>
         <div class="panel-body">
-            <p ng-show="proposal.isPaymentComplete"><i class="fa fa-check-square"></i> All buyer payments for this BuyCo have been completed.</p>
-            <p ng-show="proposal.isPayoutComplete"><i class="fa fa-check-square"></i> All seller payments for this BuyCo have been completed.</p>
-            <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported.</p>
-            <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported.</p>
-            <a ng-click="vm.processClose()" class="btn btn-primary" ng-show="proposal.shouldClose && !proposal.isClosed">
-                Close the proposal
-            </a>
-            <a ng-click="vm.processPayments()" class="btn btn-primary" ng-show="proposal.isClosed && (!proposal.isPaymentComplete || !proposal.isPayoutComplete)">
-                Process payments
-            </a>
+            <div ng-show="backers.length > 0">
+                <p ng-show="proposal.isPaymentComplete"><i class="fa fa-check-square"></i> All buyer payments for this BuyCo have been completed.</p>
+                <p ng-show="proposal.isPayoutComplete"><i class="fa fa-check-square"></i> All seller payments for this BuyCo have been completed.</p>
+            </div>
+            <div ng-show="proposal.acceptedOffer && proposal.isClosed">
+                <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported to pay the seller.</p>
+                <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported to pay the seller.</p>
+            </div>
+            <div ng-show="proposal.shouldClose && !proposal.isClosed">
+                <p>The end date of the proposal has passed. You can request the BuyCo service to close it.</p>
+                <a ng-click="vm.processClose()" class="btn btn-primary">
+                    Close the proposal
+                </a>
+            </div>
+            <div ng-show="proposal.isClosed && (!proposal.isPaymentComplete || !proposal.isPayoutComplete)">
+                <p>The proposal is closed, but not all payments have been completed. You can request the BuyCo service to process the payments according to the smart contract rules.</p>
+                <a ng-click="vm.processPayments()" class="btn btn-primary">
+                    Process payments
+                </a>
+            </div>
             <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
                 <div class="panel-heading">Processing</div>
                 <div class="panel-body"><img src="/images/ajax-loader.gif">&nbsp;&nbsp;{{processMessage}}</div>
@@ -163,7 +173,7 @@
                         <span><strong>This is your offer.</strong></span>
                     </div>
                     <div>
-                        <span class="small" ng-show="offer.id == proposal.acceptedOffer"><strong>This is the accepted offer</strong></span>
+                        <span ng-show="offer.id == proposal.acceptedOffer"><strong>This is the accepted offer.</strong></span>
                         <a href="/proposal/{{proposal.contractAddress}}/offer/{{offer.id}}" class="btn btn-primary pull-right">
                             See the offer
                         </a>
