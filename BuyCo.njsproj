@@ -439,7 +439,6 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
-    <Folder Include="api\delivery\" />
     <Folder Include="api\buyer\" />
     <Folder Include="api\audit\" />
     <Folder Include="api\user\" />

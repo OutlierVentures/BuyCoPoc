@@ -187,24 +187,19 @@ interface IUpholdCard {
 }
 
 /**
- * A backer of a proposal, i.e. a buyer.
+ * A backing of a proposal by a buyer.
  */
 interface IProposalBacking {
+
     /**
      * User ID from MongoDB.
      */
-    userId: string;
-    
+    userId: string;   
+
     /**
      * Blockchain address of this user.
      */
     address: string;
-
-    /**
-     * Uphold card ID used for payments.
-     */
-    cardId: string;
-
     /**
      * Backer index within the proposal.
      */
@@ -244,8 +239,24 @@ interface IProposalBacking {
      * Amount of the final payment.
      */
     endPaymentAmount: number;
-}
 
+    /**
+     * Indicates whether the delivery has been reported by the backer.
+     */
+    isDeliveryReported: boolean;
+
+    /**
+     * Indicates whether the delivery is correct according to the backer.
+     * Any further details about the nature of what is or isn't correct
+     * are discussed outside of the contract.
+     */
+    isDeliveryCorrect: boolean;
+
+    /**
+     * Uphold card ID used for payments.
+     */
+    cardId: string;
+}
 
 /**
  * An offer made to a buying proposal by a seller.

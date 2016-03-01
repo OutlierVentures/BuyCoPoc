@@ -178,6 +178,61 @@ export class ProposalController {
         });
     }
 
+    /**
+     * Report the delivery of an order.
+     */
+    deliveryReport = (req: express.Request, res: express.Response) => {
+        var token = req.header("AccessToken");
+        var proposalId = req.params.id;
+        var backingIndex = <number>req.body.backingIndex;
+        var transactionId = <string>req.body.transactionId;
+        var isDeliveryCorrect = <boolean>req.body.isDeliveryCorrect;
+
+        var proposalService: proposalService.ProposalService;
+
+        // TODO: transfer funds. This requires UX, including the user being informed of the transfer
+        // and the source card ID for the funds specified.
+        // For a more decentralized version this could be done client side. The Uphold token 
+        // could live in the browser. Server side would then check whether the transfer had completed.
+        // --> could we do this without holding the user's Uphold tokens entirely?
+        userRepo.getUserByAccessToken(token, function (userErr, user) {
+            if (userErr) {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+            }
+
+            serviceFactory.createProposalService()
+                .then(
+                function (ps) {
+                    proposalService = ps;
+
+                    if (transactionId)
+                        // User has submitted backing transaction
+                        return ps.processDeliveryReport(proposalId, transactionId, backingIndex, isDeliveryCorrect, user);
+                    else
+                        return ps.deliveryReport(proposalId, backingIndex, isDeliveryCorrect, user);
+                },
+                function (initErr) {
+                    res.status(500).json({
+                        "error": initErr,
+                        "error_location": "initializing proposal service"
+                    });
+                    return null;
+                })
+                .then(function (proposalBacking) {
+                    // Return the transaction ID
+                    res.json(proposalBacking);
+                }, function (backErr) {
+                    res.status(500).json({
+                        "error": backErr,
+                        "error_location": "backing proposal"
+                    });
+                    return null;
+                });
+        });
+    }
     getBackers = (req: express.Request, res: express.Response) => {
         //var token = req.header("AccessToken");
 

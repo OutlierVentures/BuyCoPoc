@@ -44,6 +44,8 @@ export function configure(app: express.Express) {
     apiRouter.route("/proposal/:id").get(pc.getOne);
     // Backing
     apiRouter.route("/proposal/:id/back").post(pc.back);
+    apiRouter.route("/proposal/:id/delivery-report").post(pc.deliveryReport);
+    // Fulfilment
     apiRouter.route("/proposal/:id/close").post(pc.close);
     apiRouter.route("/proposal/:id/process-payments").post(pc.processPayments);
 

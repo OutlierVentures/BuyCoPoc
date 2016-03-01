@@ -382,7 +382,6 @@ class ProposalController {
                                     || proposalContract.productName() != p.productName
                                     || proposalContract.maxPrice().toNumber() != p.maxPrice * 100) {
                                     throw ("Could not add proposal.");
-                                    return;
                                 }
 
                                 proposalContract.setDetails(p.productDescription,

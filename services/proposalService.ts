@@ -94,7 +94,7 @@ export class ProposalService {
             // We get each of the properties of the proposal async, all with a separate promise.
             // This leads to unreadable code, but it's the only known way of delivering
             // reasonable performance. See testProposalList.ts for more info.
-                        
+
             p.contractAddress = proposal.address;
 
             // These could be written more compactly as both the property of proposal and of
@@ -238,7 +238,7 @@ export class ProposalService {
                         deferred.reject(allBackersErr);
                     });
             })
-            .catch(err=> deferred.reject(err));
+            .catch(err => deferred.reject(err));
 
 
         return deferred.promise;
@@ -284,6 +284,9 @@ export class ProposalService {
                 if (backer[7])
                     endPaymentAmount = backer[7].toNumber();
 
+                var isDeliveryReported = <boolean>backer[8];
+                var isDeliveryCorrect = <boolean>backer[9];
+
                 var cId = backer[10];
 
                 userRepo.getUserByBlockchainAddress(backerAddress)
@@ -304,6 +307,8 @@ export class ProposalService {
                             startPaymentAmount: startPaymentAmount,
                             endPaymentTransactionId: endTx,
                             endPaymentAmount: endPaymentAmount,
+                            isDeliveryReported: isDeliveryReported,
+                            isDeliveryCorrect: isDeliveryCorrect
                         });
                     }, err => reject(err));
             });
@@ -347,7 +352,7 @@ export class ProposalService {
                 // That is NOT a reliable way and has to be fixed. It has happened before
                 // that the proposal was not added and this was left unnoticed (that's
                 // why the simple check on increasing proposalIndex).
-                
+
                 // The solution lies in the transaction hash. At this point we can get that 
                 // from the tx.
                 // TODO: check how to get the transactionHash for existing contracts (AFAIK
@@ -361,7 +366,7 @@ export class ProposalService {
 
                 return t.contractService.getProposalContractAt(newProposalAddress);
             })
-            .then(proposalContract => {               
+            .then(proposalContract => {
                 // Do rudimentary checks to ensure the proposal was added.
                 if (proposalContract.owner() != p.owner
                     || proposalContract.productName() != p.productName
@@ -380,7 +385,7 @@ export class ProposalService {
             .then(newProposal => {
                 defer.resolve(newProposal);
             })
-            .catch(err=> {
+            .catch(err => {
                 defer.reject(err);
             });
 
@@ -437,7 +442,7 @@ export class ProposalService {
             ;
         });
     }
-        
+
     /**
      * Process the creation of a new proposal in the blockchain.
      * @param p the new proposal.
@@ -514,7 +519,7 @@ export class ProposalService {
         var newBackerIndex: number;
 
         t.contractService.getProposalContractAt(p.contractAddress)
-            .then(pr=> {
+            .then(pr => {
                 proposalContract = pr;
                 return web3plus.promiseCommital(transactionId);
             })
@@ -534,11 +539,14 @@ export class ProposalService {
                     return;
                 }
 
-                // Save link to the backing in our database. Just save the address. In the contract itself
+                // Save link to the backing in our database. Just save the address and index. In the contract itself
                 // we don't store user data (yet) for privacy reasons.
-                // TODO: add amount, other properties
+                // Strictly spoken this is duplication of data, as the backing is principally stored
+                // in the contract, and in MongoDB we store the user's blockchain addresses.
+                // TODO: remove this call and rely on the contract data, caching where necessary.
                 backingUser.backings.push({
-                    proposalAddress: p.contractAddress
+                    proposalAddress: p.contractAddress,
+                    backingIndex: newBackerIndex
                 });
                 backingUser.save(
                     function (userErr, userRes) {
@@ -566,13 +574,13 @@ export class ProposalService {
                                     .then(function (setPaidResult) {
                                         return t.ensureCacheProposalContract(proposalContract);
                                     })
-                                    .then(p=> {
+                                    .then(p => {
                                         return t.getBacker(proposalContract, newBackerIndex);
                                     })
                                     .then(b => {
                                         defer.resolve(b);
                                     })
-                                    .catch(setPaidError=> {
+                                    .catch(setPaidError => {
                                         defer.reject(setPaidError);
                                     });
                             })
@@ -587,6 +595,72 @@ export class ProposalService {
 
         return defer.promise;
     }
+
+
+    /**
+     * Report the delivery of a backing of an existing proposal in the blockchain.
+     * @param p the proposal.
+     * @return a representation of the backing
+     */
+    deliveryReport(proposalId: string, backingIndex: number, isDeliveryCorrect: boolean, backingUser: userModel.IUser): Promise<boolean> {
+        var t = this;
+
+        return t.contractService.getProposalContractAt(proposalId)
+            .then(proposalContract => {
+
+                var deliveryReportPromise = proposalContract.reportDelivery(backingIndex, isDeliveryCorrect, { gas: 2500000 });
+
+                return deliveryReportPromise;
+            })
+            .then(txId => {
+                return this.processDeliveryReport(proposalId, txId, backingIndex, isDeliveryCorrect, backingUser);
+            });
+    }
+
+    /**
+     * Process the delivery report of an existing backing in the blockchain. The ID of the transaction to proposalContract.reportDelivery()
+     * should be passed.
+     * 
+     * @param transactionId transaction ID of the call to proposalContract.back()
+     * @param p the new proposal.
+     * @return The IProposal with the property "id" set to the contract address.
+     */
+    processDeliveryReport(proposalId: string, transactionId: string, backingIndex: number, isDeliveryCorrect: boolean, backingUser: userModel.IUser): Promise<boolean> {
+        var proposalContract: contractInterfaces.IProposalContract;
+
+        var t = this;
+
+        return Promise<boolean>((resolve, reject) => {
+            t.contractService.getProposalContractAt(proposalId)
+                .then(pr => {
+                    proposalContract = pr;
+                    return web3plus.promiseCommital(transactionId);
+                })
+                .then(function (tx) {
+                    // Get the from address from the transaction. If it is our global account or the account
+                    // of an individual user, both will be set here.
+                    var originatingAddress: string = tx.from;
+
+                    // Check whether the reported data is as expected. Otherwise reject.
+                    var backerFromContract = proposalContract.backers(backingIndex);
+
+                    var isReportedInContract = backerFromContract[8];
+                    var isCorrectInContract = backerFromContract[9];
+
+                    if (!(isReportedInContract && isCorrectInContract == isDeliveryCorrect)) {
+                        reject("Backing could not be added to contract.");
+                        return;
+                    }
+
+                    resolve(isDeliveryCorrect);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
+
 
     /**
      * Get offers for a proposal.
@@ -621,12 +695,12 @@ export class ProposalService {
                     .find({ "blockchainAccounts.accounts.address": { "$in": allSellerAddresses } })
                     .populate({ path: "sellerId" }).exec();
             })
-            .then(usersWithSellers=> {
+            .then(usersWithSellers => {
                 // Match the seller name with the offer.
                 // There must be a far more efficient and concise way to do this with mongo and/or underscore.
                 for (var k in offers) {
                     var o = offers[k];
-                    var theSeller = _(usersWithSellers).find(us=> {
+                    var theSeller = _(usersWithSellers).find(us => {
                         if (!us.blockchainAccounts) return false;
                         if (!us.blockchainAccounts.accounts) return false;
                         return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.owner);
@@ -637,7 +711,7 @@ export class ProposalService {
                 }
 
                 defer.resolve(offers);
-            }).catch(err=> { defer.reject(err); return null; });
+            }).catch(err => { defer.reject(err); return null; });
 
 
         return defer.promise;

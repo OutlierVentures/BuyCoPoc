@@ -18,7 +18,7 @@ import userModel = require('../../models/userModel');
 
 import serviceFactory = require('../../services/serviceFactory');
 import contractInterfaces = require('../../contracts/contractInterfaces');
-import cs  = require('../../services/contractService');
+import cs = require('../../services/contractService');
 
 import _ = require('underscore');
 
@@ -84,7 +84,7 @@ describe("ProposalController fulfilment", () => {
                         cb(err);
                     });
             },
-            function createProposal(cb) { 
+            function createProposal(cb) {
                 // Create a proposal with an end date in the past so that we can close it.
                 request(theApp)
                     .post('/api/proposal')
@@ -153,7 +153,7 @@ describe("ProposalController fulfilment", () => {
                     .expect(200)
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
-                
+
                         // Assert stuff on the result
                         assert.notEqual(newOffer.id, "0x", "New offer has an ID");
                         assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");
@@ -218,12 +218,12 @@ describe("ProposalController fulfilment", () => {
             function processPaymentsAgain(cb) {
                 // Call process-payments again. Ensure that nothing has changed on the start payments.
                 // The end payments should still not be executed because delivery hasn't been reported.
-                
+
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
                     .expect('Content-Type', /json/)
                     .expect(200)
-                    .expect(function (res) {                        
+                    .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
                         assert.ok(backer[4], "Start payment of backer 1 has been registered");
@@ -234,9 +234,175 @@ describe("ProposalController fulfilment", () => {
 
                         assert.ok(!backer[6], "End payment of backer 1 has not been registered");
                         assert.equal(backer[7].toNumber(), 0, "End payment amount of backer 1 is 0");
-                        
-                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");                        
+
+                        assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
                         assert.equal(proposalContract.endPayoutAmount().toNumber(), 0, "End payout amount is correct");
+                    })
+                    .end(cb);
+            },
+        ], done);
+    });
+
+    it("should report delivery on proposal with accepted offer on POST /api/proposal/:id/delivery-report", function (done) {
+        this.timeout(300000);
+
+        var lastYear = (new Date()).getFullYear() - 1;
+
+        var proposal: proposalModel.IProposal;
+        var proposalContract: contractInterfaces.IProposalContract;
+        var testUserToken: string;
+        var newOffer: offerModel.IOffer;
+
+        var startPayoutTransactionId: string;
+
+        async.series([
+            function getToken(cb) {
+                testHelper.getTestUserToken()
+                    .then(t => {
+                        testUserToken = t;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    });
+            },
+            function ensureCoinbase(cb) {
+                // For this test it's essential that the coinbase address used for all the web3 
+                // transactions is stored with a test user. Ensure that.
+                testHelper.ensureTestUserHasCoinbaseAddress()
+                    .then(u => {
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    });
+            },
+            function createProposal(cb) {
+                // Create a proposal with an end date in the past so that we can close it.
+                request(theApp)
+                    .post('/api/proposal')
+                    .send({
+                        proposal: {
+                            productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                            productSku: "SKU123",
+                            mainCategory: "Electronics",
+                            subCategory: "Camera",
+                            maxPrice: 0.10,
+                            endDate: lastYear + "-11-01",
+                            ultimateDeliveryDate: lastYear + "-12-01"
+                        }
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        proposal = <proposalModel.IProposal>res.body;
+                    })
+                    .end(cb);
+            },
+            function getProposalContract(cb) {
+                // Get the proposal contract for assertions
+                contractService.getProposalContractAt(proposal.contractAddress)
+                    .then(pc => {
+                        proposalContract = pc;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    })
+            },
+            function createBacking(cb) {
+                // Back a sufficient amount
+                var cardId = testHelper.getTestUserCardId();
+                var backAmount = 2;
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/back')
+                    .set("AccessToken", testUserToken)
+                    .send({
+                        proposal: proposal,
+                        amount: backAmount,
+                        fromCard: cardId
+                    })
+                    .expect(200)
+                    .end(cb);
+            },
+            function createOffer(cb) {
+                // Create a valid offer for it
+                var cardId = testHelper.getTestUserCardId();
+                var offerPrice = 0.09;
+                var minAmount = 2;
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/offer')
+                    .set("AccessToken", testUserToken)
+                    .send({
+                        "offer": {
+                            "price": offerPrice,
+                            "minimumAmount": minAmount,
+                            "toCard": cardId,
+                        }
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        newOffer = <offerModel.IOffer>res.body;
+
+                        // Assert stuff on the result
+                        assert.notEqual(newOffer.id, "0x", "New offer has an ID");
+                        assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");
+                        assert.equal(newOffer.price, offerPrice, "New offer has the correct price");
+                        assert.equal(newOffer.minimumAmount, minAmount, "New offer has the correct minimum amount");
+
+                        // TODO: add test to GET ../offers for this proposal and ensure this one is included
+                        // TODO: apply different ethereum accounts in the tests when available, to be 
+                        // able to make multiple offers etc.
+                    })
+                    .end(cb);
+            },
+            function closeProposal(cb) {
+                // Close the proposal. We expect the offer to be accepted.
+                // Create a valid offer for it
+                var cardId = testHelper.getTestUserCardId();
+                var offerPrice = 0.09;
+                var minAmount = 2;
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                    })
+                    .end(cb);
+            },
+            function testIsClosed(cb) {
+                request(theApp)
+                    .get('/api/proposal/' + proposal.contractAddress)
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        var freshProposal = <proposalModel.IProposal>res.body;
+
+                        // Assert that the proposal has been closed and that there's an accepted offer.
+                        assert.ok(freshProposal.isClosed, "Proposal is closed");
+                        assert.equal(freshProposal.acceptedOffer, newOffer.id, "Offer is accepted");
+                    })
+                    .end(cb);
+            },
+            function processDelivery(cb) {
+                // Call POST delivery-report to report delivery.
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + "/delivery-report")
+                    .send({
+                        isDeliveryCorrect: true,
+                        backingIndex: 1
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        var backer = proposalContract.backers(1);
+
+                        assert.ok(backer[8], "Delivery of backer 1 has been reported");
+                        assert.equal(backer[9], "Delivery of backer 1 is reported as correct");
                     })
                     .end(cb);
             },

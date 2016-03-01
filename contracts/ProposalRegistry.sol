@@ -175,7 +175,7 @@ contract Proposal {
         /*
          * Uphold card ID used for payments.
          */
-        string paymentCardId;
+        string cardId;
     }
 
     /*
@@ -285,7 +285,7 @@ contract Proposal {
 
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
-        backers[backerIndex].paymentCardId = cardId;
+        backers[backerIndex].cardId = cardId;
     }
 
     /*
@@ -499,7 +499,7 @@ contract Proposal {
         // To be called by the backer.
         if(b.buyerAddress != tx.origin) return;
 
-        // A delivery reported as correct cannot beb unreported.
+        // A delivery reported as correct cannot be unreported.
         if(b.isDeliveryReported && b.isDeliveryCorrect) return;
 
         b.isDeliveryReported = true;

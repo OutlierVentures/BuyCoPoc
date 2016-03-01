@@ -10,11 +10,12 @@ import { sellerSchema, ISeller} from './sellerModel'
 // to work with this in a productive, typesafe manner we define it as a class. 
 // The only function of this class is to link the user data to the smart contract.
 // Details like the amount and payments are stored in the contract.
-export class Backing {
+export interface IBackingInfo {
     /**
      * The ID of the backed proposal.
      */
     proposalAddress: string;
+    backingIndex: number;
 }
 
 export var userSchema = new mongoose.Schema({
@@ -22,7 +23,8 @@ export var userSchema = new mongoose.Schema({
     externalId: String,
     accessToken: String,
     backings: [{
-        proposalAddress: String
+        proposalAddress: String,
+        backingIndex: Number,
     }],
     blockchainAccounts: {
         selected: String,
@@ -93,7 +95,7 @@ export interface IUser extends mongoose.Document {
     /**
      * BuyCos this user has backed
      */
-    backings: [Backing];
+    backings: [IBackingInfo];
 
     blockchainAccounts: IBlockchainAccountCollection;
 
