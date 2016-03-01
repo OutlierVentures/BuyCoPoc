@@ -1,0 +1,56 @@
+﻿﻿<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>Report delivery</h2>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>
+                                You have bought <strong>{{backing.amount}}</strong> unit(s) of <strong>{{proposal.productName}}</strong>.
+                            </p>
+                            <p>
+                                Have you received the goods in good condition and were they as advertised?
+                            </p>
+                            <p>
+                                Be aware that reporting on the delivery forms a legally binding claim that influences the payment to the seller.
+                            </p>
+                            <form role="form" name="deliveryForm" novalidate>                                
+                                <fieldset ng-disabled="processMessage || successMessage">
+                                    <button name="yesButton" ng-click="vm.reportDeliveryConfirm(true)" ng-disabled="deliveryForm.$invalid" class="btn btn-primary">
+                                        Yes, I received my order correctly
+                                    </button>
+                                    <button name="noButton" ng-click="vm.reportDeliveryConfirm(false)" ng-disabled="deliveryForm.$invalid" class="btn btn-warning">
+                                        No, there was something wrong with the goods
+                                    </button>
+                                </fieldset>
+                            </form>
+                            <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
+                                <div class="panel-heading">Processing</div>
+                                <div class="panel-body"><img src="/images/ajax-loader.gif">&nbsp;&nbsp;{{processMessage}}</div>
+                            </div>
+                            <div class="panel panel-danger" style="margin-top:1em;" ng-show="errorMessage">
+                                <div class="panel-heading">There was an error processing your request.</div>
+                                <div class="panel-body">{{errorMessage}}</div>
+                            </div>
+                            <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
+                                <div class="panel-heading">Success</div>
+                                <div class="panel-body">
+                                    <p>{{successMessage}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-lg-8 (nested) -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+</div>

@@ -18,6 +18,7 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
         .when('/proposal/:id/back', { controller: ProposalController, templateUrl: 'views/proposal-back.html', name: 'back' })
         .when('/proposal/:proposalId/offer/new', { controller: OfferController, controllerAs: "vm", templateUrl: 'js/offers/offer-form.html', name: 'new' })
         .when('/proposal/:proposalId/offer/:offerId', { controller: OfferController, controllerAs: "vm", templateUrl: 'js/offers/offer-details.html', name: 'details' })
+        .when('/proposal/:id/report-delivery/:backerIndex', { controller: ProposalController, controllerAs: "vm", templateUrl: 'js/proposals/proposal-report-delivery.html', name: 'report-delivery' })
         .when('/buyer/signup', { controller: BuyerSignupController, controllerAs: "vm", templateUrl: 'js/buyers/buyer-signup.html' })
         .when('/seller/signup', { controller: SellerSignupController, controllerAs: "vm", templateUrl: 'js/sellers/seller-signup.html' })
         .when('/seller-proposal/list', { controller: SellerProposalListController, controllerAs: "vm", templateUrl: 'js/seller-proposals/seller-proposal-list.html' })

@@ -197,6 +197,11 @@ interface IProposalBacking {
     userId: string;   
 
     /**
+     * Gets whether this backing is placed by the current user.
+     */
+    isCurrentUser: boolean;
+
+    /**
      * Blockchain address of this user.
      */
     address: string;

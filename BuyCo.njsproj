@@ -44,6 +44,7 @@
     <Content Include="client\js\common\proposal-detail.html" />
     <Content Include="client\js\offers\offer-details.html" />
     <Content Include="client\js\offers\offer-form.html" />
+    <Content Include="client\js\proposals\proposal-report-delivery.html" />
     <Content Include="client\js\seller-proposals\seller-proposal-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />

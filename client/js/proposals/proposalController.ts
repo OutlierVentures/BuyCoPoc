@@ -1,6 +1,8 @@
 ﻿interface IProposalScope extends ng.IScope {
     proposal: IProposal;
     backers: Array<IProposalBacking>;
+    backing: IProposalBacking;
+    proposalContract: IProposalContract;
     offers: Array<IOffer>;
     amount: number;
     fromCard: string;
@@ -16,6 +18,7 @@
 
 interface IProposalRouteParameters extends ng.route.IRouteParamsService {
     id: string;
+    backerIndex: number;
 }
 
 class ProposalController {
@@ -46,6 +49,7 @@ class ProposalController {
         $scope.vm = this;
 
         var proposalId = this.$routeParams.id;
+        var backerIndex = this.$routeParams.backerIndex;
 
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
@@ -57,6 +61,8 @@ class ProposalController {
             this.view(proposalId);
         } else if (this.$route.current.name === "close") {
             this.close(proposalId);
+        } else if (this.$route.current.name === "report-delivery") {
+            this.reportDelivery(proposalId, backerIndex);
         }
 
     }
@@ -128,6 +134,22 @@ class ProposalController {
             anyP.pledgePaymentPerProduct = Math.max(resultData.pledgePaymentPercentage / 100 * resultData.maxPrice, 0.01);
             anyP.startPaymentPerProduct = Math.max(resultData.startPaymentPercentage / 100 * resultData.maxPrice, 0.01);
 
+            anyP.shouldClose = (moment(t.$scope.proposal.endDate).format() < moment().format());
+
+            t.blockchainService.getProposalContractAt(proposalId)
+                .then(pc => {
+                    t.$scope.proposalContract = pc;
+
+                    // Add some properties with information about the state of the proposal.
+
+                    anyP.isDeliveryComplete = pc.isDeliveryComplete();
+                    anyP.isPaymentComplete = pc.isPaymentComplete();
+                    anyP.isPayoutComplete = pc.endPayoutTransactionID() ? true : false;
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error
@@ -153,6 +175,12 @@ class ProposalController {
             url: apiUrl + '/proposal/' + proposalId + '/backers',
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: Array<IProposalBacking>) {
+            // Add "isCurrentUser"
+            resultData = _(resultData).map(b => {
+                b.isCurrentUser = (b.userId == t.$rootScope.userInfo._id);
+                return b;
+            });
+
             t.$scope.backers = resultData;
             cb(null, resultData);
         }).error(function (error) {
@@ -234,6 +262,69 @@ class ProposalController {
             // The getter already sets scope variables. Nothing to do here.
         });
 
+    }
+
+    processClose() {
+        var t = this;
+
+        t.$scope.processMessage = "Requesting the BuyCo service to close the proposal...";
+
+        // Call the backend to initiate the closing of the proposal.
+        t.$http({
+            method: 'POST',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/close',
+        }).success(function (resultData: IProposalBacking) {
+            t.$scope.processMessage = undefined;
+            t.$scope.transactionId = resultData.pledgePaymentTransactionId;
+            t.$scope.successMessage = "Successfully requested the BuyCo service to close the proposal. Refreshing...";
+            t.$timeout(() => {
+            }, 5000).then((promiseValue) => {
+                t.$scope.successMessage = undefined;
+
+                // Refresh
+                t.$route.reload();
+            });
+        }).error(function (error) {
+            t.$scope.processMessage = undefined;
+
+            // Handle error
+            console.log("Error triggering close:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error;
+        });
+    }
+
+    processPayments() {
+        var t = this;
+
+        t.$scope.processMessage = "Requesting the BuyCo service to process any pending payments...";
+
+        t.$http({
+            method: 'POST',
+            url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/process-payments',
+        }).success(function (resultData: IProposalBacking) {
+            t.$scope.processMessage = undefined;
+            t.$scope.transactionId = resultData.pledgePaymentTransactionId;
+            t.$scope.successMessage = "Successfully requested the BuyCo service to process payments for the proposal. Refreshing...";
+            t.$timeout(() => {
+            }, 5000).then((promiseValue) => {
+                t.$scope.successMessage = undefined;
+
+                // Refresh
+                t.$route.reload();
+            });
+        }).error(function (error) {
+            t.$scope.processMessage = undefined;
+
+            // Handle error
+            console.log("Error triggering payments:");
+            console.log(error);
+
+            // Show notification
+            t.$scope.errorMessage = error;
+        });
     }
 
     /**
@@ -368,7 +459,7 @@ class ProposalController {
                         }
 
                         t.blockchainService.promiseCommital(transactionId)
-                            .then(tx=> {
+                            .then(tx => {
                                 var proposalIndex = registryContract.proposalIndex().toNumber();
                                 var newProposalAddress = registryContract.proposals(proposalIndex);
 
@@ -376,7 +467,7 @@ class ProposalController {
 
                                 return t.blockchainService.getProposalContractAt(newProposalAddress);
                             })
-                            .then(proposalContract => {               
+                            .then(proposalContract => {
                                 // Do rudimentary checks to ensure the proposal was added.
                                 if (proposalContract.owner() != p.owner
                                     || proposalContract.productName() != p.productName
@@ -446,6 +537,99 @@ class ProposalController {
                 t.$scope.errorMessage = error;
         });
     }
+
+
+
+    /**
+     * Show screen to back a proposal.
+     */
+    reportDelivery(proposalId: string, backerIndex: number) {
+        var t = this;
+
+        t.getProposalData(proposalId, function (err, res) {
+        });
+
+        t.getProposalBackers(proposalId, function (err, res) {
+            t.$scope.backing = _(t.$scope.backers).find(b => b.backerIndex == backerIndex);
+        });
+    }
+
+    reportDeliveryConfirm(isCorrect: boolean) {
+        var t = this;
+
+        // Confirm backing the currently loaded proposal.
+        t.$scope.processMessage = "Processing your delivery report...";
+        t.$scope.errorMessage = undefined;
+        t.$scope.successMessage = undefined;
+
+        // Call the proposal contract from our own address.
+        // TODO: verify that an ethereum account for the user has been configured.
+        this.blockchainService.getProposalContractAt(t.$scope.proposal.contractAddress)
+            .then(proposalContract => {
+                var options: IWeb3TransactionOptions = {
+                    // Still unclear how much gas should really be used. 250000 works at this point.
+                    // If too low, it will be shown in the UX.
+                    gas: 250000,
+                    from: t.blockchainService.getCurrentAccount()
+                };
+
+                // TODO: create a guidRemoveDashes() to remove dashes from guids on front end.
+                proposalContract.reportDelivery(t.$scope.backing.backerIndex, isCorrect, options, function (err, transactionId) {
+                    if (err) {
+                        t.$scope.processMessage = undefined;
+                        if (err.message) err = err.message;
+                        t.$scope.errorMessage = err;
+                        // Unless we do $scope.$apply, the error message doesn't appear. I still don't fully
+                        // understand when this is and when this isn't necessary. It can lead to errors
+                        // when calling it at points where it should not be called.
+                        t.$scope.$apply();
+                        return;
+                    }
+
+                    t.$scope.processMessage = "Your delivery report was submitted. Waiting for further processing...";
+
+                    // Now call the backend to process the rest (payment etc).
+                    t.$http({
+                        method: 'POST',
+                        url: apiUrl + '/proposal/' + t.$scope.proposal.contractAddress + '/delivery-report',
+                        data: {
+                            // Pass our transaction ID to the server side for further processing.
+                            transactionId: transactionId,
+                            isDeliveryCorrect: isCorrect,
+                            backingIndex: t.$scope.backing.backerIndex,
+                        },
+                        headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+                    }).success(function (resultData: IProposalBacking) {
+                        t.$scope.processMessage = undefined;
+                        t.$scope.transactionId = resultData.pledgePaymentTransactionId;
+                        t.$scope.successMessage = "You successfully reported the " + (isCorrect ? "correct" : "incorrect") + " delivery of your order to buy "
+                            + t.$scope.proposal.productName + ". Taking you back to the proposal...";
+                        t.$timeout(() => {
+                        }, 5000).then((promiseValue) => {
+                            t.$scope.successMessage = undefined;
+
+                            // Redirect to the proposal view
+                            t.$location.path("/proposal/" + t.$scope.proposal.contractAddress)
+                        });
+                    }).error(function (error) {
+                        t.$scope.processMessage = undefined;
+
+                        // Handle error
+                        console.log("Error confirming delivery report:");
+                        console.log(error);
+
+                        // Show notification
+                        t.$scope.errorMessage = error;
+                    });
+
+                });
+            }, err => {
+                t.$scope.processMessage = undefined;
+                t.$scope.errorMessage = err;
+            });
+
+    }
+
 }
 
 

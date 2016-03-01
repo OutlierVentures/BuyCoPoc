@@ -21,7 +21,7 @@ export interface IProposalBacking {
     /**
      * User ID from MongoDB.
      */
-    userId: string;   
+    userId: string;
 
     /**
      * Blockchain address of this user.
