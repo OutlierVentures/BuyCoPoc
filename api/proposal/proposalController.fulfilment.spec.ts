@@ -211,7 +211,8 @@ describe("ProposalController fulfilment", () => {
             },
             function processPaymentsAgain(cb) {
                 // Call process-payments again. Ensure that nothing has changed on the start payments.
-                // The end payments should still not be executed because delivery hasn't been reported.
+                // End payments from the buyers ARE processed.
+                // The end payout should still not be executed because delivery hasn't been reported.
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
@@ -226,8 +227,8 @@ describe("ProposalController fulfilment", () => {
                         assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTransactionId, "Start payout transaction ID has not changed");
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 9, "Start payout amount is correct");
 
-                        assert.ok(!backer[6], "End payment of backer 1 has not been registered");
-                        assert.equal(backer[7].toNumber(), 0, "End payment amount of backer 1 is 0");
+                        assert.ok(backer[6], "End payment of backer 1 has been registered");
+                        assert.equal(backer[7].toNumber(), 8, "End payment amount of backer 1 is 0");
 
                         assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
                         assert.equal(proposalContract.endPayoutAmount().toNumber(), 0, "End payout amount is correct");

@@ -117,7 +117,6 @@ export class OfferContractService {
         // one or more JSON RPC calls to the blockchain node.
         var getOfferDetailsPromises = new Array<Q.Promise<offerModel.IOffer>>();
 
-
         var numOffers = proposalContract.offerIndex().toNumber();
 
         for (var i = 1; i <= numOffers; i++) {

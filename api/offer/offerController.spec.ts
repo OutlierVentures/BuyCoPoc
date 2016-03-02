@@ -41,34 +41,46 @@ describe("OfferController", () => {
         this.timeout(100000);
 
         var proposalId: string;
+        var testUserToken: string;
 
-        // Get the proposal list to obtain a valid ID
-        request(theApp)
-            .get('/api/proposal')
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .expect(function (res) {
-                var list = <Array<proposalModel.IProposal>>res.body;
-                proposalId = list[0].contractAddress;
-            })
-            .end(function (err, res) {
-
+        async.series([
+            function getToken(cb) {
+                testHelper.getTestUserToken()
+                    .then(t => {
+                        testUserToken = t;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    });
+            },
+            function getProposal(cb) {
+                // Get the proposal list to obtain a valid ID
+                request(theApp)
+                    .get('/api/proposal')
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .expect(function (res) {
+                        var list = <Array<proposalModel.IProposal>>res.body;
+                        proposalId = list[0].contractAddress;
+                    })
+                    .end(cb);
+            },
+            function getOffers(cb) {
                 request(theApp)
                     .get('/api/proposal/' + proposalId + '/offers')
+                    .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
                     .expect(200)
                     .expect(function (res) {
                         var offers = <Array<offerModel.IOffer>>res.body;
-                
+
                         // The result is empty when this proposal has no offers. We only 
                         // assert a succes code.
                     })
-                    .end(function (err, res) {
-                        done(err);
-                    });
+                    .end(cb);
 
-            });
-
+            }], done);
     });
 
 
@@ -124,7 +136,7 @@ describe("OfferController", () => {
                     .expect(200)
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
-                
+
                         // Assert stuff on the result
                         assert.notEqual(newOffer.id, "0x", "New offer has an ID");
                         assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");
