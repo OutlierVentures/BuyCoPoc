@@ -650,7 +650,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.4";
+    string public version = "0.8.5";
 
     function ProposalRegistry(string n){
         name = n;

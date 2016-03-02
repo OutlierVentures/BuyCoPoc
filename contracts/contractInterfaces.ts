@@ -32,7 +32,7 @@ export interface IWeb3TransactionCallback {
 /**
  * Version of the contracts expected. Compared when getting contracts.
  */
-export var contractsVersion = "0.8.4";
+export var contractsVersion = "0.8.5";
 
 export interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;

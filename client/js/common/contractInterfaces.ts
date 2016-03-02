@@ -36,7 +36,7 @@ interface IWeb3TransactionCallback {
 /**
  * Version of the contracts expected. Compared when getting contracts.
  */
-var codeContractsVersion = "0.8.4";
+var codeContractsVersion = "0.8.5";
 
 interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
