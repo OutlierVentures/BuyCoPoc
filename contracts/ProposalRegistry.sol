@@ -416,6 +416,9 @@ contract Proposal {
         {
             var b = backers[i];
 
+            // Only count backers that have paid the pledge payment.
+            if(b.pledgePaymentAmount == 0) continue;
+
             amount += b.amount;
         }
 
@@ -471,6 +474,9 @@ contract Proposal {
     function isStartPaymentComplete() constant public returns (bool isComplete) {
         for (uint i = 1; i <= backerIndex; i++)
         {
+            // Only consider real backers.
+            if(backers[i].pledgePaymentAmount == 0) continue;
+
             if(backers[i].startPaymentAmount == 0) return;
         }
         isComplete = true;
@@ -482,6 +488,9 @@ contract Proposal {
     function isPaymentComplete() constant public returns (bool isComplete) {
         for (uint i = 1; i <= backerIndex; i++)
         {
+            // Only consider real backers.
+            if(backers[i].pledgePaymentAmount == 0) continue;
+
             if(backers[i].endPaymentAmount == 0) return;
         }
         isComplete = true;
@@ -499,6 +508,9 @@ contract Proposal {
         // To be called by the backer.
         if(b.buyerAddress != tx.origin) return;
 
+        // Is it a real backer?
+        if(b.pledgePaymentAmount == 0) return;
+
         // A delivery reported as correct cannot be unreported.
         if(b.isDeliveryReported && b.isDeliveryCorrect) return;
 
@@ -509,7 +521,7 @@ contract Proposal {
     /*
      * The minimum percentage of deliveries reported as correct (calculated by
      * product count) to consider the delivery complete and ready for final
-     * payout.
+     * payout. In future versions this could be a parameter of the proposal.
      */
     uint public minimumReportedCorrectDeliveryPercentage = 50;
 

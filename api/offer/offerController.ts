@@ -102,7 +102,16 @@ export class OfferController {
                 res.json(buyers);
             })
             .catch(getErr => {
-                res.status(500).json({
+                var statusCode = 500;
+
+                // Poor man's status code setting
+                // TODO: introduce a more systematic way of throwing and catching errors of
+                // different types.
+                var permissionRx = new RegExp("permission");
+                if (permissionRx.test(getErr))
+                    statusCode = 403;
+
+                res.status(statusCode).json({
                     "error": getErr,
                     "error_location": "getting offer buyer info"
                 });

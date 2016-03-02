@@ -267,6 +267,15 @@ describe("OfferController", () => {
                     })
                     .end(cb);
             },
+            // Before closing we expect a 403, because we're not allowed to get the buyer data yet.
+            function getBuyerDataError(cb) {
+                request(theApp)
+                    .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
+                    .set("AccessToken", testUserToken)
+                    .expect('Content-Type', /json/)
+                    .expect(403)
+                    .end(cb);
+            },
             function closeProposal(cb) {
                 // Close the proposal. We expect the offer to be accepted.
                 request(theApp)
@@ -275,8 +284,8 @@ describe("OfferController", () => {
                     .expect(200)
                     .end(cb);
             },
-            // Test whether GET ../offers returns the list of backers with buyer data
-            function getOffers(cb) {
+            // Test whether GET ../offer/../buyers returns the list of backers with buyer data
+            function getBuyerData(cb) {
                 request(theApp)
                     .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
                     .set("AccessToken", testUserToken)

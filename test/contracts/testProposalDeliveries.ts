@@ -69,7 +69,7 @@ describe("ProposalRegistry deliveries", () => {
                 return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
-            .then(function testGetTotalBackedAmount(tx) {
+            .then(function testMinDeliveryCount(tx) {
                 var minDeliveryCount = proposalContract.getMinimumCorrectDeliveryCount().toNumber();
 
                 assert.equal(minDeliveryCount, askAmount1 * 0.5, "Minimum required delivery reports");

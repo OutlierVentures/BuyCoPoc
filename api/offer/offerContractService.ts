@@ -184,7 +184,7 @@ export class OfferContractService {
 
                     // Is the user the owner of the offer?
                     if (!_(user.blockchainAccounts.accounts).any(acc => acc.address == offer.owner))
-                        throw ("User is not the owner of this offer.");
+                        throw ("User is not the owner of this offer and doesn't have permission to see the buyer data.");
 
                     return t.contractService.getProposalContractAt(proposalId);
                 })
@@ -192,7 +192,7 @@ export class OfferContractService {
                     proposalContract = pc;
 
                     if (proposalContract.acceptedOffer() != offerId)
-                        throw ("This offer has not been accepted.");
+                        throw ("This offer has not been accepted. User doesn't have permission to see the buyer data.");
 
                     // This is the accepted offer and the user is the owner.
 
@@ -207,7 +207,7 @@ export class OfferContractService {
                     backersWithInfo = backers;
 
                     // Get the addresses of all backers
-                    var backerAddresses = _(backersWithInfo).map(b => b.address);                    
+                    var backerAddresses = _(backersWithInfo).map(b => b.address);
 
                     // Load the buyer data
                     return userModel.User
@@ -226,7 +226,7 @@ export class OfferContractService {
                             return _(us.blockchainAccounts.accounts).any(ba => ba.address == backer.address);
                         });
 
-                        
+
                         var buyerInfo = <buyerModel.IBuyer><any>theBuyerUser.buyerId;
                         if (buyerInfo) backer.buyerInfo = buyerInfo;
                     }
