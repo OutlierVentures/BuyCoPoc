@@ -8,6 +8,7 @@ import upholdService = require('../../services/upholdService');
 
 import proposalModel = require('../../models/proposalModel');
 import offerModel = require('../../models/offerModel');
+import userModel = require('../../models/userModel');
 
 import web3plus = require('../../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
@@ -22,16 +23,25 @@ export class OfferController {
     }
 
     getOne = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
-
-        // TODO: add permission checks. Offer detail data shouldn't be public.
-
+        var token = req.header("AccessToken");
+        
         var offerId = req.params.id;
+        var user: userModel.IUser;
 
-        serviceFactory.createOfferContractService()
+        userRepo.getUserByAccessToken2(token)
+            .then(u => {
+                user = u;
+                return serviceFactory.createOfferContractService();
+            }, userErr => {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+                return null;
+            })
             .then(
             function (ocs) {
-                return ocs.getOne(offerId);
+                return ocs.getOne(offerId, user);
             },
             function (initErr) {
                 res.status(500).json({
@@ -43,10 +53,58 @@ export class OfferController {
             .then(
             function (proposal) {
                 res.json(proposal);
-            }, function (createErr) {
+            })
+            .catch(getErr => {
                 res.status(500).json({
-                    "error": createErr,
+                    "error": getErr,
                     "error_location": "getting offer"
+                });
+                return null;
+            });
+    }
+
+    /**
+     * Get buyer info, only accessible to seller who made the offer where the offer is the accepted
+     * offer.
+     */
+    getBuyers = (req: express.Request, res: express.Response) => {
+        var token = req.header("AccessToken");
+
+        var proposalId = req.params.proposalId
+        var offerId = req.params.offerId;
+        var user: userModel.IUser;
+
+        userRepo.getUserByAccessToken2(token)
+            .then(u => {
+                user = u;
+
+                return serviceFactory.createOfferContractService();
+            }, userErr => {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+                return null;
+            })
+            .then(
+            function (ocs) {
+                return ocs.getBuyers(proposalId, offerId, user);
+            },
+            function (initErr) {
+                res.status(500).json({
+                    "error": initErr,
+                    "error_location": "initializing offer service"
+                });
+                return null;
+            })
+            .then(
+            function (buyers) {
+                res.json(buyers);
+            })
+            .catch(getErr => {
+                res.status(500).json({
+                    "error": getErr,
+                    "error_location": "getting offer buyer info"
                 });
                 return null;
             });

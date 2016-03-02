@@ -1,4 +1,7 @@
 import userModel = require('../models/userModel');
+import buyerModel = require('../models/buyerModel');
+import sellerModel = require('../models/sellerModel');
+
 import { Promise } from 'q';
 import _ = require('underscore');
 import web3plus = require('../node_modules/web3plus/lib/web3plus');
@@ -32,6 +35,8 @@ export function getTestUserCardId(): string {
 function getTestUserId(): string {
     // TODO: make test user configurable
     return "RonnieDoubleA";
+    // TODO: make this depend on config.useStubs
+    //return "UserstubToken";
 }
 
 export function getTestUser(): Promise<userModel.IUser> {
@@ -94,10 +99,47 @@ export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
 }
 
 /**
+ * Ensure that the test user has a buyer profile
+ */
+export function ensureTestUserIsBuyer(): Promise<userModel.IUser> {
+    return Promise<userModel.IUser>((resolve, reject) => {
+        var testUser: userModel.IUser;
+
+        var testUserId = getTestUserId();
+
+        userModel.User.findOne({ externalId: testUserId }).populate("buyerId").exec()
+            .then(u => {
+                testUser = u;
+                if (u.buyerId) {
+                    resolve(u);
+                    return;
+                }
+                else {
+                    // Create a new buyer
+                    var newBuyer = <buyerModel.IBuyer>{};
+                    newBuyer.company = "Unit test buyer & Co";
+                    newBuyer.userExternalId = testUserId;
+
+                    var buyerRepo = new buyerModel.BuyerRepository();
+                    buyerRepo.create(newBuyer)
+                        .then(savedBuyer => {
+                            testUser.buyerId = savedBuyer.id;
+                            testUser.save((err, res) => {
+                                if (err) reject(err);
+                                else resolve(testUser);
+                            });
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
+                }
+            }, err => {
+                reject(err);
+            });
+    });
+}
+
+/**
  * Ensure that the test user has a seller profile 
  */
-// TODO, as well as ensure...Buyer
-//export function ensureTestUserIsSeller(): Promise<userModel.IUser> {
-//    return Promise<userModel.IUser>((resolve, reject) => {
-//    });
-//}
+// TODO

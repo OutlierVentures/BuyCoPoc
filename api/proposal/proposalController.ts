@@ -10,6 +10,7 @@ import upholdService = require('../../services/upholdService');
 
 
 import proposalModel = require('../../models/proposalModel');
+import userModel = require('../../models/userModel');
 
 import _ = require('underscore');
 
@@ -264,12 +265,25 @@ export class ProposalController {
     }
 
     getOffers = (req: express.Request, res: express.Response) => {
-        //var token = req.header("AccessToken");
+        var token = req.header("AccessToken");
 
-        serviceFactory.createProposalService()
+        var user: userModel.IUser;
+
+        userRepo.getUserByAccessToken2(token)
+            .then(u => {
+                user = u;
+
+                return serviceFactory.createProposalService();
+            }, userErr => {
+                res.status(500).json({
+                    "error": userErr,
+                    "error_location": "loading user data"
+                });
+                return null;
+            })
             .then(
             function (ps) {
-                return ps.getOffers(req.params.id);
+                return ps.getOffers(req.params.id, user);
             },
             function (initErr) {
                 res.status(500).json({

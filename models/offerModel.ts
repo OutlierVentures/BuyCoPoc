@@ -2,6 +2,7 @@
  * An offer made to a buying proposal by a seller.
  */
 export interface IOffer {
+    // Core properties
     id: string;
     owner: string;
     price: number;
@@ -9,5 +10,7 @@ export interface IOffer {
     // TODO: uniformize name (in contract this is called "cardId")
     toCard: string;
 
-    sellerName: string;
+    // Properties added from MongoDB or related contracts
+    sellerName: string;    
+    userId: string;
 }

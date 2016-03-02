@@ -1,8 +1,11 @@
 ﻿import request = require('request');
 import userModel = require('../../models/userModel');
 import proposalModel = require('../../models/proposalModel');
+import proposalBackingModel = require('../../models/proposalBackingModel');
 import offerModel = require('../../models/offerModel');
+import buyerModel = require('../../models/buyerModel');
 import serviceFactory = require('../../services/serviceFactory');
+import proposalService = require('../../services/proposalService');
 import web3plus = require('../../node_modules/web3plus/lib/web3plus');
 import tools = require('../../lib/tools');
 import configurationService = require('../../services/configurationService');
@@ -12,6 +15,8 @@ import contractInterfaces = require('../../contracts/contractInterfaces');
 
 import Q = require('q');
 import { Promise } from 'q';
+
+import _ = require('underscore');
 
 /**
  * Service for dealing with offers to buying proposals on the blockchain. All functions
@@ -32,7 +37,7 @@ export class OfferContractService {
         var t = this;
 
         serviceFactory.getContractService()
-            .then(cs=> {
+            .then(cs => {
                 t.contractService = cs;
                 defer.resolve(null);
             }, err => {
@@ -80,7 +85,7 @@ export class OfferContractService {
             // We get each of the properties of the offer async, all with a separate promise.
             // This leads to unreadable code, but it's the only known way of delivering
             // reasonable performance. See testProposalList.ts for more info.
-                        
+
             o.id = offer.address;
 
             getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
@@ -138,14 +143,10 @@ export class OfferContractService {
     /**
     * Get a single offer by its contract address.
     */
-    getOne(offerId: string): Q.Promise<offerModel.IOffer> {
+    getOne(offerId: string, user: userModel.IUser): Q.Promise<offerModel.IOffer> {
         var deferred = Q.defer<offerModel.IOffer>();
 
         var t = this;
-
-        // Get the details of each proposal in separate promises. Each of those requires
-        // one or more JSON RPC calls to the blockchain node.
-        var getProposalDetailsPromises = new Array<Q.Promise<offerModel.IOffer>>();
 
         var defer = Q.defer<offerModel.IOffer>();
 
@@ -163,6 +164,82 @@ export class OfferContractService {
 
         return deferred.promise;
     }
+
+    /**
+   * Get a single offer by its contract address.
+   */
+    getBuyers(proposalId: string, offerId: string, user: userModel.IUser): Promise<proposalBackingModel.IProposalBacking[]> {
+
+        var t = this;
+        var offer: offerModel.IOffer;
+        var proposalContract: contractInterfaces.IProposalContract;
+        var proposalService: proposalService.ProposalService;
+
+        var backersWithInfo: proposalBackingModel.IProposalBacking[];
+
+        return Promise<proposalBackingModel.IProposalBacking[]>((resolve, reject) => {
+            this.getOne(offerId, user)
+                .then(o => {
+                    offer = o;
+
+                    // Is the user the owner of the offer?
+                    if (!_(user.blockchainAccounts.accounts).any(acc => acc.address == offer.owner))
+                        throw ("User is not the owner of this offer.");
+
+                    return t.contractService.getProposalContractAt(proposalId);
+                })
+                .then(pc => {
+                    proposalContract = pc;
+
+                    if (proposalContract.acceptedOffer() != offerId)
+                        throw ("This offer has not been accepted.");
+
+                    // This is the accepted offer and the user is the owner.
+
+                    return serviceFactory.createProposalService();
+                })
+                .then(ps => {
+                    proposalService = ps;
+
+                    return ps.getBackers(proposalId);
+                })
+                .then(backers => {
+                    backersWithInfo = backers;
+
+                    // Get the addresses of all backers
+                    var backerAddresses = _(backersWithInfo).map(b => b.address);                    
+
+                    // Load the buyer data
+                    return userModel.User
+                        .find({ "blockchainAccounts.accounts.address": { "$in": backerAddresses } })
+                        .populate({ path: "buyerId" }).exec();
+                })
+                .then(usersWithBuyerInfo => {
+                    // Match the buyer info with the backing.
+
+                    // There must be a far more efficient and concise way to do this with mongo and/or underscore.
+                    for (var k in backersWithInfo) {
+                        var backer = backersWithInfo[k];
+                        var theBuyerUser = _(usersWithBuyerInfo).find(us => {
+                            if (!us.blockchainAccounts) return false;
+                            if (!us.blockchainAccounts.accounts) return false;
+                            return _(us.blockchainAccounts.accounts).any(ba => ba.address == backer.address);
+                        });
+
+                        
+                        var buyerInfo = <buyerModel.IBuyer><any>theBuyerUser.buyerId;
+                        if (buyerInfo) backer.buyerInfo = buyerInfo;
+                    }
+
+                    resolve(backersWithInfo);
+                })
+                .catch(function (proposalErr) {
+                    reject(proposalErr);
+                });
+
+        });
+    }
+
 
     /**
      * Create a new offer for a proposal in the blockchain.

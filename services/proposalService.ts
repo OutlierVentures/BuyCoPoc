@@ -308,7 +308,8 @@ export class ProposalService {
                             endPaymentTransactionId: endTx,
                             endPaymentAmount: endPaymentAmount,
                             isDeliveryReported: isDeliveryReported,
-                            isDeliveryCorrect: isDeliveryCorrect
+                            isDeliveryCorrect: isDeliveryCorrect,
+                            buyerInfo: null
                         });
                     }, err => reject(err));
             });
@@ -666,13 +667,14 @@ export class ProposalService {
      * Get offers for a proposal.
      * @param proposalId
      */
-    getOffers(proposalId: string): Q.Promise<Array<offerModel.IOffer>> {
+    getOffers(proposalId: string, user: userModel.IUser): Q.Promise<Array<offerModel.IOffer>> {
         var defer = Q.defer<Array<offerModel.IOffer>>();
         var t = this;
 
         var proposalContract: contractInterfaces.IProposalContract;
 
         var offers: Array<offerModel.IOffer>;
+        var allOfferOwnerAddresses: string[];
 
         // Load the proposal contract
         t.contractService.getProposalContractAt(proposalId)
@@ -687,12 +689,12 @@ export class ProposalService {
                 offers = off;
 
                 // Load seller data for these offers
-                var allSellerAddresses = _(offers).map(o => {
+                allOfferOwnerAddresses = _(offers).map(o => {
                     return o.owner;
                 });
 
                 return userModel.User
-                    .find({ "blockchainAccounts.accounts.address": { "$in": allSellerAddresses } })
+                    .find({ "blockchainAccounts.accounts.address": { "$in": allOfferOwnerAddresses } })
                     .populate({ path: "sellerId" }).exec();
             })
             .then(usersWithSellers => {
@@ -700,13 +702,17 @@ export class ProposalService {
                 // There must be a far more efficient and concise way to do this with mongo and/or underscore.
                 for (var k in offers) {
                     var o = offers[k];
-                    var theSeller = _(usersWithSellers).find(us => {
+                    var theSellerUser = _(usersWithSellers).find(us => {
                         if (!us.blockchainAccounts) return false;
                         if (!us.blockchainAccounts.accounts) return false;
                         return _(us.blockchainAccounts.accounts).any(ba => ba.address == o.owner);
                     });
 
-                    if (theSeller) o.sellerName = theSeller.name;
+                    o.userId = theSellerUser.id;
+
+                    // TODO: check whether this user is allowed to see the seller. I.e. when proposal is closed?
+                    var sellerInfo = <sellerModel.ISeller><any>theSellerUser.sellerId;
+                    if (sellerInfo && sellerInfo.company) o.sellerName = sellerInfo.company;
                     else o.sellerName = "Undisclosed seller";
                 }
 

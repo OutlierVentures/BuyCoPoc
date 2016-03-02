@@ -54,7 +54,7 @@ interface IUser extends IDocument {
     accessToken: string;
 
     email: string;
-    
+
     /**
      * BuyCos this user has backed
      */
@@ -194,7 +194,7 @@ interface IProposalBacking {
     /**
      * User ID from MongoDB.
      */
-    userId: string;   
+    userId: string;
 
     /**
      * Gets whether this backing is placed by the current user.
@@ -261,6 +261,11 @@ interface IProposalBacking {
      * Uphold card ID used for payments.
      */
     cardId: string;
+
+    /**
+     * Detail info on the buyer.
+     */
+    buyerInfo: IBuyer;
 }
 
 /**
@@ -274,6 +279,7 @@ interface IOffer {
     toCard: string;
 
     sellerName: string;
+    userId: string;
 }
 
 

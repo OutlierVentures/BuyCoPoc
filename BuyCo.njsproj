@@ -398,7 +398,7 @@
     <TypeScriptCompile Include="test\controllers\testMigrationController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\controllers\testOfferController.ts">
+    <TypeScriptCompile Include="api\offer\offerController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">

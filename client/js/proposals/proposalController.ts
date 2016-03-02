@@ -209,6 +209,16 @@ class ProposalController {
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: Array<IOffer>) {
             t.$scope.offers = resultData;
+
+            // Set enhanced properties on the offer.
+            // DUPLICATION: with offerController.ts.
+            for (var k in t.$scope.offers)
+            {
+                var offer = t.$scope.offers[k];
+                var anyO = <any>offer;
+                anyO.isCurrentUser = offer.userId == t.$rootScope.userInfo._id;
+            }
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error

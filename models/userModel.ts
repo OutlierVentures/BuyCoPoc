@@ -38,8 +38,8 @@ export var userSchema = new mongoose.Schema({
             balance: Number
         }]
     },
-    buyerId: mongoose.Schema.Types.ObjectId,
-    sellerId: mongoose.Schema.Types.ObjectId,
+    buyerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Buyers' },
+    sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sellers' },
     preferences: {
         perspective: String
     }
@@ -138,13 +138,19 @@ export class UserRepository {
     };
 
     /**
-    * Get a promise by their accessToken - promise version. 
+    * Get a user by their accessToken - promise version. 
     */
     public getUserByAccessToken2(accessToken: string): Promise<IUser> {
-        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
-            User.findOne({ accessToken: accessToken }, (err: any, resultUser: IUser) => {
+        var result = Promise<IUser>((resolve, reject) => {
+            if (!accessToken) {
+                reject("No access token passed");
+                return;
+            }
+
+            User.findOne({ accessToken: accessToken }, (err, resultUser) => {
                 if (err) {
                     reject(err);
+                    return;
                 }
                 resolve(resultUser);
             });
@@ -170,8 +176,8 @@ export class UserRepository {
     * Get a user by their externalId. 
     */
     public getUserByExternalId(externalId: string): Promise<IUser> {
-        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
-            User.findOne({ externalId: externalId }, (err: any, resultUser: IUser) => {
+        var result = Promise<IUser>((resolve, reject) => {
+            User.findOne({ externalId: externalId }, (err, resultUser) => {
                 if (err) {
                     reject(err);
                 }

@@ -94,6 +94,9 @@ class OfferController {
         }).success(function (resultData: IOffer) {
             t.$scope.offer = resultData;
 
+            var anyO = <any>resultData;
+            anyO.isCurrentUser = t.$scope.offer.userId == t.$rootScope.userInfo._id;
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error

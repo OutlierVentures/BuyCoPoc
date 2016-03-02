@@ -168,17 +168,11 @@ describe("ProposalController fulfilment", () => {
             },
             function closeProposal(cb) {
                 // Close the proposal. We expect the offer to be accepted.
-                // Create a valid offer for it
-                var cardId = testHelper.getTestUserCardId();
-                var offerPrice = 0.09;
-                var minAmount = 2;
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
                     .expect(200)
-                    .expect(function (res) {
-                    })
                     .end(cb);
             },
             function testIsClosed(cb) {

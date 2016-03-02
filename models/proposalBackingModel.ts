@@ -1,4 +1,6 @@
 ﻿import mongoose = require("mongoose");
+import buyerModel = require("./buyerModel");
+
 import { Promise } from "q";
 
 export var proposalBackingSchema = new mongoose.Schema({
@@ -83,6 +85,11 @@ export interface IProposalBacking {
      * Uphold card ID used for payments.
      */
     cardId: string;
+
+    /**
+     * Detail info on the buyer.
+     */
+    buyerInfo: buyerModel.IBuyer;
 }
 
 export interface IProposalBackingDocument extends mongoose.Document, IProposalBacking {
