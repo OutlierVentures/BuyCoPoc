@@ -5,6 +5,7 @@ import fs = require('fs');
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
 import serviceFactory = require('../../services/serviceFactory');
+import tools = require('../../lib/tools');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
@@ -69,6 +70,11 @@ describe("ProposalRegistry deliveries", () => {
                 return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
             .then(function testMinDeliveryCount(tx) {
                 var minDeliveryCount = proposalContract.getMinimumCorrectDeliveryCount().toNumber();
 
@@ -119,13 +125,16 @@ describe("ProposalRegistry deliveries", () => {
             .then(pc=> {
                 proposalContract = pc;
 
-                // First backer
-                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
+                // Backers
+                proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
+                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
-            .then(function testGetTotalBackedAmount(tx) {
-                // Second backer
-                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
+            .then(function setPaid(tx) {
+
+                // Set pledges paid. This amount is not enough to accept the offer.
+                proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
+                return proposalContract.setPaid(2, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(2), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {

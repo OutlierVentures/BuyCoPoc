@@ -472,6 +472,9 @@ contract Proposal {
      * from the backers.
      */
     function isStartPaymentComplete() constant public returns (bool isComplete) {
+        // No backers? Then not complete.
+        if(getTotalBackedAmount() == 0) return;
+
         for (uint i = 1; i <= backerIndex; i++)
         {
             // Only consider real backers.
@@ -486,6 +489,9 @@ contract Proposal {
      * Returns whether all the payments have been received from the backers.
      */
     function isPaymentComplete() constant public returns (bool isComplete) {
+        // Start payment not complete? Then end payment surely not complete.
+        if(!isStartPaymentComplete()) return;
+
         for (uint i = 1; i <= backerIndex; i++)
         {
             // Only consider real backers.

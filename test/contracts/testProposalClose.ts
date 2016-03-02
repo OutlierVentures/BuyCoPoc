@@ -78,6 +78,12 @@ describe("ProposalRegistry closing", () => {
                 return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                // Set pledge paid.
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
 
                 // Make an offer
@@ -141,7 +147,7 @@ describe("ProposalRegistry closing", () => {
             .then(function setPaid(tx) {
 
                 // Set backer pledge paid
-                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(2), { gas: 2500000 });
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
