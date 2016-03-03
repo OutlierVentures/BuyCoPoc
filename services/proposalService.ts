@@ -266,7 +266,7 @@ export class ProposalService {
 
                 var pledgePaymentAmount: number;
                 if (backer[3])
-                    pledgePaymentAmount = backer[3].toNumber();
+                    pledgePaymentAmount = backer[3].toNumber() / 100;
 
                 var startTx: string;
                 if (backer[4] && backer[4].length == 32)
@@ -274,7 +274,7 @@ export class ProposalService {
 
                 var startPaymentAmount: number;
                 if (backer[5])
-                    startPaymentAmount = backer[5].toNumber();
+                    startPaymentAmount = backer[5].toNumber() / 100;
 
                 var endTx: string;
                 if (backer[6] && backer[6].length == 32)
@@ -282,7 +282,7 @@ export class ProposalService {
 
                 var endPaymentAmount: number;
                 if (backer[7])
-                    endPaymentAmount = backer[7].toNumber();
+                    endPaymentAmount = backer[7].toNumber() / 100;
 
                 var isDeliveryReported = <boolean>backer[8];
                 var isDeliveryCorrect = <boolean>backer[9];

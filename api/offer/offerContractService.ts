@@ -205,6 +205,9 @@ export class OfferContractService {
                 .then(backers => {
                     backersWithInfo = backers;
 
+                    // Only include backers that paid the pledge.
+                    backersWithInfo = _(backersWithInfo).filter(b => { if (b.pledgePaymentTransactionId) return true; else return false; });
+
                     // Get the addresses of all backers
                     var backerAddresses = _(backersWithInfo).map(b => b.address);
 
