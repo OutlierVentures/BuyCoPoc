@@ -43,6 +43,13 @@ var config: configModel.IApplicationConfig;
 function loadConfiguration() {
     var cs = new configurationService.ConfigurationService();
     config = cs.getConfiguration();
+
+    if (config.useStubs) {
+        // Set values for the stub data, matching values returned by stubUpholdService.
+        config.uphold.vaultAccount.userName = "UserstubToken";
+        config.uphold.vaultAccount.cardId = "card1";
+        config.uphold.vaultAccount.cardBitcoinAddress = "1Abc";
+    }
 }
 
 export function getConfiguration() {
@@ -66,10 +73,8 @@ export function createVaultUpholdService(): Promise<IUpholdService> {
     return Promise<IUpholdService>((resolve, reject) => {
         var c = getConfiguration();
 
-        var vaultUserName = c.useStubs ? "UserstubToken" : c.uphold.vaultAccount.userName;
-
         // Get the vault user
-        userRepo.getUserByExternalId(vaultUserName)
+        userRepo.getUserByExternalId(c.uphold.vaultAccount.userName)
             .then(vu => {
                 resolve(createUpholdService(vu.accessToken));
             })

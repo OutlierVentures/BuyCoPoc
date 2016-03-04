@@ -32,16 +32,16 @@ export function getTestUserCardId(): string {
     return "9edd1208-8948-4b7a-b54d-3215a8a34de9";
 }
 
-function getTestUserId(): string {
+function getTestUserExternalId(): string {
     // TODO: make test user configurable
     return "RonnieDoubleA";
-    // TODO: make this depend on config.useStubs
+    // TODO: make this depend on config.useStubs (no access to config currently, change manually)
     //return "UserstubToken";
 }
 
 export function getTestUser(): Promise<userModel.IUser> {
     return Promise<userModel.IUser>((resolve, reject) => {
-        userModel.User.findOne().where("externalId").equals(getTestUserId()).exec()
+        userModel.User.findOne().where("externalId").equals(getTestUserExternalId()).exec()
             .then(user => {
                 if (user)
                     resolve(user);
@@ -105,7 +105,7 @@ export function ensureTestUserIsBuyer(): Promise<userModel.IUser> {
     return Promise<userModel.IUser>((resolve, reject) => {
         var testUser: userModel.IUser;
 
-        var testUserId = getTestUserId();
+        var testUserId = getTestUserExternalId();
 
         userModel.User.findOne({ externalId: testUserId }).populate("buyerId").exec()
             .then(u => {

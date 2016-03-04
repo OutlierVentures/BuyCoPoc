@@ -70,7 +70,7 @@ export class StubUpholdService implements serviceFactory.IUpholdService {
                 "message": "",
                 "status": "",
                 "RefundedById": "",
-                "createdAt": "",
+                "createdAt": "2016-02-15 15:00",
                 "denomination": {
                     "amount": 1,
                     "currency": "GBP",
@@ -117,7 +117,7 @@ export class StubUpholdService implements serviceFactory.IUpholdService {
                 "message": "",
                 "status": "",
                 "RefundedById": "",
-                "createdAt": "",
+                "createdAt": "2016-02-03 13:22",
                 "denomination": {
                     "amount": 15,
                     "currency": "GBP",

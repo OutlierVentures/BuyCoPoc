@@ -128,7 +128,7 @@ export class AuditController {
 
         var config = serviceFactory.getConfiguration();
 
-        var adminAccount = config.useStubs ? "UserstubToken" : config.uphold.vaultAccount.userName;
+        var adminAccount = config.uphold.vaultAccount.userName;
         var t = this;
 
         // Get global Proposal Vault account

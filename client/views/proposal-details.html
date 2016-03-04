@@ -89,13 +89,13 @@
             <div ng-show="proposal.shouldClose && !proposal.isClosed">
                 <p>The end date of the proposal has passed. You can request the BuyCo service to close it.</p>
                 <a ng-click="vm.processClose()" class="btn btn-primary">
-                    Close the proposal
+                    Request to close
                 </a>
             </div>
             <div ng-show="proposal.isClosed && (!proposal.isPaymentComplete || !proposal.isPayoutComplete)">
                 <p>The proposal is closed, but not all payments have been completed. You can request the BuyCo service to process the payments according to the smart contract rules.</p>
                 <a ng-click="vm.processPayments()" class="btn btn-primary">
-                    Process payments
+                    Request to process payments
                 </a>
             </div>
             <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
