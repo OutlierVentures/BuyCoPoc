@@ -225,10 +225,10 @@ class DashboardController {
     private loadData() {
         var t = this;
         t.$scope.userInfo = t.$rootScope.userInfo;
-        t.loadBitReserveData();
+        t.loadUpholdData();
     }
 
-    private loadBitReserveData() {
+    private loadUpholdData() {
         // Load Uphold data
         var t = this;
 

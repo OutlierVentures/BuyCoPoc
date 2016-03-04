@@ -11,26 +11,19 @@ import web3plus = require('../../node_modules/web3plus/lib/web3plus');
 import _ = require('underscore');
 import Q = require('q');
 
-interface IBuyCoStatistics {
-    totalDepositsAmount: number,
-    totalPaidOutAmount: number,
-    totalBalance: number,
-}
-
-
 interface IAuditList {
     items: IAuditListItem[],
-    totals: IBuyCoStatistics
+    totals: proposalModel.IBuyCoStatistics
 }
 
 interface IAuditListItem {
     proposal: proposalModel.IProposal,
-    statistics: IBuyCoStatistics
+    statistics: proposalModel.IBuyCoStatistics
 }
 
 interface IAuditDetails {
     proposal: proposalModel.IProposal,
-    statistics: IBuyCoStatistics,
+    statistics: proposalModel.IBuyCoStatistics,
 }
 
 interface IVaultStatistics {
@@ -61,8 +54,8 @@ export class AuditController {
     getList = (req: express.Request, res: express.Response) => {
         // This is an anonymous method.
         // var token = req.header("AccessToken");
-        serviceFactory.createCachedProposalService()
-            .then(cs => {
+        serviceFactory.createProposalService()
+            .then(ps => {
 
                 // Load all proposals
                 proposalModel.Proposal.find({}).exec()
@@ -72,19 +65,7 @@ export class AuditController {
                         var getStatsPromises = new Array<Q.Promise<IBuyCoStatistics>>();
 
                         _(proposals).each((proposal) => {
-                            function getEmptyStats() {
-                                var deferred = Q.defer<IBuyCoStatistics>();
-                                deferred.resolve(<IBuyCoStatistics>{});
-                                return deferred.promise;
-                            }
-                            
-                            // TODO: implement get...statistics
-
-                            //if (circle.contractAddress)
-                            //    getStatsPromises.push(cs.getCircleContractStatistics(circle, null));
-                            //else
-                                getStatsPromises.push(getEmptyStats());
-
+                            getStatsPromises.push(ps.getProposalContractStatistics(proposal, null));
                         });
 
                         Q.all(getStatsPromises)
@@ -102,9 +83,9 @@ export class AuditController {
 
                                 // Compute totals for all the items.
                                 var totals: IBuyCoStatistics = {
-                                    totalDepositsAmount: 0,
-                                    totalPaidOutAmount: 0,
-                                    totalBalance: 0,
+                                    totalPaymentAmount: 0,
+                                    totalPayoutAmount: 0,
+                                    totalEscrowAmount: 0,
                                 };
 
                                 for (var k in totals) {
@@ -147,7 +128,7 @@ export class AuditController {
 
         var config = serviceFactory.getConfiguration();
 
-        var adminAccount = config.uphold.vaultAccount.userName;
+        var adminAccount = config.useStubs ? "UserstubToken" : config.uphold.vaultAccount.userName;
         var t = this;
 
         // Get global Proposal Vault account

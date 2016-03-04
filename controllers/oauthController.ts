@@ -86,7 +86,7 @@ export class OAuthController {
     }
 
     /**
-     * Gets the route this controller exposes to initiate an authentication request, e.g. /api/auth/bitreserve.
+     * Gets the route this controller exposes to initiate an authentication request, e.g. /api/auth/uphold.
      */
     getAuthRoute(): string {
         return this.config.basePath;

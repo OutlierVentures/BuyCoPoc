@@ -722,4 +722,44 @@ export class ProposalService {
 
         return defer.promise;
     }
+
+    getProposalContractStatistics(proposal: proposalModel.IProposal, user: userModel.IUser): Promise<proposalModel.IBuyCoStatistics> {
+        var t = this;
+
+        return Promise<proposalModel.IBuyCoStatistics>((resolve, reject) => {
+            var proposalContract: contractInterfaces.IProposalContract;
+
+            t.contractService.getProposalContractAt(proposal.contractAddress)
+                .then(pc => {
+                    proposalContract = pc;
+
+                    var getNumberPromises = new Array<Q.Promise<IBigNumber>>(
+                        Q.denodeify<IBigNumber>(proposalContract.getTotalPaymentAmount)(),
+                        Q.denodeify<IBigNumber>(proposalContract.getTotalPayoutAmount)(),
+                        Q.denodeify<IBigNumber>(proposalContract.getTotalEscrowAmount)()
+                    );
+
+                    return Q.all(getNumberPromises);
+                })
+                .then(function (numberResults) {
+                    function normalizeBigNumber(n: IBigNumber) {
+                        return n.toNumber() / 100;
+                    }
+
+                    var normalizedResults = numberResults.map(normalizeBigNumber);
+
+                    var statistics: proposalModel.IBuyCoStatistics = {
+                        totalPaymentAmount: normalizedResults[0],
+                        totalPayoutAmount: normalizedResults[1],
+                        totalEscrowAmount: normalizedResults[2],
+                    };
+
+                    resolve(statistics);
+                })
+                .catch(function (err) {
+                    reject(err);
+                });
+        });
+    }
+
 }

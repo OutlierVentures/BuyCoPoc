@@ -56,6 +56,12 @@ export interface IProposal {
 export interface IProposalDocument extends mongoose.Document, IProposal {
 }
 
+export interface IBuyCoStatistics {
+    totalPaymentAmount: number,
+    totalPayoutAmount: number,
+    totalEscrowAmount: number,
+}
+
 export interface IProposalFilter {
     maxPrice?: number;
     minPrice?: number;

@@ -310,9 +310,9 @@ interface IMainCategory extends ICategoryBase {
 /*** START from API auditController ***/
 
 interface IBuyCoStatistics {
-    totalDepositsAmount: number,
-    totalPaidOutAmount: number,
-    totalBalance: number,
+    totalPaymentAmount: number,
+    totalPayoutAmount: number,
+    totalEscrowAmount: number,
 }
 
 

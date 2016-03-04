@@ -36,7 +36,7 @@ interface IWeb3TransactionCallback {
 /**
  * Version of the contracts expected. Compared when getting contracts.
  */
-var codeContractsVersion = "0.8.5";
+var codeContractsVersion = "0.8.6";
 
 interface IProposalRegistryContract extends IWeb3Contract {
     allContractTypes;
@@ -118,6 +118,10 @@ interface IProposalContract extends IWeb3Contract {
 
     registerStartPayout(txId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
     registerEndPayout(txId: string, amount: number | IBigNumber, options?: IWeb3TransactionOptions, callback?: IWeb3TransactionCallback);
+
+    getTotalPaymentAmount(): IBigNumber;
+    getTotalPayoutAmount(): IBigNumber;
+    getTotalEscrowAmount(): IBigNumber;
 }
 
 interface IOfferContract extends IWeb3Contract {

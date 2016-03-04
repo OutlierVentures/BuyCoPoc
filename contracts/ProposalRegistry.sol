@@ -627,6 +627,40 @@ contract Proposal {
         endPayoutAmount = amount;
         endPayoutTransactionID =  txId;
     }
+
+    /**************** START STATISTICS **************/
+
+    /*
+     * Gets the total amount deposited by backers.
+     */
+    function getTotalPaymentAmount() constant returns (uint amount) {
+        int computedAmount;
+        for (uint i = 1; i <= backerIndex; i++)
+        {
+            var b = backers[i];
+            computedAmount += int(b.pledgePaymentAmount);
+            computedAmount += int(b.startPaymentAmount);
+            computedAmount += b.endPaymentAmount;
+        }
+        amount = uint(computedAmount);
+    }
+
+    /**
+     * Gets the total amount paid out to the seller.
+     */
+    function getTotalPayoutAmount() constant returns (uint amount) {
+        amount = startPayoutAmount + endPayoutAmount;
+    }
+
+    /**
+     * Gets the total amount currently held in escrow.
+     */
+    function getTotalEscrowAmount() constant returns (uint amount) {
+        return getTotalPaymentAmount() - getTotalPayoutAmount();
+    }
+
+    /**************** END STATISTICS **************/
+
 }
 
 /*
@@ -650,7 +684,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.5";
+    string public version = "0.8.6";
 
     function ProposalRegistry(string n){
         name = n;

@@ -27,7 +27,7 @@ import stubOauthController = require('./controllers/stubOauthController');
 
 import apiRoutes = require('./routes/api');
 
-import stubBitReserveService = require('./services/stubUpholdService');
+import stubUpholdService = require('./services/stubUpholdService');
 
 export class Server {
     basePath = "./";
@@ -77,12 +77,12 @@ export class Server {
         /**
          * Create a new Uphold service and get user info from it.
          */
-        function getBitReserveUserInfo(token: string, callback) {
+        function getUpholdUserInfo(token: string, callback) {
             var brs = serviceFactory.createUpholdService(token);
             brs.getUser(callback);
         }
 
-        upholdOauthController.setGetUserInfoFunction(getBitReserveUserInfo);
+        upholdOauthController.setGetUserInfoFunction(getUpholdUserInfo);
 
         if (this.config.useStubs) {
             // Create a stub controller from the real controller.
