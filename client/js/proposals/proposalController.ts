@@ -115,7 +115,7 @@ class ProposalController {
 
     private getCategoryJsonString(mainCategory: string, subCategory: string) {
 
-        return '{ "mainCategory": ' + JSON.stringify(mainCategory) + ', "subCategory": ' + JSON.stringify(subCategory) + ' }"';
+        return '{ "mainCategory": ' + JSON.stringify(mainCategory) + ', "subCategory": ' + JSON.stringify(subCategory) + ' }';
     }
 
     private getCardsData(cb: any) {
