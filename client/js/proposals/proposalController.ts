@@ -144,6 +144,7 @@ class ProposalController {
                     // TODO: move to server side, cache.
                     anyP.isDeliveryComplete = pc.isDeliveryComplete();
                     anyP.isPaymentComplete = pc.isPaymentComplete();
+                    anyP.isStartPaymentComplete = pc.isStartPaymentComplete();
                     anyP.isPayoutComplete = pc.endPayoutTransactionID() ? true : false;
                 })
                 .catch(err => {

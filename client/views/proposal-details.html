@@ -78,12 +78,13 @@
         </div>
         <div class="panel-body">
             <div ng-show="backers.length > 0">
+                <p ng-show="proposal.isStartPaymentComplete"><i class="fa fa-check-square"></i> The start payments from the buyers for this BuyCo have been completed.</p>
                 <p ng-show="proposal.isPaymentComplete"><i class="fa fa-check-square"></i> All buyer payments for this BuyCo have been completed.</p>
+                <div ng-show="proposal.acceptedOffer && proposal.isClosed">
+                    <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported to pay the seller.</p>
+                    <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported to pay the seller.</p>
+                </div>
                 <p ng-show="proposal.isPayoutComplete"><i class="fa fa-check-square"></i> All seller payments for this BuyCo have been completed.</p>
-            </div>
-            <div ng-show="proposal.acceptedOffer && proposal.isClosed">
-                <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported to pay the seller.</p>
-                <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported to pay the seller.</p>
             </div>
             <div ng-show="proposal.shouldClose && !proposal.isClosed">
                 <p>The end date of the proposal has passed. You can request the BuyCo service to close it.</p>
