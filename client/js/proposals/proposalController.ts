@@ -309,6 +309,8 @@ class ProposalController {
     processPayments() {
         var t = this;
 
+        t.$scope.errorMessage = undefined;
+        t.$scope.successMessage = undefined;
         t.$scope.processMessage = "Requesting the BuyCo service to process any pending payments. This can take a very long time. You can wait for the result or come back here later.";
 
         t.$http({
