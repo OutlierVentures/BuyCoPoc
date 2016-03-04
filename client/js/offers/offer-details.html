@@ -14,13 +14,22 @@
             Minimum amount of products to be bought: <span class="text-muted">{{(offer.minimumAmount || 0) | number}}</span>
         </span><br><br>
     </div>
-    <div class="panel panel-default">
-        <!-- TODO: show only to the winning offer -->
+    <div class="panel panel-default" ng-show="proposal.acceptedOffer == offer.id">
         <div class="panel-heading">
             Accepted
         </div>
         <div class="panel-body">
-            <p>Congratulations, your offer has been accepted!</p>
+            <p ng-show="offer.isCurrentUser">Congratulations, your offer has been accepted!</p>
+            <p ng-show="!offer.isCurrentUser">This is the accepted offer.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <!-- TODO: show only to the winning offer -->
+        <div class="panel-heading">
+            Payment details
+        </div>
+        <div class="panel-body">
+
             <h4>Payment details</h4>
             <div class="list-group">
                 <p class="list-group-item">
@@ -36,6 +45,7 @@
             </div>
         </div>
     </div>
+    <!-- The variable "buyers" is only filled for the owner of this offer. So other viewers don't see this part. --> 
     <div class="panel panel-default" ng-show="buyers">
         <div class="panel-heading">
             Buyer details
@@ -46,8 +56,9 @@
                 <thead><tr><th>Name</th><th>Address</th><th>Product count</th><th>Total amount (GBP)</th></tr></thead>
                 <tbody>
                     <tr ng-repeat="buyer in buyers track by buyer.backerIndex">
-                        <td>{{buyer.buyerInfo.name}}
-                        <span ng-show="buyer.buyerInfo.company"><br />Company: {{buyer.buyerInfo.company}}</span>
+                        <td>
+                            {{buyer.buyerInfo.name}}
+                            <span ng-show="buyer.buyerInfo.company"><br />Company: {{buyer.buyerInfo.company}}</span>
                         </td>
                         <td>
                             {{buyer.buyerInfo.addressLine1}}<br />
@@ -62,13 +73,13 @@
             </table>
         </div>
     </div>
-    <!--<div class="panel panel-default">
+    <div class="panel panel-default" ng-show="offer.sellerName">
         <div class="panel-heading">
             Seller data
         </div>
         <div class="panel-body">
-            <h4>{{seller.name}}</h4>
-            <p>{{seller.address}}</p>
+            <p>{{offer.sellerName}}</p>
+            <!--<p>{{seller.address}}</p>-->
         </div>
-    </div>-->
+    </div>
 </div>
