@@ -66,8 +66,10 @@ export function createVaultUpholdService(): Promise<IUpholdService> {
     return Promise<IUpholdService>((resolve, reject) => {
         var c = getConfiguration();
 
+        var vaultUserName = c.useStubs ? "UserstubToken" : c.uphold.vaultAccount.userName;
+
         // Get the vault user
-        userRepo.getUserByExternalId(c.uphold.vaultAccount.userName)
+        userRepo.getUserByExternalId(vaultUserName)
             .then(vu => {
                 resolve(createUpholdService(vu.accessToken));
             })
