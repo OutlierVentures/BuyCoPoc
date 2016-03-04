@@ -50,8 +50,7 @@ class BuyerSignupController implements IBuyerSignUp {
     ) {
         this.displayMode = DisplayMode.Add;
         this.displayModes = DisplayMode; 
-        let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
-        this.buyerResource = this.dataAccessService.getBuyerResource(creds);
+
         this.countryResource = this.dataAccessService.getCountryResource();
         
         // Watch the currentCountryCode and then update current country if it is changed. 
@@ -74,11 +73,14 @@ class BuyerSignupController implements IBuyerSignUp {
                 this.messageClass = this.messageTypeAsBsClass(this.messageType);
             }
         });
-        
+
+        var t = this;
         this.$rootScope.$on("loggedOn", (event: any, data: any) => {
-            this.messageType = MessageType.Success;
-            this.message=`Welcome ${this.$rootScope.userInfo.name}!`;
+            if (!t.buyerResource) t.loadBuyerResource();
         });
+
+        if (this.$rootScope.userInfo)
+            t.loadBuyerResource();
            
         this.getCountries()
         .then(() => {
@@ -90,6 +92,11 @@ class BuyerSignupController implements IBuyerSignUp {
         // Test the message box.
         // this.message = "Testing 1, 2, 3...";
         // this.messageType = MessageType.Success;
+    }
+
+    loadBuyerResource() {
+        let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
+        this.buyerResource = this.dataAccessService.getBuyerResource(creds);
     }
     
     /** 

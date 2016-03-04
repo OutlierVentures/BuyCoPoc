@@ -187,6 +187,10 @@ export class UserAccountService {
         return Promise<userModel.IBlockchainAccountCollection>((resolve, reject) => {
             userRepo.getUserByAccessToken2(accessToken)
                 .then(user => {
+                    if (!user) {
+                        throw ("User not found");
+                    }
+
                     // Do some normalization / fixes on the account.
                     // Ensure an account is set as selected.
                     if (user.blockchainAccounts
