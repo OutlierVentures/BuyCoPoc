@@ -23,7 +23,13 @@
                 End date: <span class="text-muted">{{proposal.endDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
             </p>
             <p ng-show="proposal.isClosed">
-                <strong>This BuyCo is closed. Join in next time for a great deal!</strong>
+                <strong>This BuyCo is closed.</strong><br />
+                <span ng-show="$root.userInfo.preferences.perspective=='buyer'">
+                    Did you miss out on a great deal? You can create a new BuyCo for the same product and conditions.<br />
+                    <a href="/proposal/new/{{proposal.contractAddress}}" class="btn btn-primary">
+                        <i class="fa fa-pencil"></i>&nbsp;&nbsp;Create proposal for {{proposal.productName}}
+                    </a>
+                </span>
             </p>
             <p>
                 Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>

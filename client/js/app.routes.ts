@@ -13,6 +13,8 @@ function AppRoutes($routeProvider: ng.route.IRouteProvider, $locationProvider: n
         .when('/auth/uphold/callback', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/user/login', { controller: LoginController, templateUrl: 'views/login-finished.html' })
         .when('/proposal/new', { controller: ProposalController, templateUrl: 'views/proposal-form.html', name: 'new' })
+        // Copy an existing BuyCo
+        .when('/proposal/new/:id', { controller: ProposalController, templateUrl: 'views/proposal-form.html', name: 'new' })
         //.when('/proposal/list', { controller: ProposalListController, templateUrl: 'views/proposal-list.html' })
         .when('/proposal/:id', { controller: ProposalController, templateUrl: 'views/proposal-details.html', name: 'details' })
         .when('/proposal/:id/back', { controller: ProposalController, templateUrl: 'views/proposal-back.html', name: 'back' })

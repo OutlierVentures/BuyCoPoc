@@ -54,7 +54,7 @@ class ProposalController {
         // This controller serves multiple actions. We distinguish the action by a 'name' which
         // is set in the route configuration in app.ts.
         if (this.$route.current.name === "new") {
-            this.create();
+            this.create(proposalId);
         } if (this.$route.current.name === "back") {
             this.back(proposalId);
         } else if (this.$route.current.name === "details") {
@@ -67,8 +67,28 @@ class ProposalController {
 
     }
 
-    create() {
+    create(proposalId?: string) {
         this.getCategoryData((err, res) => { });
+        var t = this;
+
+        if (proposalId) {
+            // Copy an existing (closed) BuyCo
+            this.getProposalData(proposalId, (err, res) => {
+                var p = t.$scope.proposal;
+
+                // Clear the contract address (not strictly necessary as it will be
+                // set on save).
+                p.contractAddress = undefined;
+                // Clear the dates
+                p.endDate = undefined;
+                p.ultimateDeliveryDate = undefined;
+
+                var anyP = <any>p;
+
+                // Set the category JSON string value so the dropdown selects the right value.
+                anyP.category = t.getCategoryJsonString(p.mainCategory, p.subCategory);
+            });
+        }
     }
 
     private getCategoryData(cb: any) {
@@ -79,6 +99,10 @@ class ProposalController {
             method: 'GET',
             url: apiUrl + '/category/all'
         }).success(function (resultData: IMainCategory[]) {
+            _(resultData).each(mc => _(mc.subCategories).each(sc => {
+                var anySc = <any>sc;
+                anySc.jsonString = t.getCategoryJsonString(mc.name, sc.name);
+            }));
             t.$scope.allCategories = resultData;
             cb(null, resultData);
         }).error(function (error) {
@@ -87,6 +111,11 @@ class ProposalController {
 
             cb("Error getting category data", null);
         });
+    }
+
+    private getCategoryJsonString(mainCategory: string, subCategory: string) {
+
+        return '{ "mainCategory": ' + JSON.stringify(mainCategory) + ', "subCategory": ' + JSON.stringify(subCategory) + ' }"';
     }
 
     private getCardsData(cb: any) {
@@ -213,8 +242,7 @@ class ProposalController {
 
             // Set enhanced properties on the offer.
             // DUPLICATION: with offerController.ts.
-            for (var k in t.$scope.offers)
-            {
+            for (var k in t.$scope.offers) {
                 var offer = t.$scope.offers[k];
                 var anyO = <any>offer;
                 anyO.isCurrentUser = offer.userId == t.$rootScope.userInfo._id;
