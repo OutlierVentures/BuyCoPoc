@@ -4,6 +4,7 @@ import proposalModel = require('../../models/proposalModel');
 import proposalBackingModel = require('../../models/proposalBackingModel');
 import offerModel = require('../../models/offerModel');
 import buyerModel = require('../../models/buyerModel');
+import sellerModel = require('../../models/sellerModel');
 import serviceFactory = require('../../services/serviceFactory');
 import proposalService = require('../../services/proposalService');
 import web3plus = require('../../node_modules/web3plus/lib/web3plus');
@@ -63,12 +64,30 @@ export class OfferContractService {
                 return;
             }
 
+            var offer: offerModel.IOffer;
+
             t.contractService.getOfferContractAt(offerAddress)
                 .then(offer => {
                     return t.offerContractToObject(offer);
                 })
                 .then(o => {
-                    d.resolve(o);
+                    offer = o;
+
+                    // Get seller user data
+                    return userModel.User
+                        .findOne({ "blockchainAccounts.accounts.address": o.owner })
+                        .populate({ path: "sellerId" }).exec();
+                })
+                .then(theSellerUser => {
+                    offer.userId = theSellerUser.id;
+
+                    // WARNING: DUPLICATION with proposalService
+                    // TODO: check whether this user is allowed to see the seller. I.e. when proposal is closed?
+                    var sellerInfo = <sellerModel.ISeller><any>theSellerUser.sellerId;
+                    if (sellerInfo && sellerInfo.company) offer.sellerName = sellerInfo.company;
+                    else offer.sellerName = "Undisclosed seller";
+
+                    d.resolve(offer);
                 })
                 .catch(err => {
                     d.reject(err);
