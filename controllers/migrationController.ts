@@ -115,12 +115,21 @@ export class MigrationController {
 
                 //var proposals = JSON.parse(fs.readFileSync('../client/data/proposals.json', 'utf8'));
                 // proposals.forEach(proposal
-                
+
+                contractService.registryContract.addProposal("iPhone 6S", "Electronics", "Mobile phone",
+                    15000, "2016-02-01", "2016-04-01", { gas: 2500000 });
+
+                contractService.registryContract.addProposal("OnePlus X", "Electronics", "Mobile phone",
+                    10000, "2016-03-10", "2016-05-01", { gas: 2500000 });
+
+                contractService.registryContract.addProposal("Canon EOS 5D Mark III", "Electronics", "Camera",
+                    40000, "2016-04-01", "2016-05-01", { gas: 2500000 });
+
                 contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
                     4, "2016-03-01", "2016-05-01", { gas: 2500000 });
 
-                return contractService.registryContract.addProposal("Ethiopia Adado Coop", "Food and drink", "Coffee",
-                    4, "2016-03-01", "2016-05-01", { gas: 2500000 });
+                return contractService.registryContract.addProposal("FTO Guatemala Huehuetenango", "Food and drink", "Coffee",
+                    4, "2016-03-02", "2016-05-02", { gas: 2500000 });
             }, err=> {
                 res.status(500).json({
                     "error_location": "loading registry",
