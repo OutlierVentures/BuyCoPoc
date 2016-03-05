@@ -39,7 +39,7 @@ class BlockchainService {
             // COULD DO: model this as an IIdentityProvider as well. Arguably it is a provider
             // of an identity.
             configurationService.getEthereumJsonRpcUrl()
-                .then(url=> {
+                .then(url => {
                     t.connect(url);
                 }, err => {
                     // TODO: handle error when connecting to blockchain.
@@ -71,7 +71,7 @@ class BlockchainService {
         console.log("Connected to Ethereum node at " + url);
         // Extend the web3 object
         this.accounts.log = function (msg) { console.log(msg); };
-        
+
         // Override the password request function for decrypting the password.
         // ethereumjs-accounts calls this function with the account info any 
         // time a transaction sent from that account has to be signed.  
@@ -87,9 +87,15 @@ class BlockchainService {
         this.afterConnect();
     }
 
-    getAccounts() {
-        // Return the saved accounts because of the better data structure.
-        return this.savedAccounts;  
+    getAccounts(): IBlockchainAccountCollection {
+        // Get the accounts from ethereumjs-accounts. Return in our improved structure.
+        var t = this;
+        if (!t.accounts) return null;
+
+        var ethJsAccts = t.accounts.get();
+        var col = t.fromEthereumJsAccountsFormat(ethJsAccts);
+
+        return col;
     }
 
     /**
@@ -112,13 +118,16 @@ class BlockchainService {
                 t.saveAccounts();
 
                 t.$rootScope.$emit('blockchainConnected');
-            }, err => {
+            })
+            .catch(err => {
                 // On error, also ensure we have at least one account. This could be a new
                 // user without any accounts.
                 if (t.accounts.length == 0) {
                     t.accounts.new(DUMMY_PASSWORD);
                     t.saveAccounts();
                 }
+
+                t.$rootScope.$emit('blockchainConnected');
             });
     }
 
@@ -243,7 +252,7 @@ class BlockchainService {
                 t.$http({
                     method: 'GET',
                     url: apiUrl + "/config/ethereum/contracts/proposalRegistry",
-                }),           
+                }),
                 // Get ABI for the contract
                 t.$http({
                     method: 'GET',

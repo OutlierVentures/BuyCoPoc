@@ -234,7 +234,8 @@ export class ProposalService {
                 Q.all(getBackerDetailsPromises)
                     .then(function (allBackers) {
                         deferred.resolve(allBackers);
-                    }, function (allBackersErr) {
+                    })
+                    .catch(allBackersErr => {
                         deferred.reject(allBackersErr);
                     });
             })

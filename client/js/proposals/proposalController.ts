@@ -398,9 +398,8 @@ class ProposalController {
                     gas: 250000,
                     from: t.blockchainService.getCurrentAccount()
                 };
-
-                // TODO: create a guidRemoveDashes() to remove dashes from guids on front end.
-                proposalContract.back(t.$scope.amount, t.$scope.fromCard.replace("-", ""), options, function (err, transactionId) {
+                
+                proposalContract.back(t.$scope.amount, guidRemoveDashes(t.$scope.fromCard), options, function (err, transactionId) {
                     if (err) {
                         t.$scope.processMessage = undefined;
                         if (err.message) err = err.message;
