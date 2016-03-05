@@ -4,6 +4,7 @@ import request = require('supertest');
 import express = require('express');
 
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 describe("CacheController", () => {
     var theServer: server.Server;
@@ -29,7 +30,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/update')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {                
                 var result = res.body;
                 
@@ -47,7 +48,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/refresh')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var result = res.body;
                 

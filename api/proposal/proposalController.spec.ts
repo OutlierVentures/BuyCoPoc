@@ -46,7 +46,7 @@ describe("ProposalController", () => {
             .get('/api/proposal')
             .expect('Content-Type', /json/)
             //.expect('Content-Length', '20')
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -69,7 +69,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 proposalId = list[0].contractAddress;
@@ -80,7 +80,7 @@ describe("ProposalController", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposalId)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var proposal = <proposalModel.IProposal>res.body;
                 
@@ -102,7 +102,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal/category/Electronics/Camera')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -140,7 +140,7 @@ describe("ProposalController", () => {
             .post('/api/proposal')
             .send(newProposalData)
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 newProposal = <proposalModel.IProposal>res.body;
                 
@@ -186,7 +186,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 proposal = list[0];
@@ -196,7 +196,7 @@ describe("ProposalController", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress + '/backers')
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
@@ -240,7 +240,7 @@ describe("ProposalController", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .end(function (err, res) {
                         if (err) done(err);
 
@@ -255,7 +255,7 @@ describe("ProposalController", () => {
                                 amount: amount,
                                 fromCard: cardId
                             })
-                            .expect(200)
+                            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                             .expect(function (res) {
                                 // Nothing to assert here; POST ../back gives no content.
                             })
@@ -267,7 +267,7 @@ describe("ProposalController", () => {
                                 request(theApp)
                                     .get('/api/proposal/' + proposal.contractAddress + '/backers')
                                     .expect('Content-Type', /json/)
-                                    .expect(200)
+                                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                                     .expect(function (res) {
                                         var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
@@ -296,7 +296,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal/closing-candidates')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -329,7 +329,7 @@ describe("ProposalController", () => {
                 }
             })
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .end(function (err, res) {
                 if (err) done(err);
 
@@ -342,7 +342,7 @@ describe("ProposalController", () => {
                     // to close, yet we request closing it. However because the controller delegates
                     // everything to the service, it can't determine whether there was a validation
                     // error or something else. Hence everything arrives as a 500.
-                    .expect(500)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 500); })
                     .end(function (err, res) {
                         done(err);
                     });
@@ -369,7 +369,7 @@ describe("ProposalController", () => {
                 }
             })
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
             .end(function (err, res) {
                 if (err) done(err);
 
@@ -378,7 +378,7 @@ describe("ProposalController", () => {
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var proposal = <proposalModel.IProposal>res.body;
                                                 

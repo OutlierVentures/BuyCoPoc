@@ -59,7 +59,7 @@ describe("OfferController", () => {
                 request(theApp)
                     .get('/api/proposal')
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var list = <Array<proposalModel.IProposal>>res.body;
                         proposalId = list[0].contractAddress;
@@ -71,7 +71,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var offers = <Array<offerModel.IOffer>>res.body;
 
@@ -107,15 +107,27 @@ describe("OfferController", () => {
         var offerPrice = 0.09;
 
         var newProposal: proposalModel.IProposal;
+        var testUserToken: string;
 
         async.series([
+            function getToken(cb) {
+                testHelper.getTestUserToken()
+                    .then(t => {
+                        testUserToken = t;
+                        cb();
+                    })
+                    .catch(err => {
+                        cb(err);
+                    });
+            },
             // Create a new proposal to ensure we have a proposal that we can add an offer to.
             function createProposal(cb) {
                 request(theApp)
                     .post('/api/proposal')
+                    .set("AccessToken", testUserToken)
                     .send(newProposalData)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         newProposal = <proposalModel.IProposal>res.body;
                         proposalId = newProposal.contractAddress;
@@ -125,6 +137,7 @@ describe("OfferController", () => {
             function createOffer(cb) {
                 request(theApp)
                     .post('/api/proposal/' + proposalId + '/offer')
+                    .set("AccessToken", testUserToken)
                     .send({
                         "offer": {
                             "price": offerPrice,
@@ -133,7 +146,7 @@ describe("OfferController", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -152,8 +165,9 @@ describe("OfferController", () => {
             function getOffers(cb) {
                 request(theApp)
                     .get('/api/proposal/' + proposalId + '/offers')
+                    .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var offers = <Array<offerModel.IOffer>>res.body;
 
@@ -185,6 +199,7 @@ describe("OfferController", () => {
         };
 
         var offerPrice = 0.09;
+        var offerMinAmount = 2;
 
         var testUserToken: string;
 
@@ -227,9 +242,10 @@ describe("OfferController", () => {
             function createProposal(cb) {
                 request(theApp)
                     .post('/api/proposal')
+                    .set("AccessToken", testUserToken)
                     .send(newProposalData)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         proposal = <proposalModel.IProposal>res.body;
                         proposalId = proposal.contractAddress;
@@ -239,7 +255,7 @@ describe("OfferController", () => {
             function createBacking(cb) {
                 // Back a sufficient amount
                 var cardId = testHelper.getTestUserCardId();
-                var backAmount = 512;
+                var backAmount = 2;
 
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/back')
@@ -249,7 +265,7 @@ describe("OfferController", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .end(cb);
             },
             function createOffer(cb) {
@@ -259,12 +275,12 @@ describe("OfferController", () => {
                     .send({
                         "offer": {
                             "price": offerPrice,
-                            "minimumAmount": 456,
+                            "minimumAmount": offerMinAmount,
                             "toCard": testHelper.getTestUserCardId()
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -272,7 +288,7 @@ describe("OfferController", () => {
                         assert.notEqual(newOffer.id, "0x", "New offer has an ID");
                         assert.notEqual(newOffer.id, "0x0000000000000000000000000000000000000000", "New offer has an ID");
                         assert.equal(newOffer.price, offerPrice, "New offer has the correct price");
-                        assert.equal(newOffer.minimumAmount, 456, "New offer has the correct minimum amount");
+                        assert.equal(newOffer.minimumAmount, offerMinAmount, "New offer has the correct minimum amount");
 
                         // TODO: apply different ethereum accounts in the tests when available, to be 
                         // able to make multiple offers etc.
@@ -285,7 +301,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(403)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 403); })
                     .end(cb);
             },
             function closeProposal(cb) {
@@ -293,7 +309,7 @@ describe("OfferController", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .end(cb);
             },
             // Test whether GET ../offer/../buyers returns the list of backers with buyer data
@@ -302,7 +318,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
                     .expect(function (res) {
                         var buyers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 

@@ -70,7 +70,7 @@ export class FulfilmentService {
      * @param proposalId the address of the proposal
      * @return The proposal
      */
-    executePayments(proposalId: string): Promise<proposalModel.IProposal> {
+    processPayments(proposalId: string): Promise<proposalModel.IProposal> {
         var t = this;
 
         var proposalContract: contractInterfaces.IProposalContract;

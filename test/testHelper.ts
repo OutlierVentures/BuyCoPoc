@@ -99,6 +99,22 @@ export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
 }
 
 /**
+ * Check status of a request, throw detailed error if it fails. For use with supertest.
+ * Source: https://github.com/visionmedia/supertest/issues/317#issuecomment-191019912
+ * @param res
+ * @param expectedStatus
+ */
+export function checkStatusCode (res, expectedStatus) {
+    if (!expectedStatus) expectedStatus = 200;
+    if (res.status === expectedStatus) return res;
+    var description = res.req.method + ' ' + res.req.path;
+    var data = (res.request && res.request._data) ? res.request._data : null;
+    var paddedDataStr = (data && _.isObject(data)) ? (' ' + JSON.stringify(data)) : '';
+    var resStr = (_.isObject(res.body) ? JSON.stringify(res.body) : res.body);
+    throw new Error(description + "\nRequest body:" + paddedDataStr + '\nResult status ' + res.statusCode + ', expected ' + expectedStatus + '\nResponse: ' + resStr);
+};
+
+/**
  * Ensure that the test user has a buyer profile
  */
 export function ensureTestUserIsBuyer(): Promise<userModel.IUser> {

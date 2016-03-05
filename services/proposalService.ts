@@ -494,7 +494,7 @@ export class ProposalService {
         return t.contractService.getProposalContractAt(p.contractAddress)
             .then(proposalContract => {
 
-                var backPromise = proposalContract.back(amount, "cardId12345", { gas: 2500000 });
+                var backPromise = proposalContract.back(amount, fromCard, { gas: 2500000 });
 
                 return backPromise;
             })

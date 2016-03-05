@@ -372,7 +372,7 @@ export class ProposalController {
         serviceFactory.createFulfilmentService()
             .then(
             function (fuls) {
-                return fuls.executePayments(proposalId);
+                return fuls.processPayments(proposalId);
             },
             function (initErr) {
                 res.status(500).json({
