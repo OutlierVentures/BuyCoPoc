@@ -101,7 +101,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         proposal = <proposalModel.IProposal>res.body;
                     })
@@ -131,7 +131,7 @@ describe("ProposalController fulfilment", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function createOffer(cb) {
@@ -151,7 +151,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -173,14 +173,14 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function testIsClosed(cb) {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var freshProposal = <proposalModel.IProposal>res.body;
 
@@ -195,7 +195,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
@@ -218,7 +218,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
@@ -290,7 +290,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         proposal = <proposalModel.IProposal>res.body;
                     })
@@ -320,7 +320,7 @@ describe("ProposalController fulfilment", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function createOffer(cb) {
@@ -340,7 +340,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -366,7 +366,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                     })
                     .end(cb);
@@ -375,7 +375,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var freshProposal = <proposalModel.IProposal>res.body;
 
@@ -395,7 +395,7 @@ describe("ProposalController fulfilment", () => {
                         backingIndex: 1
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
@@ -458,7 +458,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         proposal = <proposalModel.IProposal>res.body;
                     })
@@ -488,7 +488,7 @@ describe("ProposalController fulfilment", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function createSecondBacking(cb) {
@@ -504,7 +504,7 @@ describe("ProposalController fulfilment", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function createOffer(cb) {
@@ -524,7 +524,7 @@ describe("ProposalController fulfilment", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -550,7 +550,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                     })
                     .end(cb);
@@ -559,7 +559,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var freshProposal = <proposalModel.IProposal>res.body;
 
@@ -574,7 +574,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
@@ -603,7 +603,7 @@ describe("ProposalController fulfilment", () => {
                         backingIndex: 1
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 
@@ -619,7 +619,7 @@ describe("ProposalController fulfilment", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/process-payments")
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backer = proposalContract.backers(1);
 

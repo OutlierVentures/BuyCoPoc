@@ -41,7 +41,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/category')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -64,7 +64,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/category')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -77,7 +77,7 @@ describe("CategoryController", () => {
                 request(theApp)
                     .get('/api/category/' + mainCat)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var cat = <categoryModel.IMainCategory>res.body;
 
@@ -99,7 +99,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/proposal/category')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -122,7 +122,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/proposal/category')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -137,7 +137,7 @@ describe("CategoryController", () => {
                 request(theApp)
                     .get('/api/proposal/category/' + mainCatName)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var mainCat = <categoryModel.IMainCategory>res.body;
 

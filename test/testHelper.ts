@@ -104,7 +104,7 @@ export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
  * @param res
  * @param expectedStatus
  */
-export function checkStatusCode (res, expectedStatus) {
+export function checkStatusCode (res, expectedStatus? : number) {
     if (!expectedStatus) expectedStatus = 200;
     if (res.status === expectedStatus) return res;
     var description = res.req.method + ' ' + res.req.path;

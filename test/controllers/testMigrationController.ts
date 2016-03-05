@@ -35,7 +35,7 @@ describe("MigrationController", () => {
         request(theApp)
             .post('/api/migration/update')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {                
                 var result = res.body;
                 
@@ -53,7 +53,7 @@ describe("MigrationController", () => {
         request(theApp)
             .post('/api/migration/test/seed')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 

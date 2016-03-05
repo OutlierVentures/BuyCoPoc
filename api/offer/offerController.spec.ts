@@ -59,7 +59,7 @@ describe("OfferController", () => {
                 request(theApp)
                     .get('/api/proposal')
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var list = <Array<proposalModel.IProposal>>res.body;
                         proposalId = list[0].contractAddress;
@@ -71,7 +71,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var offers = <Array<offerModel.IOffer>>res.body;
 
@@ -127,7 +127,7 @@ describe("OfferController", () => {
                     .set("AccessToken", testUserToken)
                     .send(newProposalData)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newProposal = <proposalModel.IProposal>res.body;
                         proposalId = newProposal.contractAddress;
@@ -146,7 +146,7 @@ describe("OfferController", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -167,7 +167,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var offers = <Array<offerModel.IOffer>>res.body;
 
@@ -245,7 +245,7 @@ describe("OfferController", () => {
                     .set("AccessToken", testUserToken)
                     .send(newProposalData)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         proposal = <proposalModel.IProposal>res.body;
                         proposalId = proposal.contractAddress;
@@ -265,7 +265,7 @@ describe("OfferController", () => {
                         amount: backAmount,
                         fromCard: cardId
                     })
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             function createOffer(cb) {
@@ -280,7 +280,7 @@ describe("OfferController", () => {
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         newOffer = <offerModel.IOffer>res.body;
 
@@ -301,7 +301,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 403); })
+                    .expect(res => testHelper.checkStatusCode(res, 403))
                     .end(cb);
             },
             function closeProposal(cb) {
@@ -309,7 +309,7 @@ describe("OfferController", () => {
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + '/close')
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(cb);
             },
             // Test whether GET ../offer/../buyers returns the list of backers with buyer data
@@ -318,7 +318,7 @@ describe("OfferController", () => {
                     .get('/api/proposal/' + proposalId + '/offer/' + newOffer.id + '/buyers')
                     .set("AccessToken", testUserToken)
                     .expect('Content-Type', /json/)
-                    .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var buyers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 

@@ -30,7 +30,7 @@ describe("ContractController", () => {
         request(theApp)
             .get('/api/contract/Proposal/abi')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 

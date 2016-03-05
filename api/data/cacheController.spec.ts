@@ -30,7 +30,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/update')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {                
                 var result = res.body;
                 
@@ -48,7 +48,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/refresh')
             .expect('Content-Type', /json/)
-            .expect(function (res) { testHelper.checkStatusCode(res, 200); })
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 
