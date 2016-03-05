@@ -418,6 +418,7 @@ describe("ProposalController fulfilment", () => {
         var testUserToken: string;
         var newOffer: offerModel.IOffer;
 
+        var startPayoutTransactionId: string;
         var endPayoutTransactionId: string;
 
         async.series([
@@ -586,8 +587,8 @@ describe("ProposalController fulfilment", () => {
                         assert.ok(backer2[4], "Start payment of backer 2 has been registered");
                         assert.equal(backer2[5].toNumber(), 4, "Start payment amount of backer 2 is correct");
 
-                        endPayoutTransactionId = proposalContract.startPayoutTransactionID();
-                        assert.ok(proposalContract.startPayoutTransactionID(), "Start payout transaction ID has been set");
+                        startPayoutTransactionId = proposalContract.startPayoutTransactionID();
+                        assert.ok(startPayoutTransactionId, "Start payout transaction ID has been set");
                         assert.equal(proposalContract.startPayoutAmount().toNumber(), 13, "Start payout amount is correct");
 
                         assert.ok(!proposalContract.endPayoutTransactionID(), "End payout transaction ID has not been registered");
@@ -598,6 +599,7 @@ describe("ProposalController fulfilment", () => {
                 // Call POST delivery-report to report delivery of backer 1.
                 request(theApp)
                     .post('/api/proposal/' + proposal.contractAddress + "/delivery-report")
+                    .set("AccessToken", testUserToken)
                     .send({
                         isDeliveryCorrect: true,
                         backingIndex: 1
@@ -630,6 +632,8 @@ describe("ProposalController fulfilment", () => {
 
                         assert.ok(backer2[6], "End payment of backer 2 has been registered");
                         assert.equal(backer2[7].toNumber(), 4, "End payment amount of backer 2 is correct");
+
+                        assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTransactionId, "Start payout ID hasn't changed");
 
                         endPayoutTransactionId = proposalContract.endPayoutTransactionID();
                         assert.ok(endPayoutTransactionId, "End payout transaction ID has been set");

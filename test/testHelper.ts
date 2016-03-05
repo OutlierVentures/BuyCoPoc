@@ -106,6 +106,7 @@ export function ensureTestUserHasCoinbaseAddress(): Promise<userModel.IUser> {
  */
 export function checkStatusCode (res, expectedStatus? : number) {
     if (!expectedStatus) expectedStatus = 200;
+    if (!res) throw new Error("Empty result object");
     if (res.status === expectedStatus) return res;
     var description = res.req.method + ' ' + res.req.path;
     var data = (res.request && res.request._data) ? res.request._data : null;
