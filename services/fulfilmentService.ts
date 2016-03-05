@@ -88,7 +88,7 @@ export class FulfilmentService {
                     // can safely execute them in parallel for optimal performance. For any 
                     // BuyCo contract, either one of them will provide some activity or none at all.
                     return Q.all([
-                        t.processStartPayment(p)
+                        t.processStartPayments(p)
                             .then(pRes => {
                                 return t.processStartPayout(p);
                             }),
@@ -116,7 +116,7 @@ export class FulfilmentService {
      *
      * @param proposalContract
      */
-    processStartPayment(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
+    processStartPayments(proposalContract: contractInterfaces.IProposalContract): Promise<contractInterfaces.IProposalContract> {
         var t = this;
 
         return Promise<contractInterfaces.IProposalContract>((resolve, reject) => {
@@ -297,7 +297,7 @@ export class FulfilmentService {
                 })
                 .then(vs => {
                     return vs.createAndCommitTransaction(t.config.uphold.vaultAccount.cardId,
-                        proposalContract.getStartPayoutAmount().toNumber() / 100, "GBP", winningOfferContract.owner());
+                        proposalContract.getStartPayoutAmount().toNumber() / 100, "GBP", tools.guidAddDashes(winningOfferContract.cardId()));
                 })
                 .then(tx => {
                     upholdTransaction = tx;
@@ -523,7 +523,7 @@ export class FulfilmentService {
                 })
                 .then(vs => {
                     return vs.createAndCommitTransaction(t.config.uphold.vaultAccount.cardId,
-                        proposalContract.getEndPayoutAmount().toNumber() / 100, "GBP", winningOfferContract.owner());
+                        proposalContract.getEndPayoutAmount().toNumber() / 100, "GBP", tools.guidAddDashes(winningOfferContract.cardId()));
                 })
                 .then(tx => {
                     upholdTransaction = tx;

@@ -257,6 +257,12 @@ export class ProposalService {
                 // get its property as an array, we can't access them by name. 
                 // WARNING: The array indexes break whenever a property is added in the middle.
 
+                // Conversion from "contract data" to "TypeScript data":
+                // - All GUIDs are stored in the contracts without dashes (length 32). GUIDs
+                //  in code are considered to have dashes (length 36). This goes for tx IDs
+                //  and card IDs.    
+                // - Money amounts are stored as cents and therefore divided by 100.
+
                 var backerAddress = backer[0];
                 var amount = backer[1].toNumber();
 
@@ -287,7 +293,9 @@ export class ProposalService {
                 var isDeliveryReported = <boolean>backer[8];
                 var isDeliveryCorrect = <boolean>backer[9];
 
-                var cId = backer[10];
+                var cId: string;
+                if (backer[10])
+                    cId = tools.guidAddDashes(backer[10]);
 
                 userRepo.getUserByBlockchainAddress(backerAddress)
                     .then(user => {
@@ -494,7 +502,7 @@ export class ProposalService {
         return t.contractService.getProposalContractAt(p.contractAddress)
             .then(proposalContract => {
 
-                var backPromise = proposalContract.back(amount, fromCard, { gas: 2500000 });
+                var backPromise = proposalContract.back(amount, tools.guidRemoveDashes(fromCard), { gas: 2500000 });
 
                 return backPromise;
             })
