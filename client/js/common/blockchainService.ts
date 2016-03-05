@@ -89,7 +89,7 @@ class BlockchainService {
 
     getAccounts() {
         // Return the saved accounts because of the better data structure.
-        return this.savedAccounts;
+        return this.savedAccounts;  
     }
 
     /**

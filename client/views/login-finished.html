@@ -59,7 +59,7 @@
     <ul class="nav nav-accounts">
         <li ng-repeat="account in blockchainAccounts.accounts track by account.address" class="list-group-item">
             <div class="container">
-                <a href="#"><code>{{account.address}}</code></a>
+                <p><code>{{account.address}}</code> - {{account.balance}}</p>
             </div>
         </li>
     </ul>

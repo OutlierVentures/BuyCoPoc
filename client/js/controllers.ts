@@ -136,12 +136,26 @@ class LoginController {
             });
         }
 
-        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+        t.tryLoadBlockchainAccounts();
 
         $rootScope.$on('blockchainConnected', e => {
-            t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+            t.tryLoadBlockchainAccounts();
+
         });
 
+    }
+
+    tryLoadBlockchainAccounts() {
+        var t = this;
+
+        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+
+        if (t.$scope.blockchainAccounts) {
+            // Load balance for each account.
+            _(t.$scope.blockchainAccounts.accounts).each(acc => {
+                acc.balance = web3.fromWei(web3.eth.getBalance(acc.address), 'ether').toNumber();
+            });
+        }
     }
 
     loadUserData() {
@@ -208,7 +222,7 @@ class DashboardController {
         $rootScope.$on('loggedOn', function () {
             t.loadData();
         });
-        
+
         // Get underscore from global (TODO: inject!)
         // t._ = t.$window._;
 
