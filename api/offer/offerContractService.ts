@@ -1,4 +1,6 @@
 ﻿import request = require('request');
+import domain = require('domain');
+
 import userModel = require('../../models/userModel');
 import proposalModel = require('../../models/proposalModel');
 import proposalBackingModel = require('../../models/proposalBackingModel');
@@ -97,28 +99,42 @@ export class OfferContractService {
 
     offerContractToObject(offer: contractInterfaces.IOfferContract): Promise<offerModel.IOffer> {
         return Promise<offerModel.IOffer>((resolve, reject) => {
-            var getProperties = new Array<Q.Promise<void>>();
+            // The getter for the offers can cause exceptions deep down in the belly
+            // of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/89
+            // We wrap it in a domain to prevent this from crashing the whole app.
 
-            var o = <offerModel.IOffer>{};
+            var d = domain.create()
+            d.on('error', function (err) {
+                // Handle the error safely, reject the promise with the error message.
+                if (err.message) err = err.message;
+                reject(err);
+            })
 
-            // We get each of the properties of the offer async, all with a separate promise.
-            // This leads to unreadable code, but it's the only known way of delivering
-            // reasonable performance. See testProposalList.ts for more info.
+            d.run(function () {
 
-            o.id = offer.address;
+                var getProperties = new Array<Q.Promise<void>>();
 
-            getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
-            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
-            getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
-            getProperties.push(Q.denodeify<string>(offer.cardId)().then(function (cid) { o.toCard = tools.guidAddDashes(cid); }));
+                var o = <offerModel.IOffer>{};
 
-            Q.all(getProperties)
-                .then(function () {
-                    resolve(o);
-                })
-                .catch(err => {
-                    reject(err);
-                })
+                // We get each of the properties of the offer async, all with a separate promise.
+                // This leads to unreadable code, but it's the only known way of delivering
+                // reasonable performance. See testProposalList.ts for more info.
+
+                o.id = offer.address;
+
+                getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
+                getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
+                getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
+                getProperties.push(Q.denodeify<string>(offer.cardId)().then(function (cid) { o.toCard = tools.guidAddDashes(cid); }));
+
+                Q.all(getProperties)
+                    .then(function () {
+                        resolve(o);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+            });
         });
     }
 

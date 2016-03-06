@@ -209,26 +209,7 @@ export class ProposalService {
                 var numBackers = proposalContract.backerIndex().toNumber();
 
                 for (var i = 1; i <= numBackers; i++) {
-                    //var defer = Q.defer<proposalBackingModel.IProposalBacking>();
-
                     getBackerDetailsPromises.push(t.getBacker(proposalContract, i));
-
-                    // AvA 20160215: disabled error catching below because of restructuring of 
-                    // function getBackers(). 
-                    // TODO: Check if error returns.
-
-                    //// The getter for the backers can cause exceptions deep down in the belly
-                    //// of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
-                    //// We wrap it in a domain to prevent this from crashing the whole app.
-
-                    //var d = domain.create()
-                    //d.on('error', function (err) {
-                    //    // Handle the error safely, reject the promise with the error message.
-                    //    if (err.message) err = err.message;
-                    //    defer.reject(err);
-                    //})
-
-                    //d.run(t.createGetBackerFunction(defer, proposalContract, i));
                 }
 
                 Q.all(getBackerDetailsPromises)
@@ -248,79 +229,93 @@ export class ProposalService {
     getBacker(proposalContract: contractInterfaces.IProposalContract, index: number): Promise<proposalBackingModel.IProposalBacking> {
         var t = this;
         return Promise<proposalBackingModel.IProposalBacking>((resolve, reject) => {
-            proposalContract.backers(index, function (backerErr, backer) {
-                if (backerErr) {
-                    reject(backerErr);
-                    return;
-                }
 
-                // Because backers are stored as a struct in the Solidity contract, we 
-                // get its property as an array, we can't access them by name. 
-                // WARNING: The array indexes break whenever a property is added in the middle.
+            // The getter for the backers can cause exceptions deep down in the belly
+            // of web3.js. See https://github.com/OutlierVentures/BuyCo/issues/37
+            // We wrap it in a domain to prevent this from crashing the whole app.
 
-                // Conversion from "contract data" to "TypeScript data":
-                // - All GUIDs are stored in the contracts without dashes (length 32). GUIDs
-                //  in code are considered to have dashes (length 36). This goes for tx IDs
-                //  and card IDs.    
-                // - Money amounts are stored as cents and therefore divided by 100.
+            var d = domain.create()
+            d.on('error', function (err) {
+                // Handle the error safely, reject the promise with the error message.
+                if (err.message) err = err.message;
+                reject(err);
+            })
 
-                var backerAddress = backer[0];
-                var amount = backer[1].toNumber();
+            d.run(function () {
+                proposalContract.backers(index, function (backerErr, backer) {
+                    if (backerErr) {
+                        reject(backerErr);
+                        return;
+                    }
 
-                var pledgeTx: string;
-                if (backer[2] && backer[2].length == 32)
-                    pledgeTx = tools.guidAddDashes(backer[2])
+                    // Because backers are stored as a struct in the Solidity contract, we 
+                    // get its property as an array, we can't access them by name. 
+                    // WARNING: The array indexes break whenever a property is added in the middle.
 
-                var pledgePaymentAmount: number;
-                if (backer[3])
-                    pledgePaymentAmount = backer[3].toNumber() / 100;
+                    // Conversion from "contract data" to "TypeScript data":
+                    // - All GUIDs are stored in the contracts without dashes (length 32). GUIDs
+                    //  in code are considered to have dashes (length 36). This goes for tx IDs
+                    //  and card IDs.    
+                    // - Money amounts are stored as cents and therefore divided by 100.
 
-                var startTx: string;
-                if (backer[4] && backer[4].length == 32)
-                    startTx = tools.guidAddDashes(backer[4])
+                    var backerAddress = backer[0];
+                    var amount = backer[1].toNumber();
 
-                var startPaymentAmount: number;
-                if (backer[5])
-                    startPaymentAmount = backer[5].toNumber() / 100;
+                    var pledgeTx: string;
+                    if (backer[2] && backer[2].length == 32)
+                        pledgeTx = tools.guidAddDashes(backer[2])
 
-                var endTx: string;
-                if (backer[6] && backer[6].length == 32)
-                    endTx = tools.guidAddDashes(backer[6])
+                    var pledgePaymentAmount: number;
+                    if (backer[3])
+                        pledgePaymentAmount = backer[3].toNumber() / 100;
 
-                var endPaymentAmount: number;
-                if (backer[7])
-                    endPaymentAmount = backer[7].toNumber() / 100;
+                    var startTx: string;
+                    if (backer[4] && backer[4].length == 32)
+                        startTx = tools.guidAddDashes(backer[4])
 
-                var isDeliveryReported = <boolean>backer[8];
-                var isDeliveryCorrect = <boolean>backer[9];
+                    var startPaymentAmount: number;
+                    if (backer[5])
+                        startPaymentAmount = backer[5].toNumber() / 100;
 
-                var cId: string;
-                if (backer[10] && backer[10].length == 32)
-                    cId = tools.guidAddDashes(backer[10]);
+                    var endTx: string;
+                    if (backer[6] && backer[6].length == 32)
+                        endTx = tools.guidAddDashes(backer[6])
 
-                userRepo.getUserByBlockchainAddress(backerAddress)
-                    .then(user => {
-                        var uId: string;
-                        if (user)
-                            uId = user.id;
+                    var endPaymentAmount: number;
+                    if (backer[7])
+                        endPaymentAmount = backer[7].toNumber() / 100;
 
-                        resolve({
-                            address: backerAddress,
-                            backerIndex: index,
-                            amount: amount,
-                            userId: uId,
-                            cardId: cId,
-                            pledgePaymentTransactionId: pledgeTx,
-                            pledgePaymentAmount: pledgePaymentAmount,
-                            startPaymentTransactionId: startTx,
-                            startPaymentAmount: startPaymentAmount,
-                            endPaymentTransactionId: endTx,
-                            endPaymentAmount: endPaymentAmount,
-                            isDeliveryReported: isDeliveryReported,
-                            isDeliveryCorrect: isDeliveryCorrect,
-                            buyerInfo: null
-                        });
-                    }, err => reject(err));
+                    var isDeliveryReported = <boolean>backer[8];
+                    var isDeliveryCorrect = <boolean>backer[9];
+
+                    var cId: string;
+                    if (backer[10] && backer[10].length == 32)
+                        cId = tools.guidAddDashes(backer[10]);
+
+                    userRepo.getUserByBlockchainAddress(backerAddress)
+                        .then(user => {
+                            var uId: string;
+                            if (user)
+                                uId = user.id;
+
+                            resolve({
+                                address: backerAddress,
+                                backerIndex: index,
+                                amount: amount,
+                                userId: uId,
+                                cardId: cId,
+                                pledgePaymentTransactionId: pledgeTx,
+                                pledgePaymentAmount: pledgePaymentAmount,
+                                startPaymentTransactionId: startTx,
+                                startPaymentAmount: startPaymentAmount,
+                                endPaymentTransactionId: endTx,
+                                endPaymentAmount: endPaymentAmount,
+                                isDeliveryReported: isDeliveryReported,
+                                isDeliveryCorrect: isDeliveryCorrect,
+                                buyerInfo: null
+                            });
+                        }, err => reject(err));
+                });
             });
         });
     }

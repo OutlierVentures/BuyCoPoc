@@ -169,9 +169,19 @@ class OfferController {
 
                     // TODO: move to server side, cache.
                     anyP.startPayoutAmount = pc.getStartPayoutAmount().toNumber() / 100;
-                    anyP.startPayoutTransactionID = pc.startPayoutTransactionID();
+                    var startTx = pc.startPayoutTransactionID();
+                    if (startTx && startTx.length == 32)
+                        startTx = guidAddDashes(startTx);
+
+                    anyP.startPayoutTransactionID = startTx;
+
                     anyP.endPayoutAmount = pc.getEndPayoutAmount().toNumber() / 100;
-                    anyP.endPayoutTransactionID = pc.endPayoutTransactionID();
+
+                    var endTx = pc.endPayoutTransactionID();
+                    if (endTx && endTx.length == 32)
+                        endTx = guidAddDashes(endTx);
+
+                    anyP.endPayoutTransactionID = endTx;
                 })
                 .catch(err => {
                     console.error(err);
