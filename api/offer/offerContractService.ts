@@ -110,7 +110,7 @@ export class OfferContractService {
             getProperties.push(Q.denodeify<string>(offer.owner)().then(function (addr) { o.owner = addr; }));
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.price)().then(function (p) { o.price = p.toNumber() / 100; }));
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(offer.minimumAmount)().then(function (ma) { o.minimumAmount = ma.toNumber(); }));
-            getProperties.push(Q.denodeify<string>(offer.cardId)().then(function (cid) { o.toCard = cid; }));
+            getProperties.push(Q.denodeify<string>(offer.cardId)().then(function (cid) { o.toCard = tools.guidAddDashes(cid); }));
 
             Q.all(getProperties)
                 .then(function () {

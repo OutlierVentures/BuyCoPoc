@@ -295,7 +295,7 @@ export class ProposalService {
                 var isDeliveryCorrect = <boolean>backer[9];
 
                 var cId: string;
-                if (backer[10])
+                if (backer[10] && backer[10].length == 32)
                     cId = tools.guidAddDashes(backer[10]);
 
                 userRepo.getUserByBlockchainAddress(backerAddress)

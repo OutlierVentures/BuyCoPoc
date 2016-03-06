@@ -76,6 +76,9 @@ export function createVaultUpholdService(): Promise<IUpholdService> {
         // Get the vault user
         userRepo.getUserByExternalId(c.uphold.vaultAccount.userName)
             .then(vu => {
+                if (!vu) {
+                    throw ("Couldn't find global vault user. Has the global vault user logged in once?");
+                }
                 resolve(createUpholdService(vu.accessToken));
             })
             .catch(err => {
