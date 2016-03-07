@@ -165,6 +165,14 @@ class LoginController {
             url: apiUrl + '/user',
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: IUser) {
+            if (!resultData) {
+                // Login error. Token invalid? Refresh and relogin.
+                t.$window.sessionStorage.setItem("upholdToken", "");
+                t.$window.sessionStorage.setItem("upholdUserInfo", "");
+                t.$route.reload();
+                return;
+            }
+
             t.$rootScope.userInfo = resultData;
 
             // Homepage per perspective

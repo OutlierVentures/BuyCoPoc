@@ -231,7 +231,7 @@ export class ProposalController {
                 }, function (backErr) {
                     res.status(500).json({
                         "error": backErr,
-                        "error_location": "backing proposal"
+                        "error_location": "reporting delivery"
                     });
                     return null;
                 });

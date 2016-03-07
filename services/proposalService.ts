@@ -114,7 +114,10 @@ export class ProposalService {
             getProperties.push(Q.denodeify<string>(proposal.ultimateDeliveryDate)().then(function (udd) { p.ultimateDeliveryDate = new Date(udd); }));
 
             getProperties.push(Q.denodeify<boolean>(proposal.isClosed)().then(function (closed) { p.isClosed = closed; }));
-            getProperties.push(Q.denodeify<string>(proposal.acceptedOffer)().then(function (ao) { p.acceptedOffer = ao; }));
+            getProperties.push(Q.denodeify<string>(proposal.acceptedOffer)().then(function (ao) {
+                if (ao != "0x0000000000000000000000000000000000000000")
+                    p.acceptedOffer = ao;
+            }));
 
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.pledgePaymentPercentage)().then(function (pp) { p.pledgePaymentPercentage = pp.toNumber(); }));
             getProperties.push(Q.denodeify<contractInterfaces.IBigNumber>(proposal.startPaymentPercentage)().then(function (sp) { p.startPaymentPercentage = sp.toNumber(); }));
@@ -653,7 +656,7 @@ export class ProposalService {
                     var isCorrectInContract = backerFromContract[9];
 
                     if (!(isReportedInContract && isCorrectInContract == isDeliveryCorrect)) {
-                        reject("Backing could not be added to contract.");
+                        reject("Delivery report could not be added to contract.");
                         return;
                     }
 
