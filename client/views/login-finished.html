@@ -23,7 +23,7 @@
             <h4>For sellers</h4>
             <ul class="buttons">
                 <li>
-                    <a class="btn btn-primary" href="/seller-proposal/list">Find BuyCo's for your market</a>
+                    <a class="btn btn-primary" href="/seller-proposal/list">Find BuyCos for your market</a>
                 </li>
                 <li>
                     <a class="btn btn-link" href="/seller/signup">
@@ -59,7 +59,7 @@
     <ul class="nav nav-accounts">
         <li ng-repeat="account in blockchainAccounts.accounts track by account.address" class="list-group-item">
             <div class="container">
-                <a href="#"><code>{{account.address}}</code></a>
+                <p><code>{{account.address}}</code> - {{account.balance | number : 2}}</p>
             </div>
         </li>
     </ul>
@@ -68,10 +68,10 @@
     <div class="container">
         <div class="jumbotron">
             <div class="container">
-                <h5>Global Circle Vault</h5>
+                <h5>Global Vault</h5>
                 <p>Hello {{userInfo.name}},</p>
                 <p>You successfully logged in!</p>
-                <p>Your access token has been stored for the app to use. The app is now able to pay out loans on your behalf. You can now close this window.</p>
+                <p>Your access token has been stored for the app to use. The app is now able to pay on your behalf. You can now close this window.</p>
             </div>
         </div>
     </div>

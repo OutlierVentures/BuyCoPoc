@@ -1,9 +1,10 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import request = require('supertest');
 import express = require('express');
 
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 describe("CacheController", () => {
     var theServer: server.Server;
@@ -29,7 +30,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/update')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {                
                 var result = res.body;
                 
@@ -47,7 +48,7 @@ describe("CacheController", () => {
         request(theApp)
             .post('/api/data/cache/refresh')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 

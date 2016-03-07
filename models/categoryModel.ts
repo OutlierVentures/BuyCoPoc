@@ -8,14 +8,14 @@
 }
 
 /**
- * A sub category of BuyCo's, e.g. "Camera"
+ * A sub category of BuyCos, e.g. "Camera"
  */
 export interface ISubCategory extends ICategoryBase {
 
 }
 
 /**
- * A main category of BuyCo's, e.g. "Electronics"
+ * A main category of BuyCos, e.g. "Electronics"
  */
 export interface IMainCategory extends ICategoryBase{    
     subCategories: ISubCategory[];

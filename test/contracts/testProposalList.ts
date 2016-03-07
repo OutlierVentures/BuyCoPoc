@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import web3config = require('./web3config');
 import fs = require('fs');
 
@@ -361,26 +361,29 @@ describe("ProposalRegistry list", () => {
 
             var startTime = Date.now();
 
-
             console.log("Before loading contract:" + Date.now());
-            var proposal: contractInterfaces.IProposalContract = proposalContractDefinition.at(proposalAddress);
+            var proposalContract: contractInterfaces.IProposalContract = proposalContractDefinition.at(proposalAddress);
             console.log("After loading contract:" + Date.now());
 
-            const p: proposalModel.IProposal = {
+            let p = <proposalModel.IProposal>{
                 contractAddress: proposalAddress,
                 owner: web3plus.web3.eth.coinbase,
-                productName: proposal.productName(),
-                productDescription: proposal.productDescription(),
-                productSku: proposal.productSku(),
-                productUnitSize: proposal.productUnitSize(),
-                mainCategory: proposal.mainCategory(),
-                subCategory: proposal.subCategory(),
-                maxPrice: proposal.maxPrice().toNumber(),
-                endDate: new Date(proposal.endDate()),
-                ultimateDeliveryDate: new Date(proposal.ultimateDeliveryDate()),
-                pledgePaymentPercentage: proposal.pledgePaymentPercentage().toNumber(),
-                startPaymentPercentage: proposal.startPaymentPercentage().toNumber(),
-                minimumReportedCorrectDeliveryPercentage: proposal.minimumReportedCorrectDeliveryPercentage().toNumber(),
+                productName: proposalContract.productName(),
+                productDescription: proposalContract.productDescription(),
+                productSku: proposalContract.productSku(),
+                productUnitSize: proposalContract.productUnitSize(),
+
+                // Don't get all properties. We're just testing performance here, and we already
+                // know it's slow.
+
+                //mainCategory: proposal.mainCategory(),
+                //subCategory: proposal.subCategory(),
+                //maxPrice: proposal.maxPrice().toNumber(),
+                //endDate: new Date(proposal.endDate()),
+                //ultimateDeliveryDate: new Date(proposal.ultimateDeliveryDate()),
+                //pledgePaymentPercentage: proposal.pledgePaymentPercentage().toNumber(),
+                //startPaymentPercentage: proposal.startPaymentPercentage().toNumber(),
+                //minimumReportedCorrectDeliveryPercentage: proposal.minimumReportedCorrectDeliveryPercentage().toNumber(),
             };
 
             //var p: proposalModel.IProposal = {

@@ -175,7 +175,7 @@ contract Proposal {
         /*
          * Uphold card ID used for payments.
          */
-        string paymentCardId;
+        string cardId;
     }
 
     /*
@@ -263,10 +263,12 @@ contract Proposal {
         // We can only compute this once there is an accepted offer. However when
         // there is none, the end payment will be minus the currently paid amount,
         // hence a full reimbursement.
-        amount = int(backers[backerIndex].amount)
-            * (int(acceptedOffer.price())
-            - int(getPledgePaymentAmount(backerIndex))
-            - int(getStartPaymentAmount(backerIndex)));
+        amount = (int(backers[backerIndex].amount) * int(acceptedOffer.price())) // Total amount to be paid
+            // Minus the amount already paid by this backer. We use the
+            // actually registered amounts to handle any cases where e.g.
+            // a single backer hasn't paid the start payment.
+            - int(backers[backerIndex].pledgePaymentAmount)
+            - int(backers[backerIndex].startPaymentAmount);
     }
 
     /*
@@ -283,7 +285,7 @@ contract Proposal {
 
         backers[backerIndex].amount = am;
         backers[backerIndex].buyerAddress = tx.origin;
-        backers[backerIndex].paymentCardId = cardId;
+        backers[backerIndex].cardId = cardId;
     }
 
     /*
@@ -320,6 +322,9 @@ contract Proposal {
         if (paymentType == 1) {
             // Pledge payment
 
+            // Can only register once
+            if(b.pledgePaymentAmount != 0) return;
+
             // Validate correct amount
             if(amount != int(getPledgePaymentAmount(backerIndex)))
                 return;
@@ -329,6 +334,17 @@ contract Proposal {
         }
         else if (paymentType == 2) {
             // Start payment
+
+            // Validate that the BuyCo was closed
+            if(!isClosed) return;
+
+            // Can only register once
+            if(b.startPaymentAmount != 0) return;
+
+            // There should be an accepted offer. If not, the pledge payments
+            // should be refunded.
+            if(address(acceptedOffer) == 0x0)
+                return;
 
             // Validate pledge payment
             if(b.pledgePaymentAmount == 0)
@@ -343,13 +359,11 @@ contract Proposal {
         else if (paymentType == 3) {
             // End payment
 
-            // Validate that the BuyCo was closed
-            if(!isClosed)
-                return;
-
             // Validate that start payment was registered
-            if(b.startPaymentAmount == 0)
-                return;
+            if(b.startPaymentAmount == 0) return;
+
+            // Can only register once
+            if(b.endPaymentAmount != 0) return;
 
             // Validate correct amount
             if(amount != getEndPaymentAmount(backerIndex))
@@ -402,6 +416,9 @@ contract Proposal {
         {
             var b = backers[i];
 
+            // Only count backers that have paid the pledge payment.
+            if(b.pledgePaymentAmount == 0) continue;
+
             amount += b.amount;
         }
 
@@ -434,25 +451,19 @@ contract Proposal {
         // To be called by the registry owner.
         if(tx.origin != registry.owner()) return;
 
-        // TODO: check whether endDate has passed. The only time source that
-        // the contract has access to is the block number. This is not a
-        // dependable time, especially not on a private chain. Once we have
-        // some sort of solution for this, the proposal should be closed even
-        // if no valid offer was found.
+        // Checking whether the end time is the responsibility of the registry
+        // owner. We currently have no way to deal with time within the contract.
 
-        // COULD DO: there might be backers who haven't completed payment. And
-        // even without those, we might still have a deal. We should remove the
-        // backers that haven't paid at this point, and then do matching.
+        // The proposal gets closed no matter whether there's a valid offer or
+        // not.
 
         // Get the best offer.
         uint bestOfferIndex = getBestOfferIndex();
 
         // Did we find a valid offer?
-        if (bestOfferIndex == 0) return;
-
-        // Ensure that all start payments hae been registered.
-
-        acceptedOffer = offers[bestOfferIndex];
+        if (bestOfferIndex > 0) {
+            acceptedOffer = offers[bestOfferIndex];
+        }
         isClosed = true;
     }
 
@@ -461,8 +472,14 @@ contract Proposal {
      * from the backers.
      */
     function isStartPaymentComplete() constant public returns (bool isComplete) {
+        // No backers? Then not complete.
+        if(getTotalBackedAmount() == 0) return;
+
         for (uint i = 1; i <= backerIndex; i++)
         {
+            // Only consider real backers.
+            if(backers[i].pledgePaymentAmount == 0) continue;
+
             if(backers[i].startPaymentAmount == 0) return;
         }
         isComplete = true;
@@ -472,8 +489,14 @@ contract Proposal {
      * Returns whether all the payments have been received from the backers.
      */
     function isPaymentComplete() constant public returns (bool isComplete) {
+        // Start payment not complete? Then end payment surely not complete.
+        if(!isStartPaymentComplete()) return;
+
         for (uint i = 1; i <= backerIndex; i++)
         {
+            // Only consider real backers.
+            if(backers[i].pledgePaymentAmount == 0) continue;
+
             if(backers[i].endPaymentAmount == 0) return;
         }
         isComplete = true;
@@ -491,7 +514,10 @@ contract Proposal {
         // To be called by the backer.
         if(b.buyerAddress != tx.origin) return;
 
-        // A delivery reported as correct cannot beb unreported.
+        // Is it a real backer?
+        if(b.pledgePaymentAmount == 0) return;
+
+        // A delivery reported as correct cannot be unreported.
         if(b.isDeliveryReported && b.isDeliveryCorrect) return;
 
         b.isDeliveryReported = true;
@@ -501,7 +527,7 @@ contract Proposal {
     /*
      * The minimum percentage of deliveries reported as correct (calculated by
      * product count) to consider the delivery complete and ready for final
-     * payout.
+     * payout. In future versions this could be a parameter of the proposal.
      */
     uint public minimumReportedCorrectDeliveryPercentage = 50;
 
@@ -546,9 +572,10 @@ contract Proposal {
      * Returns whether the start payout to the seller may be done.
      */
     function isReadyForEndPayout() constant returns (bool isReady) {
-        isReady = isClosed && isPaymentComplete() && isDeliveryComplete();
+        isReady = isClosed && isPaymentComplete() && isDeliveryComplete()
+            // Start payout has to be done before end payout.
+            && startPayoutAmount != 0;
     }
-
 
     function getStartPayoutAmount() constant returns (uint amount) {
         amount = acceptedOffer.price() * getTotalBackedAmount()
@@ -556,6 +583,13 @@ contract Proposal {
     }
 
     function getEndPayoutAmount() constant returns (uint amount) {
+        // TODO: Handle refunds. If the ultimateDeliveryDate has passed, there
+        // can be two situations:
+        // 1. isDeliveryComplete == true: end payment should be made to seller
+        // 2. isDeliveryComplete == false: end payout should be negative (refund)
+        //  and end payment to backers should be negative (refund).
+        // Currently refunds are not supported; any BuyCo is assumed to be
+        // successfully fulfilled within the ultimateDeliveryDate.
         amount = acceptedOffer.price() * getTotalBackedAmount()
             - getStartPayoutAmount();
     }
@@ -566,6 +600,9 @@ contract Proposal {
     function registerStartPayout(string txId, uint amount) {
         // Payments are confirmed by the registry owner.
         if(tx.origin != registry.owner()) return;
+
+        // Can only register once
+        if(startPayoutAmount != 0) return;
 
         if(!isReadyForStartPayout()) return;
         if(amount != getStartPayoutAmount()) return;
@@ -581,12 +618,49 @@ contract Proposal {
         // Payments are confirmed by the registry owner.
         if(tx.origin != registry.owner()) return;
 
+        // Can only register once
+        if(endPayoutAmount != 0) return;
+
         if(!isReadyForEndPayout()) return;
         if(amount != getEndPayoutAmount()) return;
 
         endPayoutAmount = amount;
         endPayoutTransactionID =  txId;
     }
+
+    /**************** START STATISTICS **************/
+
+    /*
+     * Gets the total amount deposited by backers.
+     */
+    function getTotalPaymentAmount() constant returns (uint amount) {
+        int computedAmount;
+        for (uint i = 1; i <= backerIndex; i++)
+        {
+            var b = backers[i];
+            computedAmount += int(b.pledgePaymentAmount);
+            computedAmount += int(b.startPaymentAmount);
+            computedAmount += b.endPaymentAmount;
+        }
+        amount = uint(computedAmount);
+    }
+
+    /**
+     * Gets the total amount paid out to the seller.
+     */
+    function getTotalPayoutAmount() constant returns (uint amount) {
+        amount = startPayoutAmount + endPayoutAmount;
+    }
+
+    /**
+     * Gets the total amount currently held in escrow.
+     */
+    function getTotalEscrowAmount() constant returns (uint amount) {
+        return getTotalPaymentAmount() - getTotalPayoutAmount();
+    }
+
+    /**************** END STATISTICS **************/
+
 }
 
 /*
@@ -610,7 +684,7 @@ contract ProposalRegistry {
      * this number should be increased. The code compares it with a variable in
      * contractInterfaces.
      */
-    string public version = "0.8.1";
+    string public version = "0.8.6";
 
     function ProposalRegistry(string n){
         name = n;

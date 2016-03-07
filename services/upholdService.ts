@@ -1,5 +1,8 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
+import serviceFactory = require('./serviceFactory');
+
+import { Promise } from 'q';
 
 // Enable request debugging
 // TODO: make configurable (config debug option)
@@ -119,7 +122,8 @@ function isSuccessStatusCode(statusCode: number): boolean {
     return false;
 }
 
-export class UpholdService {
+
+export class UpholdService implements serviceFactory.IUpholdService {
     constructor(
         private authorizationToken: string) {
     }
@@ -269,5 +273,31 @@ export class UpholdService {
                 }
             });
 
+    }
+
+    /**
+     * Create a transaction and immediately commit it.
+     */
+    createAndCommitTransaction = (
+        fromCard: string,
+        amount: number,
+        currency: string,
+        recipient: string): Promise<IUpholdTransaction> => {
+        var t = this;
+        return Promise<IUpholdTransaction>((resolve, reject) => {
+            t.createTransaction(fromCard, amount, currency, recipient, (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                t.commitTransaction(res, (commitErr, commitRes) => {
+                    if (commitErr) {
+                        reject(commitErr);
+                        return;
+                    }
+                    resolve(commitRes);
+                });
+            });
+        });
     }
 }

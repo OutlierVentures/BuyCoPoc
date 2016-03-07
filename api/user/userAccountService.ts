@@ -15,7 +15,7 @@ var userRepo = new userModel.UserRepository();
  * with a balance below this (e.g. a new one), we will send it
  * "ether" up to this amount.
  */
-var MINIMUM_USER_ACCOUNT_BALANCE = 30;
+var MINIMUM_USER_ACCOUNT_BALANCE = 20;
 
 /**
  * Get and save information from user accounts
@@ -187,6 +187,10 @@ export class UserAccountService {
         return Promise<userModel.IBlockchainAccountCollection>((resolve, reject) => {
             userRepo.getUserByAccessToken2(accessToken)
                 .then(user => {
+                    if (!user) {
+                        throw ("User not found");
+                    }
+
                     // Do some normalization / fixes on the account.
                     // Ensure an account is set as selected.
                     if (user.blockchainAccounts
@@ -208,9 +212,10 @@ export class UserAccountService {
                                 };
                             }
                             resolve(user.blockchainAccounts);
-                        },
-                        err => { }
-                        );
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
 
 
                 })

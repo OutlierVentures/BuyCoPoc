@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import web3config = require('./web3config');
 import fs = require('fs');
 
@@ -14,7 +14,7 @@ describe("ContractDeployment", () => {
     var timeAfterDeployment: number;
 
     before(function (done) {
-        //this.timeout(10000);
+        this.timeout(10000);
         web3config.createWeb3();
 
         done();

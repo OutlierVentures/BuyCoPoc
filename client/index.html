@@ -30,7 +30,7 @@
                         </div>
                         <div ng-controller="UserAccountController">
                             <ul class="nav navbar-nav" ng-cloak ng-show="!isLoggedIn">
-                                <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
+                                <li data-match-route="/audit"><a href="/audit">Audit</a></li>
                             </ul>
                             <ul class="nav navbar-nav" ng-cloak ng-show="isLoggedIn">
                                 <!--<li data-match-route="/audit"><a href="/audit">Audit</a></li>-->
@@ -68,6 +68,9 @@
                                 </li>
                                 <li data-match-route="/seller-proposals/list" ng-show="$root.userInfo.preferences.perspective=='seller'">
                                     <a href="seller-proposal/list">Buying Proposals</a>
+                                </li>
+                                <li data-match-route="/audit/list">
+                                    <a href="/audit">Audit</a>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">

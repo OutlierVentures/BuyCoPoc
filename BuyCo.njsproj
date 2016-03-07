@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="client\accounts-manager.html" />
+    <Content Include="client\js\audit\audit-list.html" />
     <Content Include="client\js\buyers\buyer-signup.html" />
     <Content Include="client\js\categories\main-category-details.html" />
     <Content Include="client\js\categories\category-list.html" />
@@ -43,11 +44,12 @@
     <Content Include="client\js\common\proposal-detail.html" />
     <Content Include="client\js\offers\offer-details.html" />
     <Content Include="client\js\offers\offer-form.html" />
+    <Content Include="client\js\proposals\proposal-report-delivery.html" />
     <Content Include="client\js\seller-proposals\seller-proposal-list.html" />
     <Content Include="client\js\sellers\seller-signup.html" />
     <Content Include="client\less\app.less" />
-    <Content Include="config.json" />
     <Content Include="test\spec-runner.html" />
+    <TypeScriptCompile Include="api\audit\auditController.ts" />
     <TypeScriptCompile Include="api\buyer\buyerController.ts" />
     <TypeScriptCompile Include="api\category\categoryService.ts" />
     <TypeScriptCompile Include="api\category\categoryController.spec.ts">
@@ -61,11 +63,15 @@
     <TypeScriptCompile Include="api\data\cacheController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="api\proposal\proposalController.fulfilment.spec.ts">
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="api\user\userAccountService.ts" />
     <TypeScriptCompile Include="api\user\userAccountController.ts" />
     <TypeScriptCompile Include="client\js\app.module.ts" />
     <TypeScriptCompile Include="client\js\app.routes.ts" />
     <TypeScriptCompile Include="client\js\app.ts" />
+    <TypeScriptCompile Include="client\js\audit\auditController.ts" />
     <TypeScriptCompile Include="client\js\buyers\buyer-resource.mock.ts" />
     <TypeScriptCompile Include="client\js\buyers\buyer-signup.controller.ts" />
     <TypeScriptCompile Include="client\js\buyers\buyer.service.ts" />
@@ -356,7 +362,7 @@
     <TypeScriptCompile Include="services\contractService.ts" />
     <TypeScriptCompile Include="services\configurationService.ts" />
     <TypeScriptCompile Include="services\cachedProposalService.ts" />
-    <TypeScriptCompile Include="services\proposalService.spec.ts" />
+    <TypeScriptCompile Include="services\fulfilmentService.ts" />
     <TypeScriptCompile Include="services\proposalService.ts" />
     <TypeScriptCompile Include="services\serviceFactory.ts" />
     <TypeScriptCompile Include="services\stubUpholdService.ts" />
@@ -392,7 +398,7 @@
     <TypeScriptCompile Include="test\controllers\testMigrationController.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="test\controllers\testOfferController.ts">
+    <TypeScriptCompile Include="api\offer\offerController.spec.ts">
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\controllers\testTestDiscovery.ts">
@@ -412,8 +418,10 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="test\testHelper.ts" />
     <TypeScriptCompile Include="typings\assertion-error\assertion-error.d.ts" />
+    <TypeScriptCompile Include="typings\async\async.d.ts" />
     <TypeScriptCompile Include="typings\body-parser\body-parser.d.ts" />
     <TypeScriptCompile Include="typings\chai\chai.d.ts" />
+    <TypeScriptCompile Include="typings\express-validator\express-validator.d.ts" />
     <TypeScriptCompile Include="typings\express\express.d.ts" />
     <TypeScriptCompile Include="typings\form-data\form-data.d.ts" />
     <TypeScriptCompile Include="typings\mime\mime.d.ts" />
@@ -432,8 +440,8 @@
   <ItemGroup>
     <Folder Include="api\data\" />
     <Folder Include="api\category\" />
-    <Folder Include="api\delivery\" />
     <Folder Include="api\buyer\" />
+    <Folder Include="api\audit\" />
     <Folder Include="api\user\" />
     <Folder Include="api\seller\" />
     <Folder Include="api\configuration\" />
@@ -445,6 +453,7 @@
     <Folder Include="client\images\" />
     <Folder Include="client\js\" />
     <Folder Include="client\js\buyers\" />
+    <Folder Include="client\js\audit\" />
     <Folder Include="client\js\proposals\" />
     <Folder Include="client\js\common\" />
     <Folder Include="client\js\categories\" />
@@ -478,8 +487,10 @@
     <Folder Include="typings\" />
     <Folder Include="services\" />
     <Folder Include="typings\assertion-error\" />
+    <Folder Include="typings\async\" />
     <Folder Include="typings\body-parser\" />
     <Folder Include="typings\chai\" />
+    <Folder Include="typings\express-validator\" />
     <Folder Include="typings\express\" />
     <Folder Include="typings\form-data\" />
     <Folder Include="typings\mime\" />

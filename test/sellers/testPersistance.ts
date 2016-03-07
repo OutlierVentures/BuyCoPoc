@@ -12,6 +12,7 @@ var dbUri: string;
 
 describe("Example spec for a model", () => {
     before(done => {
+        
         // Load configuration and initiate database connection
         var cs = new configurationService.ConfigurationService();
         cs.basePath = path.resolve(path.dirname(__filename), "../../") + "/";

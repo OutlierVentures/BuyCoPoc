@@ -11,6 +11,7 @@ import configController = require('../api/configuration/configurationController'
 import contractController = require('../api/contract/contractController');
 import cacheController = require('../api/data/cacheController');
 import userAccountController = require('../api/user/userAccountController');
+import auditController = require('../api/audit/auditController');
 
 /**
  * Configure the routes for all API functions on an Express app.
@@ -41,7 +42,13 @@ export function configure(app: express.Express) {
     apiRouter.route("/proposal/closing-candidates").get(pc.getClosingCandidates);
 
     apiRouter.route("/proposal/:id").get(pc.getOne);
+    // Backing
     apiRouter.route("/proposal/:id/back").post(pc.back);
+    apiRouter.route("/proposal/:id/delivery-report").post(pc.deliveryReport);
+    // Fulfilment
+    apiRouter.route("/proposal/:id/close").post(pc.close);
+    apiRouter.route("/proposal/:id/process-payments").post(pc.processPayments);
+
     apiRouter.route("/proposal/:id/backers").get(pc.getBackers);
     apiRouter.route("/proposal/:id/offers").get(pc.getOffers);
     apiRouter.route("/proposal").post(pc.create);
@@ -53,6 +60,7 @@ export function configure(app: express.Express) {
     var oc = new offerController.OfferController();
     apiRouter.route("/proposal/:id/offer").post(oc.create);
     apiRouter.route("/offer/:id").get(oc.getOne);
+    apiRouter.route("/proposal/:proposalId/offer/:offerId/buyers").get(oc.getBuyers);
 
     // Sellers
     var sc = new sellerController.SellerController();
@@ -90,6 +98,12 @@ export function configure(app: express.Express) {
     var cacheCon = new cacheController.CacheController();
     apiRouter.route("/data/cache/update").post(cacheCon.update);
     apiRouter.route("/data/cache/refresh").post(cacheCon.fullRefresh);
+
+    
+    var ac = new auditController.AuditController();
+    apiRouter.get("/audit/buyco", ac.getList);
+    apiRouter.get("/audit/vault", ac.getVaultData);
+    apiRouter.get("/audit/info", ac.getInfo);
 
     // Catch non-existing api calls.
     apiRouter.route("*").all(function (req, res) {

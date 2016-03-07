@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import fs = require('fs');
 import request = require('supertest');
@@ -7,6 +7,7 @@ import Q = require('q');
 
 import web3config = require('../../test/contracts/web3config');
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 import proposalModel = require('../../models/proposalModel');
 import categoryModel = require('../../models/categoryModel');
@@ -40,11 +41,11 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/category')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
-                assert.ok(list.length > 0, "At least one category");
+                assert.isAbove(list.length, 0, "At least one category");
                 var first = list[0];
                 assert.ok(first.name, "First category has a name");
                 assert.ok(!first.totalProposalCount, "No proposal info");
@@ -63,7 +64,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/category')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -76,7 +77,7 @@ describe("CategoryController", () => {
                 request(theApp)
                     .get('/api/category/' + mainCat)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var cat = <categoryModel.IMainCategory>res.body;
 
@@ -98,7 +99,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/proposal/category')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -121,7 +122,7 @@ describe("CategoryController", () => {
         request(theApp)
             .get('/api/proposal/category')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <categoryModel.IMainCategory[]>res.body;
 
@@ -136,7 +137,7 @@ describe("CategoryController", () => {
                 request(theApp)
                     .get('/api/proposal/category/' + mainCatName)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var mainCat = <categoryModel.IMainCategory>res.body;
 

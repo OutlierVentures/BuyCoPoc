@@ -14,43 +14,72 @@
             Minimum amount of products to be bought: <span class="text-muted">{{(offer.minimumAmount || 0) | number}}</span>
         </span><br><br>
     </div>
-    <div class="panel panel-default">
-        <!-- TODO: show only to the winning offer -->
+    <div class="panel panel-default" ng-show="proposal.acceptedOffer == offer.id">
         <div class="panel-heading">
             Accepted
         </div>
         <div class="panel-body">
-            <p>Congratulations, your offer has been accepted!</p>
+            <p ng-show="offer.isCurrentUser">Congratulations, your offer has been accepted!</p>
+            <p ng-show="!offer.isCurrentUser">This is the accepted offer.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <!-- TODO: show only to the winning offer -->
+        <div class="panel-heading">
+            Payment details
+        </div>
+        <div class="panel-body">
+
             <h4>Payment details</h4>
             <div class="list-group">
                 <p class="list-group-item">
-                    <!-- TODO: fill correct tx IDs and amounts -->
-                    Start payment of GBP xxx.xx paid on 2016-01-15 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                    Start payment (GBP {{proposal.startPayoutAmount | number : 2 }}):
+                    <span ng-show="!proposal.startPayoutTransactionID">not paid yet</span>
+                    <span ng-show="proposal.startPayoutTransactionID"><a href="https://uphold.com/reserve/transactions/{{proposal.startPayoutTransactionID}}" target="_blank">see transaction info</a></span>
                 </p>
                 <p class="list-group-item">
-                    <!-- TODO: fill correct tx IDs and amounts -->
-                    End payment of GBP xxx.xx paid on 2016-01-28 <span>(<a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">see transaction info</a>)</span>
+                    End payment (GBP {{proposal.endPayoutAmount | number : 2 }}):
+                    <span ng-show="!proposal.endPayoutTransactionID">not paid yet</span>
+                    <span ng-show="proposal.endPayoutTransactionID"><a href="https://uphold.com/reserve/transactions/{{proposal.endPayoutTransactionID}}" target="_blank">see transaction info</a></span>
                 </p>
             </div>
-            <h4>Buyer details</h4>
-            <!-- TODO: fill table below with buyer data -->
+        </div>
+    </div>
+    <!-- The variable "buyers" is only filled for the owner of this offer. So other viewers don't see this part. --> 
+    <div class="panel panel-default" ng-show="buyers">
+        <div class="panel-heading">
+            Buyer details
+        </div>
+        <div class="panel-body">
             <p>Please use the following details for delivery of the goods.</p>
             <table class="table table-striped">
                 <thead><tr><th>Name</th><th>Address</th><th>Product count</th><th>Total amount (GBP)</th></tr></thead>
                 <tbody>
-                    <tr><td>John Smith</td><td>High Street 48<br />Ipswich<br />Sussex<br />AB1 QR5<br />United Kingdom</td><td>45</td><td>487.98</td></tr>
-                    <tr><td>Pete McMahon</td><td>Some Street 10<br />London<br />Greater London<br />AB1 QR5<br />United Kingdom</td><td>2</td><td>12.05</td></tr>
+                    <tr ng-repeat="buyer in buyers track by buyer.backerIndex">
+                        <td>
+                            {{buyer.buyerInfo.name}}
+                            <span ng-show="buyer.buyerInfo.company"><br />Company: {{buyer.buyerInfo.company}}</span>
+                        </td>
+                        <td>
+                            {{buyer.buyerInfo.addressLine1}}<br />
+                            {{buyer.buyerInfo.addressLine2}}<br />
+                            {{buyer.buyerInfo.postalCode}}<br />
+                            {{buyer.buyerInfo.city}}<br />
+                            {{buyer.buyerInfo.country}}
+                        <td>{{buyer.amount}}</td>
+                        <td>{{buyer.totalAmount | number: 2}}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-default" ng-show="offer.sellerName">
         <div class="panel-heading">
             Seller data
         </div>
         <div class="panel-body">
-            <h4>{{seller.name}}</h4>
-            <p>{{seller.address}}</p>
+            <p>{{offer.sellerName}}</p>
+            <!--<p>{{seller.address}}</p>-->
         </div>
     </div>
 </div>

@@ -54,7 +54,7 @@ interface IUser extends IDocument {
     accessToken: string;
 
     email: string;
-    
+
     /**
      * BuyCos this user has backed
      */
@@ -137,6 +137,7 @@ interface IProposal {
     ultimateDeliveryDate: Date;
 
     isClosed?: boolean;
+    acceptedOffer?: string;
 
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
@@ -186,24 +187,24 @@ interface IUpholdCard {
 }
 
 /**
- * A backer of a proposal, i.e. a buyer.
+ * A backing of a proposal by a buyer.
  */
 interface IProposalBacking {
+
     /**
      * User ID from MongoDB.
      */
     userId: string;
-    
+
+    /**
+     * Gets whether this backing is placed by the current user.
+     */
+    isCurrentUser: boolean;
+
     /**
      * Blockchain address of this user.
      */
     address: string;
-
-    /**
-     * Uphold card ID used for payments.
-     */
-    cardId: string;
-
     /**
      * Backer index within the proposal.
      */
@@ -243,8 +244,29 @@ interface IProposalBacking {
      * Amount of the final payment.
      */
     endPaymentAmount: number;
-}
 
+    /**
+     * Indicates whether the delivery has been reported by the backer.
+     */
+    isDeliveryReported: boolean;
+
+    /**
+     * Indicates whether the delivery is correct according to the backer.
+     * Any further details about the nature of what is or isn't correct
+     * are discussed outside of the contract.
+     */
+    isDeliveryCorrect: boolean;
+
+    /**
+     * Uphold card ID used for payments.
+     */
+    cardId: string;
+
+    /**
+     * Detail info on the buyer.
+     */
+    buyerInfo: IBuyer;
+}
 
 /**
  * An offer made to a buying proposal by a seller.
@@ -257,6 +279,7 @@ interface IOffer {
     toCard: string;
 
     sellerName: string;
+    userId: string;
 }
 
 
@@ -270,15 +293,51 @@ interface ICategoryBase {
 }
 
 /**
- * A sub category of BuyCo's, e.g. "Camera"
+ * A sub category of BuyCos, e.g. "Camera"
  */
 interface ISubCategory extends ICategoryBase {
 
 }
 
 /**
- * A main category of BuyCo's, e.g. "Electronics"
+ * A main category of BuyCos, e.g. "Electronics"
  */
 interface IMainCategory extends ICategoryBase {
     subCategories: ISubCategory[];
 }
+
+
+/*** START from API auditController ***/
+
+interface IBuyCoStatistics {
+    totalPaymentAmount: number,
+    totalPayoutAmount: number,
+    totalEscrowAmount: number,
+}
+
+
+interface IAuditList {
+    items: IAuditListItem[],
+    totals: IBuyCoStatistics
+}
+
+interface IAuditListItem {
+    proposal: IProposal,
+    statistics: IBuyCoStatistics
+}
+
+interface IAuditDetails {
+    proposal: IProposal,
+    statistics: IBuyCoStatistics,
+}
+
+interface IVaultStatistics {
+    balance: number,
+    transactions: IUpholdTransaction[]
+    totals: {
+        debitAmount: number,
+        creditAmount: number
+    }
+}
+
+/*** END from API auditController ***/

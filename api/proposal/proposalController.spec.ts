@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import fs = require('fs');
 import request = require('supertest');
@@ -7,6 +7,7 @@ import Q = require('q');
 
 import web3config = require('../../test/contracts/web3config');
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 import proposalModel = require('../../models/proposalModel');
 import proposalBackingModel = require('../../models/proposalBackingModel');
@@ -45,7 +46,7 @@ describe("ProposalController", () => {
             .get('/api/proposal')
             .expect('Content-Type', /json/)
             //.expect('Content-Length', '20')
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -68,7 +69,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 proposalId = list[0].contractAddress;
@@ -79,7 +80,7 @@ describe("ProposalController", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposalId)
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var proposal = <proposalModel.IProposal>res.body;
                 
@@ -101,7 +102,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal/category/Electronics/Camera')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -125,7 +126,8 @@ describe("ProposalController", () => {
                 productDescription: "From the unit tests " + Date(),
                 productSku: "SKU123",
                 productUnitSize: "1 unit",
-                category: "Electronics - Camera",
+                mainCategory: "Electronics",
+                subCategory: "Camera",
                 maxPrice: 0.10,
                 //endDate: "2016-12-01",
                 //ultimateDeliveryDate: "2017-12-01"
@@ -138,13 +140,13 @@ describe("ProposalController", () => {
             .post('/api/proposal')
             .send(newProposalData)
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 newProposal = <proposalModel.IProposal>res.body;
                 
                 // Assert stuff on the result
                 assert.notEqual(newProposal.contractAddress, "0x", "New proposal has an ID");
-                assert.equal(newProposal.endDate, "", "New proposal has an empty string as end date");
+                assert.ok(!newProposal.endDate, "New proposal has an empty end date");
                 assert.equal(newProposal.productSku, "SKU123", "New proposal has correct SKU");
                 assert.equal(newProposal.productUnitSize, "1 unit", "New proposal has correct unit size");
                 assert.equal(newProposal.mainCategory, "Electronics", "New proposal has correct main category");
@@ -184,7 +186,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 proposal = list[0];
@@ -194,7 +196,7 @@ describe("ProposalController", () => {
                 request(theApp)
                     .get('/api/proposal/' + proposal.contractAddress + '/backers')
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(res => testHelper.checkStatusCode(res))
                     .expect(function (res) {
                         var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
@@ -209,38 +211,9 @@ describe("ProposalController", () => {
 
     });
 
-    /**
-     * Get a token of any user in the database. Returns a promise that resolves
-     * with the token.
-     */
-    function getTestUserToken(): Q.Promise<string> {
-        var defer = Q.defer<string>();
-        // TODO: make test user configurable
-        userModel.User.findOne().where("externalId").equals("RonnieDoubleA").exec()
-            .then(function (user) {
-                if (user)
-                    defer.resolve(user.accessToken);
-                else
-                    defer.reject("No user found");
-            },
-            function (userErr) {
-                defer.reject(userErr);
-            });
-
-        return defer.promise;
-    }
-
-    /**
-     * Returns the card ID of the test user to use for sourcing funds in tests.
-     */
-    function getTestUserCardId(): string {
-        // TODO: make test card configurable
-        // "GBP card for unit tests"
-        return "9edd1208-8948-4b7a-b54d-3215a8a34de9";
-    }
 
     it("should back a proposal on POST /api/proposal/:id/back", function (done) {
-        this.timeout(100000);
+        this.timeout(300000);
 
         var proposal: proposalModel.IProposal;
         var amount = 1;
@@ -249,7 +222,7 @@ describe("ProposalController", () => {
         var sourceAddress = web3.eth.coinbase;
 
         // Find a valid user token to simulate the originating user
-        getTestUserToken()
+        testHelper.getTestUserToken()
             .then(function (testUserToken) {
 
                 // Create a proposal with a low amount to keep the transfer amount low
@@ -259,19 +232,20 @@ describe("ProposalController", () => {
                         proposal: {
                             productName: "A testing product", "productDescription": "From the unit tests " + Date(),
                             productSku: "SKU123",
-                            category: "Electronics - Camera",
+                            mainCategory: "Electronics",
+                            subCategory: "Camera",
                             maxPrice: 0.10,
                             endDate: "2016-12-01",
                             ultimateDeliveryDate: "2017-12-01"
                         }
                     })
                     .expect('Content-Type', /json/)
-                    .expect(200)
+                    .expect(res => testHelper.checkStatusCode(res))
                     .end(function (err, res) {
                         if (err) done(err);
 
                         var proposal = <proposalModel.IProposal>res.body;
-                        var cardId = getTestUserCardId();
+                        var cardId = testHelper.getTestUserCardId();
 
                         request(theApp)
                             .post('/api/proposal/' + proposal.contractAddress + '/back')
@@ -281,7 +255,7 @@ describe("ProposalController", () => {
                                 amount: amount,
                                 fromCard: cardId
                             })
-                            .expect(200)
+                            .expect(res => testHelper.checkStatusCode(res))
                             .expect(function (res) {
                                 // Nothing to assert here; POST ../back gives no content.
                             })
@@ -293,7 +267,7 @@ describe("ProposalController", () => {
                                 request(theApp)
                                     .get('/api/proposal/' + proposal.contractAddress + '/backers')
                                     .expect('Content-Type', /json/)
-                                    .expect(200)
+                                    .expect(res => testHelper.checkStatusCode(res))
                                     .expect(function (res) {
                                         var backers = <Array<proposalBackingModel.IProposalBacking>>res.body;
 
@@ -322,7 +296,7 @@ describe("ProposalController", () => {
         request(theApp)
             .get('/api/proposal/closing-candidates')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var list = <Array<proposalModel.IProposal>>res.body;
                 
@@ -332,6 +306,87 @@ describe("ProposalController", () => {
             })
             .end(function (err, res) {
                 done(err);
+            });
+    });
+
+    it("should not close a proposal with end date in the future on POST /api/proposal/:id/close", function (done) {
+        this.timeout(100000);
+
+        var twoYearsAhead = (new Date()).getFullYear() + 2;
+
+        // Create a proposal with an end date far in the future
+        request(theApp)
+            .post('/api/proposal')
+            .send({
+                proposal: {
+                    productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                    productSku: "SKU123",
+                    mainCategory: "Electronics",
+                    subCategory: "Camera",
+                    maxPrice: 0.10,
+                    endDate: twoYearsAhead + "-11-01",
+                    ultimateDeliveryDate: twoYearsAhead + "-12-01"
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(res => testHelper.checkStatusCode(res))
+            .end(function (err, res) {
+                if (err) done(err);
+
+                var proposal = <proposalModel.IProposal>res.body;
+                var cardId = testHelper.getTestUserCardId();
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    // Ideally this would be 400, as it's a bad request. The proposal isn't ready 
+                    // to close, yet we request closing it. However because the controller delegates
+                    // everything to the service, it can't determine whether there was a validation
+                    // error or something else. Hence everything arrives as a 500.
+                    .expect(res => testHelper.checkStatusCode(res, 500))
+                    .end(function (err, res) {
+                        done(err);
+                    });
+            });
+    });
+
+    it("should close a proposal with end date in the past on POST /api/proposal/:id/close", function (done) {
+        this.timeout(100000);
+
+        var lastYear = (new Date()).getFullYear() - 1;
+
+        // Create a proposal with an end date in the past
+        request(theApp)
+            .post('/api/proposal')
+            .send({
+                proposal: {
+                    productName: "A testing product", "productDescription": "From the unit tests " + Date(),
+                    productSku: "SKU123",
+                    mainCategory: "Electronics",
+                    subCategory: "Camera",
+                    maxPrice: 0.10,
+                    endDate: lastYear + "-11-01",
+                    ultimateDeliveryDate: lastYear + "-12-01"
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(res => testHelper.checkStatusCode(res))
+            .end(function (err, res) {
+                if (err) done(err);
+
+                var proposal = <proposalModel.IProposal>res.body;
+                var cardId = testHelper.getTestUserCardId();
+
+                request(theApp)
+                    .post('/api/proposal/' + proposal.contractAddress + '/close')
+                    .expect(res => testHelper.checkStatusCode(res))
+                    .expect(function (res) {
+                        var proposal = <proposalModel.IProposal>res.body;
+                                                
+                        assert.ok(proposal.isClosed, "Proposal is closed");
+                    })
+                    .end(function (err, res) {
+                        done(err);
+                    });
             });
     });
 

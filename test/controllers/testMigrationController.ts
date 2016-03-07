@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import fs = require('fs');
 import request = require('supertest');
@@ -6,6 +6,7 @@ import express = require('express');
 
 import web3config = require('../contracts/web3config');
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
@@ -34,7 +35,7 @@ describe("MigrationController", () => {
         request(theApp)
             .post('/api/migration/update')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {                
                 var result = res.body;
                 
@@ -52,7 +53,7 @@ describe("MigrationController", () => {
         request(theApp)
             .post('/api/migration/test/seed')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 

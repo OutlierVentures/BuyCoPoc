@@ -1,9 +1,12 @@
 ﻿interface IOfferScope extends ng.IScope {
     proposal: IProposal;
+    proposalContract: IProposalContract;
+
     cards: Array<IUpholdCard>;
     vm: OfferController;
 
     offer: IOffer;
+    buyers: IProposalBacking[];
     toCard: string;
 
     seller: ISeller;
@@ -94,6 +97,9 @@ class OfferController {
         }).success(function (resultData: IOffer) {
             t.$scope.offer = resultData;
 
+            var anyO = <any>resultData;
+            anyO.isCurrentUser = t.$scope.offer.userId == t.$rootScope.userInfo._id;
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error
@@ -105,6 +111,40 @@ class OfferController {
 
             cb("Error getting offer data", null);
         });
+    }
+
+    private getBuyers(proposalId: string, offerId: string, cb: any) {
+        var t = this;
+
+        // Get statistics
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/proposal/' + proposalId + '/offer/' + offerId + '/buyers',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: Array<IProposalBacking>) {
+            // Add "isCurrentUser"
+            //resultData = _(resultData).map(b => {
+            //    b.isCurrentUser = (b.userId == t.$rootScope.userInfo._id);
+            //    return b;
+            //});
+
+            _(resultData).each(b => {
+                var anyB = <any>b;
+                // TODO: calculate server side; take owner cut into account
+                anyB.totalAmount = t.$scope.offer.price * b.amount;
+            });
+
+            t.$scope.buyers = resultData;
+            cb(null, resultData);
+        }).error(function (error) {
+            // Handle error
+            // The method gives 403 if it's not our offer, and 500 if it's not accepted. So quite regular.
+            //console.log("Error loading buyers for offer:");
+            //console.log(error);
+
+            cb("Error getting backers data: " + error, null);
+        });
+
     }
 
     private getProposalData(proposalId: string, cb: any) {
@@ -123,6 +163,31 @@ class OfferController {
             anyP.startPayoutPercentage = startPayoutPerc;
             anyP.startPayoutPerProduct = startPayoutPerc / 100 * resultData.maxPrice;
 
+            t.blockchainService.getProposalContractAt(proposalId)
+                .then(pc => {
+                    t.$scope.proposalContract = pc;
+
+                    // TODO: move to server side, cache.
+                    anyP.startPayoutAmount = pc.getStartPayoutAmount().toNumber() / 100;
+                    var startTx = pc.startPayoutTransactionID();
+                    if (startTx && startTx.length == 32)
+                        startTx = guidAddDashes(startTx);
+
+                    anyP.startPayoutTransactionID = startTx;
+
+                    anyP.endPayoutAmount = pc.getEndPayoutAmount().toNumber() / 100;
+
+                    var endTx = pc.endPayoutTransactionID();
+                    if (endTx && endTx.length == 32)
+                        endTx = guidAddDashes(endTx);
+
+                    anyP.endPayoutTransactionID = endTx;
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+
+
             cb(null, resultData);
         }).error(function (error) {
             // Handle error
@@ -140,12 +205,17 @@ class OfferController {
         var t = this;
 
         t.getOfferData(offerId, function (err, res) {
-            // The getter already sets scope variables. Nothing to do here.
+            // getBuyers depends on the offer data
+            t.getBuyers(proposalId, offerId, function (err, res) {
+                // The getter already sets scope variables. Nothing to do here.
+            });
         });
 
         t.getProposalData(proposalId, function (err, res) {
             // The getter already sets scope variables. Nothing to do here.
         });
+
+
 
     }
 
@@ -181,8 +251,8 @@ class OfferController {
 
                 // Set the seller address for consistency checks.
                 t.$scope.offer.owner = t.blockchainService.getCurrentAccount();
-                
-                proposalContract.offer(t.$scope.offer.price * 100, t.$scope.offer.minimumAmount, t.$scope.toCard, options, function (err, transactionId) {
+
+                proposalContract.offer(t.$scope.offer.price * 100, t.$scope.offer.minimumAmount, guidRemoveDashes(t.$scope.toCard), options, function (err, transactionId) {
                     if (err) {
                         t.$scope.processMessage = undefined;
                         if (err.message) err = err.message;

@@ -136,12 +136,26 @@ class LoginController {
             });
         }
 
-        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+        t.tryLoadBlockchainAccounts();
 
         $rootScope.$on('blockchainConnected', e => {
-            t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+            t.tryLoadBlockchainAccounts();
+
         });
 
+    }
+
+    tryLoadBlockchainAccounts() {
+        var t = this;
+
+        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+
+        if (t.$scope.blockchainAccounts) {
+            // Load balance for each account.
+            _(t.$scope.blockchainAccounts.accounts).each(acc => {
+                acc.balance = web3.fromWei(web3.eth.getBalance(acc.address), 'ether').toNumber();
+            });
+        }
     }
 
     loadUserData() {
@@ -151,6 +165,14 @@ class LoginController {
             url: apiUrl + '/user',
             headers: { AccessToken: t.$rootScope.userInfo.accessToken }
         }).success(function (resultData: IUser) {
+            if (!resultData) {
+                // Login error. Token invalid? Refresh and relogin.
+                t.$window.sessionStorage.setItem("upholdToken", "");
+                t.$window.sessionStorage.setItem("upholdUserInfo", "");
+                t.$route.reload();
+                return;
+            }
+
             t.$rootScope.userInfo = resultData;
 
             // Homepage per perspective
@@ -208,7 +230,7 @@ class DashboardController {
         $rootScope.$on('loggedOn', function () {
             t.loadData();
         });
-        
+
         // Get underscore from global (TODO: inject!)
         // t._ = t.$window._;
 
@@ -225,10 +247,10 @@ class DashboardController {
     private loadData() {
         var t = this;
         t.$scope.userInfo = t.$rootScope.userInfo;
-        t.loadBitReserveData();
+        t.loadUpholdData();
     }
 
-    private loadBitReserveData() {
+    private loadUpholdData() {
         // Load Uphold data
         var t = this;
 

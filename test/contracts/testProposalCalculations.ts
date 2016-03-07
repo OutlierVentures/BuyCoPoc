@@ -1,10 +1,11 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import web3config = require('./web3config');
 import fs = require('fs');
 
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
 import serviceFactory = require('../../services/serviceFactory');
+import tools = require('../../lib/tools');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
@@ -129,6 +130,12 @@ describe("ProposalRegistry calculation", () => {
             .then(pc=> {
                 proposalContract = pc;
                 return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                // Set pledge paid.
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {

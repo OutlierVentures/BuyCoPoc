@@ -1,6 +1,6 @@
-﻿import assert = require('assert');
-import web3config = require('./web3config');
+﻿import web3config = require('./web3config');
 import fs = require('fs');
+import chai = require('chai'); var assert = chai.assert;
 
 import contractInterfaces = require('../../contracts/contractInterfaces');
 import contractService = require('../../services/contractService');
@@ -156,6 +156,8 @@ describe("ProposalRegistry payouts", () => {
         // also that address.
         var sellerAddress1 = web3.eth.coinbase;
 
+        var startPayoutTxId: string;
+
         var proposalContract: contractInterfaces.IProposalContract;
 
         registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice, "2016-03-01", "2016-05-01", { gas: 2500000 })
@@ -237,16 +239,30 @@ describe("ProposalRegistry payouts", () => {
                 assert.equal(proposalContract.startPayoutAmount().toNumber(), 0, "Start payout amount paid");
 
                 // Register start payment
-                return proposalContract.registerStartPayout(tools.newGuid(true), proposalContract.getStartPayoutAmount(), { gas: 2500000 });
+                startPayoutTxId = tools.newGuid(true);
+
+                return proposalContract.registerStartPayout(startPayoutTxId, proposalContract.getStartPayoutAmount(), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
                 assert.equal(proposalContract.startPayoutAmount().toNumber(), proposalContract.getStartPayoutAmount().toNumber(), "Start payout amount paid");
+                assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTxId, "Start payout transaction ID");
 
-                assert.ok(!proposalContract.isPaymentComplete(), "End payment complete");
+                // Try to register start payment again with a new value. That should
+                // not be processed.
+                return proposalContract.registerStartPayout(tools.newGuid(true), proposalContract.getStartPayoutAmount(), { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetLatestOffer(tx) {
+                assert.equal(proposalContract.startPayoutTransactionID(), startPayoutTxId, "Start payout transaction ID unchanged");
+
+                assert.ok(!proposalContract.isPaymentComplete(), "End payment not complete");
 
                 // Set first end paid
-                return proposalContract.setPaid(1, 3, tools.newGuid(true), proposalContract.getEndPaymentAmount(1), { gas: 2500000 });
+                var endPaymentAmount = proposalContract.getEndPaymentAmount(1);
+                // (sell price * amount) - (Ask price * amount * 0.5)
+                assert.equal(endPaymentAmount.toNumber(), 2722500, "End payment amount for backer 1");
+                return proposalContract.setPaid(1, 3, tools.newGuid(true), endPaymentAmount, { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {

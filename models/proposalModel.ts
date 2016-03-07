@@ -17,6 +17,7 @@ export var proposalSchema = new mongoose.Schema({
     ultimateDeliveryDate: Date,
 
     isClosed: Boolean,
+    acceptedOffer: String,
 
     nrOfBackings: Number,
     nrOfBackers: Number,
@@ -41,6 +42,7 @@ export interface IProposal {
     ultimateDeliveryDate: Date;
 
     isClosed?: boolean;
+    acceptedOffer?: string;
 
     nrOfBackings?: number; // Number of unique users that made a proposalbacking
     nrOfBackers?: number;  // Number of ProposalBackings
@@ -52,6 +54,12 @@ export interface IProposal {
 }
 
 export interface IProposalDocument extends mongoose.Document, IProposal {
+}
+
+export interface IBuyCoStatistics {
+    totalPaymentAmount: number,
+    totalPayoutAmount: number,
+    totalEscrowAmount: number,
 }
 
 export interface IProposalFilter {

@@ -1,9 +1,10 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import path = require('path');
 import request = require('supertest');
 import express = require('express');
 
 import server = require('../../server');
+import testHelper = require('../../test/testHelper');
 
 describe("ContractController", () => {
     var theServer: server.Server;
@@ -29,7 +30,7 @@ describe("ContractController", () => {
         request(theApp)
             .get('/api/contract/Proposal/abi')
             .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(res => testHelper.checkStatusCode(res))
             .expect(function (res) {
                 var result = res.body;
                 

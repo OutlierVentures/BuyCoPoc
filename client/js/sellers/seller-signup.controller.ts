@@ -33,7 +33,7 @@ class SellerSignupController implements ISellerSignUp {
     message: string;
     messageClass: string;
     form: ng.IFormController;
-    
+
     private displayMode: DisplayMode;
     private messageType: MessageType;
     private sellerResource: ISellerResourceClass;
@@ -59,18 +59,17 @@ class SellerSignupController implements ISellerSignUp {
         private _: UnderscoreStatic
     ) {
         // this.displayMode = DisplayMode.Add;
-        this.displayModes = DisplayMode; 
-        const creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
-        this.sellerResource = this.dataAccessService.getSellerResource(creds);
+        this.displayModes = DisplayMode;
+
         this.countryResource = this.dataAccessService.getCountryResource();
-        
+
         // Watch the currentCountryCode and then update current country if it is changed. 
         this.$scope.$watch(() => { return this.currentCountryCode; }, (newValue, oldValue) => {
             if (this.countries && (!this.currentCountry || newValue !== oldValue)) {
                 this.setCurrentCountry(newValue);
             }
         });
-        
+
         this.setDisplayFlags();
 
         // Watch the displayMode and set the three boolean flags correctly when it changes.
@@ -86,48 +85,61 @@ class SellerSignupController implements ISellerSignUp {
                 this.setCurrentRegion(newValue);
             }
         });
-        
+
+        var t = this;
+        this.$rootScope.$on("loggedOn", (event: any, data: any) => {
+            if (!t.sellerResource) t.loadSellerResource();
+        });
+
+        if (this.$rootScope.userInfo)
+            t.loadSellerResource();
+
         //// And watch the message type, to update the messageClass used in the view.
         //this.$scope.$watch(() => { return this.messageType; }, (newValue, oldValue) => {
         //    if ((newValue || newValue===0) && (!this.messageClass || newValue !== oldValue)) {
         //        this.messageClass = this.messageTypeAsBsClass(this.messageType);
         //    }
         //});
-                   
+
         this.getCountries()
-        .then(() => {
-            return this.getSeller();
-        }).catch((err) => {
-            return this.showMessage(err);
-        });
-            
+            .then(() => {
+                return this.getSeller();
+            }).catch((err) => {
+                return this.showMessage(err);
+            });
+
         // Test the message box.
         // this.message = "Testing 1, 2, 3...";
         // this.messageType = MessageType.Success;
     }
-    
+
+    loadSellerResource() {
+        let creds: ICredentials = { accessToken: this.$rootScope.userInfo.accessToken, externalId: this.$rootScope.userInfo.externalId };
+        this.sellerResource = this.dataAccessService.getSellerResource(creds);
+    }
+
     /** 
      * Shows the given message onscreen.
      * (default is error with Bootstrap style 'danger' if isError=true then style 'success'.)
      **/
     showMessage(message: string, isError = true) {
         let messageType = isError ? MessageType.Danger : MessageType.Success;
-        if (message) { 
+        if (message) {
             this.messageType = messageType;
-            this.message=message;
+            this.message = message;
         }
     }
-    
+
     setCurrentCountry(countryCode: string) {
         if (countryCode && this.countries) {
-            let oldCountryCode = this.currentCountry; 
+            let oldCountryCode = this.currentCountry;
             this.currentCountry = _.find(this.countries, (aCountry) => {
                 return aCountry.code === countryCode;
             });
             if (!this.currentCountry) {
                 this.showMessage(`No country found with code ${countryCode}`);
             }
-            
+
             // Update the regions dropdown and reset the region value if the country changed.
             if (oldCountryCode !== this.currentCountry) {
                 // Reset current selected country.
@@ -136,7 +148,7 @@ class SellerSignupController implements ISellerSignUp {
                 // Get regions for newly selected country.
                 this.getRegions();
             }
-            this.currentCountryCode=countryCode;
+            this.currentCountryCode = countryCode;
         }
     }
 
@@ -144,7 +156,7 @@ class SellerSignupController implements ISellerSignUp {
         if (this.regions) {
             if (regionCode) {
                 this.currentRegion = _.find(this.regions, (region: IRegion) => {
-                    return region.code === regionCode; 
+                    return region.code === regionCode;
                 });
             } else {
                 this.currentRegion = null;
@@ -152,12 +164,12 @@ class SellerSignupController implements ISellerSignUp {
             this.currentRegionCode = regionCode;
         }
     }
-    
+
     getSeller() {
         return this.$q((resolve, reject) => {
             if (this.$rootScope.userInfo) {
                 this.sellerResource.get(
-                    { },
+                    {},
                     (seller: ISeller) => {
                         if (seller.userExternalId) {
                             this.seller = seller;
@@ -180,9 +192,9 @@ class SellerSignupController implements ISellerSignUp {
                     }
                 );
             }
-        }); 
+        });
     }
-    
+
     getCountries() {
         return this.$q((resolve, reject) => {
             try {
@@ -226,8 +238,8 @@ class SellerSignupController implements ISellerSignUp {
     }
 
     signUp() {
-        if(this.form.$invalid) {
-            angular.forEach(this.form.$error.required, function(field) {
+        if (this.form.$invalid) {
+            angular.forEach(this.form.$error.required, function (field) {
                 field.$setTouched();
             });
             this.showMessage("Some missing or invalid fields.");
@@ -239,7 +251,7 @@ class SellerSignupController implements ISellerSignUp {
         }
         // Assign selected country and region from dropdown to string field.
         this.saveCountryAndRegionString();
-         
+
         this.sellerResource.save(
             this.seller,
             (data: any) => {
@@ -256,22 +268,22 @@ class SellerSignupController implements ISellerSignUp {
                 this.showMessage(httpResponse.message);
             });
     }
-    
+
     // TODO BW dd. 2016-01-16: Refactor message box to directive for reuse on other screens.
     resetMessage() {
-        this.message = ''; 
+        this.message = '';
     }
- 
+
     /* Return message type as bootstrap class. 
     * @param type Enum MessageType, for instance Succes.
     * @returns bootstrap class as string, for instance 'alert-success'.
-    */   
+    */
     //private messageTypeAsBsClass(type: MessageType) {
     //    let typeString = MessageType[type].toString().toLowerCase();
     //    let result = `alert-${typeString}`;
     //    return result;
     //};
-    
+
     edit() {
         this.displayMode = DisplayMode.Edit;
         return false;
@@ -286,13 +298,13 @@ class SellerSignupController implements ISellerSignUp {
             this.seller.regionCode = this.currentRegion.code;
         }
     }
-    
+
     private loadCountryAndRegionDropdown() {
         this.setCurrentCountry(this.seller.countryCode);
         this.getRegions().
-        then((result) => {
-            this.setCurrentRegion(this.seller.regionCode);
-        });
+            then((result) => {
+                this.setCurrentRegion(this.seller.regionCode);
+            });
     }
 
     private setDisplayFlags() {
@@ -303,4 +315,4 @@ class SellerSignupController implements ISellerSignUp {
 }
 
 angular.module("buyCoApp")
-.controller("SellerSignupController", SellerSignupController);
+    .controller("SellerSignupController", SellerSignupController);

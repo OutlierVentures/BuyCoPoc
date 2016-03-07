@@ -1,10 +1,10 @@
 ﻿/// <reference path="typings/tsd.d.ts" />
 import express = require('express');
+import expressValidator = require('express-validator');
 import morgan = require('morgan');
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
 import web3config = require('./lib/web3config');
-import assert = require('assert');
 import http = require('http');
 import https = require('https');
 import uriJs = require('urijs');
@@ -27,7 +27,7 @@ import stubOauthController = require('./controllers/stubOauthController');
 
 import apiRoutes = require('./routes/api');
 
-import stubBitReserveService = require('./services/stubUpholdService');
+import stubUpholdService = require('./services/stubUpholdService');
 
 export class Server {
     basePath = "./";
@@ -77,12 +77,12 @@ export class Server {
         /**
          * Create a new Uphold service and get user info from it.
          */
-        function getBitReserveUserInfo(token: string, callback) {
+        function getUpholdUserInfo(token: string, callback) {
             var brs = serviceFactory.createUpholdService(token);
             brs.getUser(callback);
         }
 
-        upholdOauthController.setGetUserInfoFunction(getBitReserveUserInfo);
+        upholdOauthController.setGetUserInfoFunction(getUpholdUserInfo);
 
         if (this.config.useStubs) {
             // Create a stub controller from the real controller.
@@ -103,6 +103,9 @@ export class Server {
 
         var app = express();
         app.use(bodyParser.json());
+
+        // Validation
+        app.use(expressValidator());
 
         // Logging
         app.use(morgan('dev'));

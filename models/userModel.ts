@@ -10,11 +10,12 @@ import { sellerSchema, ISeller} from './sellerModel'
 // to work with this in a productive, typesafe manner we define it as a class. 
 // The only function of this class is to link the user data to the smart contract.
 // Details like the amount and payments are stored in the contract.
-export class Backing {
+export interface IBackingInfo {
     /**
      * The ID of the backed proposal.
      */
     proposalAddress: string;
+    backingIndex: number;
 }
 
 export var userSchema = new mongoose.Schema({
@@ -22,7 +23,8 @@ export var userSchema = new mongoose.Schema({
     externalId: String,
     accessToken: String,
     backings: [{
-        proposalAddress: String
+        proposalAddress: String,
+        backingIndex: Number,
     }],
     blockchainAccounts: {
         selected: String,
@@ -36,8 +38,8 @@ export var userSchema = new mongoose.Schema({
             balance: Number
         }]
     },
-    buyerId: mongoose.Schema.Types.ObjectId,
-    sellerId: mongoose.Schema.Types.ObjectId,
+    buyerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Buyers' },
+    sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sellers' },
     preferences: {
         perspective: String
     }
@@ -93,7 +95,7 @@ export interface IUser extends mongoose.Document {
     /**
      * BuyCos this user has backed
      */
-    backings: [Backing];
+    backings: [IBackingInfo];
 
     blockchainAccounts: IBlockchainAccountCollection;
 
@@ -136,13 +138,19 @@ export class UserRepository {
     };
 
     /**
-    * Get a promise by their accessToken - promise version. 
+    * Get a user by their accessToken - promise version. 
     */
     public getUserByAccessToken2(accessToken: string): Promise<IUser> {
-        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
-            User.findOne({ accessToken: accessToken }, (err: any, resultUser: IUser) => {
+        var result = Promise<IUser>((resolve, reject) => {
+            if (!accessToken) {
+                reject("No access token passed");
+                return;
+            }
+
+            User.findOne({ accessToken: accessToken }, (err, resultUser) => {
                 if (err) {
                     reject(err);
+                    return;
                 }
                 resolve(resultUser);
             });
@@ -151,11 +159,25 @@ export class UserRepository {
     };
 
     /**
+    * Get a user by any of their blockchain addresses.
+    */
+    public getUserByBlockchainAddress(blockchainAddress: string): PromiseLike<IUser> {
+        return this.getUserByBlockchainAddresses([blockchainAddress]);
+    };
+
+    /**
+    * Get a user by any of their blockchain addresses.
+    */
+    public getUserByBlockchainAddresses(blockchainAddresses: Array<string>): PromiseLike<IUser> {
+        return User.findOne({ "blockchainAccounts.accounts.address": { "$in": blockchainAddresses } }).exec();
+    };
+
+    /**
     * Get a user by their externalId. 
     */
     public getUserByExternalId(externalId: string): Promise<IUser> {
-        var result = Promise<IUser>((resolve: (resultUser: IUser) => void, reject: (error: any) => void) => {
-            User.findOne({ externalId: externalId }, (err: any, resultUser: IUser) => {
+        var result = Promise<IUser>((resolve, reject) => {
+            User.findOne({ externalId: externalId }, (err, resultUser) => {
                 if (err) {
                     reject(err);
                 }

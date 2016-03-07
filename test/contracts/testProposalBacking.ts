@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import web3config = require('./web3config');
 import fs = require('fs');
 
@@ -175,7 +175,7 @@ describe("ProposalRegistry backing", () => {
                 var registeredAmount = backer[3].toNumber();
                 assert.equal(registeredAmount, pledgePaymentAmount, "Pledge payment amount is registered correctly");
 
-                // Register a start payment for this backer
+                // Try to register a start payment for this backer. Should not be accepted as there is no accepted offer.
                 startPaymentAmount = proposalContract.getStartPaymentAmount(1).toNumber();
                 return proposalContract.setPaid(1, 2, startPaymentTxId, startPaymentAmount);
             })
@@ -183,9 +183,9 @@ describe("ProposalRegistry backing", () => {
             .then(function testGetBacker(tx) {
                 var backer = proposalContract.backers(1);
 
-                assert.equal(backer[4], startPaymentTxId, "Start payment transaction ID is registered correctly");
-                var registeredAmount = backer[5].toNumber();
-                assert.equal(registeredAmount, startPaymentAmount, "Start payment amount is registered correctly");
+                assert.ok(!backer[4], "Start payment transaction ID is not registered as there are no valid offers");
+                //var registeredAmount = backer[5].toNumber();
+                //assert.equal(registeredAmount, startPaymentAmount, "Start payment amount is registered correctly");
 
                 done();
             })

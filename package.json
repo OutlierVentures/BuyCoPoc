@@ -1,6 +1,6 @@
 {
   "name": "buyco-poc",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "description": "Buyco Proof of Concept implementation",
   "main": "server.js",
   "repository": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "body-parser": "*",
     "express": "^4.13.3",
+    "express-validator": "^2.19.1",
     "http-proxy": "^1.13.1",
     "mongoose": "^4.1.3",
     "morgan": "^1.6.1",
@@ -33,6 +34,7 @@
     "web3plus": "git+https://4c2b0edc3e30d3d1e28479782f8f1ee64f4ca812:x-oauth-basic@github.com/OutlierVentures/web3plus.git"
   },
   "devDependencies": {
+    "async": "^1.5.2",
     "chai": "^3.4.1",
     "grunt": "^0.4.5",
     "grunt-concurrent": "^2.0.3",
