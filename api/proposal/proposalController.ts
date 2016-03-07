@@ -31,13 +31,15 @@ export class ProposalController {
         // Most filter parameters are taken from the URL Query (e.g. URL parameters) api/
         let proposalFilter: proposalModel.IProposalFilter = req.query;
 
-        // Only the maincategory and subcategory are in the URL part itself.
+        // The categories can either be passed as request parameters or in the proposalFilter.
+        // See if they have been passed in the request category and apply them.
         var mainCategory = req.params.mainCategory;
         var subCategory = req.params.subCategory;
 
-        proposalFilter.mainCategory = mainCategory;
-        proposalFilter.subCategory = subCategory;
-        
+        if (mainCategory && subCategory) {
+            proposalFilter.mainCategory = mainCategory;
+            proposalFilter.subCategory = subCategory;
+        }
         // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()
             .then(
@@ -306,7 +308,7 @@ export class ProposalController {
 
     getClosingCandidates = (req: express.Request, res: express.Response) => {
         var token = req.headers["accesstoken"];
-        
+
         // Create a proposal service and query it for proposals within the determined filter - if any.
         serviceFactory.createCachedProposalService()
             .then(
