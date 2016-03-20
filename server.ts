@@ -62,7 +62,7 @@ export class Server {
             clientID: this.config.uphold.app.clientID,
             clientSecret: this.config.uphold.app.clientSecret,
 
-            scope: "cards:read,cards:write,transactions:read,transactions:write,user:read",
+            scope: "cards:read,cards:write,transactions:transfer:application,transactions:read,user:read",
             // Uphold uses a different domain for the authorization URL. simple-oauth2 doesn't support that.
             // The "site" parameter also may not be empty.
             // As a workaround, we use the greatest common denominator of the two URLs: "https://".
