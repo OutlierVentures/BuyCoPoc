@@ -140,7 +140,14 @@ export class FulfilmentService {
             for (let i = 1; i <= proposalContract.backerIndex().toNumber(); i++) {
                 let backer = proposalContract.backers(i);
 
-                // Has this backer paid the start payment?
+                // TODO: make the check "should we execute a payment" more robust. 
+                // See https://github.com/OutlierVentures/BuyCo/issues/102
+
+                // Has this backer not paid the pledge payment? Then we don't consider it an actual backer.
+                if (!backer[2])
+                    continue;
+
+                // Has this backer already paid the start payment? Then there's nothing to do.
                 if (backer[4])
                     continue;
 
