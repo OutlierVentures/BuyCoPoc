@@ -369,7 +369,11 @@ export class FulfilmentService {
             for (let i = 1; i <= proposalContract.backerIndex().toNumber(); i++) {
                 let backer = proposalContract.backers(i);
 
-                // Has this backer paid the end payment?
+                // Has this backer paid the pledge payment? If not, it's not a real backer. Skip.
+                if (!backer[2])
+                    continue;
+
+                // Has this backer already paid the end payment? Then nothing to do for this backer.
                 if (backer[6])
                     continue;
 
