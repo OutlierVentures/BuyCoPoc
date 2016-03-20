@@ -62,9 +62,9 @@ export class Server {
             clientID: this.config.uphold.app.clientID,
             clientSecret: this.config.uphold.app.clientSecret,
 
-            // We use the deprecated "transactions:write" scope because transactions:transfer:application likely has more 
+            // We use the wide "transactions:transfer:others" scope because transactions:transfer:application likely has more 
             // impact than just limiting to the relevant transactions.
-            scope: "cards:read,cards:write,transactions:read,transactions:write,user:read",
+            scope: "cards:read,cards:write,transactions:read,transactions:transfer:others,user:read",
             // TODO: analyze required changes to apply transactions:transfer:application (how does this relate
             // to cards? Can an application have cards?)
             // scope: "cards:read,cards:write,transactions:transfer:application,transactions:read,user:read",
