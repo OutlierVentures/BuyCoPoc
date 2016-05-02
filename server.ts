@@ -1,12 +1,14 @@
 ﻿/// <reference path="typings/tsd.d.ts" />
 import express = require('express');
+import expressValidator = require('express-validator');
 import morgan = require('morgan');
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
 import web3config = require('./lib/web3config');
-import assert = require('assert');
 import http = require('http');
 import https = require('https');
+import uriJs = require('urijs');
+var httpProxy = require('http-proxy');
 
 import configModel = require('./models/configModel');
 
@@ -18,22 +20,21 @@ import fs = require('fs');
 
 import indexRoute = require('./routes/index');
 import oauthController = require('./controllers/oauthController');
-import upholdController = require('./controllers/upholdController');
-import migrationController = require('./controllers/migrationController');
-import proposalController = require('./controllers/proposalController');
 
-import bitReserveService = require('./services/upholdService');
 import serviceFactory = require('./services/serviceFactory');
 import configurationService = require('./services/configurationService');
 import stubOauthController = require('./controllers/stubOauthController');
 
-import stubBitReserveService = require('./services/stubUpholdService');
+import apiRoutes = require('./routes/api');
+
+import stubUpholdService = require('./services/stubUpholdService');
 
 export class Server {
     basePath = "./";
     config: configModel.IApplicationConfig;
     HTTP_PORT: number;
     HTTPS_PORT: number;
+    db: mongoose.Mongoose;
 
     /**
      * Create the Express application.
@@ -61,7 +62,13 @@ export class Server {
             clientID: this.config.uphold.app.clientID,
             clientSecret: this.config.uphold.app.clientSecret,
 
-            scope: "cards:read,cards:write,transactions:read,transactions:write,user:read",
+            // We use the wide "transactions:transfer:others" scope because transactions:transfer:application likely has more 
+            // impact than just limiting to the relevant transactions.
+            scope: "cards:read,cards:write,transactions:read,transactions:transfer:others,user:read",
+            // TODO: analyze required changes to apply transactions:transfer:application (how does this relate
+            // to cards? Can an application have cards?)
+            // scope: "cards:read,cards:write,transactions:transfer:application,transactions:read,user:read",
+
             // Uphold uses a different domain for the authorization URL. simple-oauth2 doesn't support that.
             // The "site" parameter also may not be empty.
             // As a workaround, we use the greatest common denominator of the two URLs: "https://".
@@ -76,12 +83,12 @@ export class Server {
         /**
          * Create a new Uphold service and get user info from it.
          */
-        function getBitReserveUserInfo(token: string, callback) {
+        function getUpholdUserInfo(token: string, callback) {
             var brs = serviceFactory.createUpholdService(token);
             brs.getUser(callback);
         }
 
-        upholdOauthController.setGetUserInfoFunction(getBitReserveUserInfo);
+        upholdOauthController.setGetUserInfoFunction(getUpholdUserInfo);
 
         if (this.config.useStubs) {
             // Create a stub controller from the real controller.
@@ -103,6 +110,9 @@ export class Server {
         var app = express();
         app.use(bodyParser.json());
 
+        // Validation
+        app.use(expressValidator());
+
         // Logging
         app.use(morgan('dev'));
 
@@ -112,46 +122,27 @@ export class Server {
         // disconnect for some reason.
         // TODO: make this more stable, in a way that doesn't require a specific call to Mongoose
         // before every request (because that will be forgotten).
-        var db = mongoose.connect(this.config.database.url);
+        this.db = mongoose.connect(this.config.database.url);
 
         // Client folder containing the Angular SPA, serve as static assets
-        var clientDir = path.join(__dirname, 'client')
+        var clientDir = path.join(__dirname, 'client');
         app.use(express.static(clientDir));
+
+        // Static assets for other data
+        var categoryDir = path.join(__dirname, 'api/category/data');
+        app.use("/data/category", express.static(categoryDir));
 
         // All routes which are directly accessible (i.e. not only from within the Angular SPA).
         // All open index.html, where Angular handles further routing to the right controller/ view.
-        // Ideally all routes not matched by server-side routes are forwarded to Angular.
-        // TODO: introduce an "other" wildcard handler for this.
-        app.get('/', indexRoute.index);
-        app.get('/user/profile', indexRoute.index);
-        app.get('/user/login', indexRoute.index);
-
-        app.get('/proposal/list', indexRoute.index);
-        app.get('/proposal/:id', indexRoute.index);
-        app.get('/proposal/:id/join', indexRoute.index);
-        app.get('/proposal/new', indexRoute.index);
-
-        app.get('/not-found', indexRoute.index);
-
         app.get(upholdOauthController.getAuthRoute(), upholdOauthController.auth);
         app.post(upholdOauthController.getCallbackApiRoute(), upholdOauthController.callback);
         app.get(upholdOauthController.getCallbackPublicRoute(), indexRoute.index);
 
-        // Uphold API wrapper
-        var uc = new upholdController.UpholdController();
-        app.get("/api/uphold/me/cards", uc.getCards);
-        app.get("/api/uphold/me/cards/withBalance", uc.getCardsWithBalance);
+        // Routes for API functions
+        apiRoutes.configure(app);
 
-        // Proposals
-        var pc = new proposalController.ProposalController();
-        app.get("/api/proposal", pc.getAll);
-        app.get("/api/proposal/:id", pc.getOne);
-        app.post("/api/proposal", pc.create);
-
-        // Migrations
-        var mc = new migrationController.MigrationController();
-        app.post("/api/migration/update", mc.update);
-        app.post("/api/migration/test/seed", mc.seedTestData);
+        // All routes not matched by server-side routes are forwarded to Angular using this wildcard.
+        app.get("*", indexRoute.index);
 
         return app;
     }
@@ -203,9 +194,43 @@ export class Server {
         }
 
         http.createServer(app).listen(this.HTTP_PORT);
-        https.createServer(httpsOptions, app).listen(this.HTTPS_PORT);
-
         console.log('http server started on port ' + this.HTTP_PORT);
+
+        https.createServer(httpsOptions, app).listen(this.HTTPS_PORT);
         console.log('https server started on port ' + this.HTTPS_PORT);
+
+        // Create an HTTPS proxy for the ethereum node, to allow calling it securely from 
+        // the client.
+        // Because we serve the DApp over HTTPS, the calls it makes (including those to
+        // the Ethereum node) should be over HTTPS as well. 
+        // See: https://ethereum.stackexchange.com/questions/794/what-are-best-practices-for-serving-a-dapp-over-https-connecting-to-an-ethereum/857#857
+        if (this.config.ethereum.httpsProxy) {
+            var ethJsonRpcUrl = uriJs.parse(this.config.ethereum.jsonRpcUrl);
+            var ethProxyPort = this.config.ethereum.httpsProxy.port;
+
+            // The HTTPS proxy is exposed at one port higher than the HTTPS port of the
+            // application. For example, the application runs on https://blockstars.io:4124, 
+            // then the ethereum node will be made available under https://blockstars.io:4125.
+            // In production deployments, those should be made available under different
+            // host names through the normal https port 443 in order to prevent firewall 
+            // issues for users.
+            httpProxy.createServer({
+                target: {
+                    host: ethJsonRpcUrl.hostname,
+                    port: ethJsonRpcUrl.port
+                },
+                ssl: httpsOptions
+            }).listen(ethProxyPort);
+            console.log('https proxy for Ethereum node started on port ' + ethProxyPort);
+        }
+    }
+
+    /**
+     * Stop running the application and close the database connection.
+     */
+    stop() {
+        this.db.disconnect();
     }
 }
+
+        

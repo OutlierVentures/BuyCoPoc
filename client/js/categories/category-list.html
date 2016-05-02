@@ -1,0 +1,23 @@
+﻿<div class="container">
+    <div class="text-center loading" ng-show="!categories">
+        <img src="/images/ajax-loader.gif">
+        <h3>Loading</h3>
+        <p>Getting the latest BuyCos...</p>
+    </div>
+    <div class="text-center info" ng-show="categories.length==0">
+        <i class="fa fa-times"></i>
+        <h3>No active BuyCos</h3>
+        <p>There are no active BuyCos.</p>
+    </div>
+    <div class="row text-center" ng-show="categories.length>0">
+        <div class="col-md-6" ng-repeat="category in categories track by category.name">
+            <a href="/proposal/category/{{category.name}}" class="category">
+                <img src="/data/{{category.imageUrl}}">
+                <span class="abs">
+                    <h3>{{category.name}}</h3>
+                    <span>{{category.totalProposalCount}} BuyCos</span>
+                </span>
+            </a>
+        </div>
+    </div>
+</div>

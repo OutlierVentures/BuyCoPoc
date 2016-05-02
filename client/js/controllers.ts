@@ -1,9 +1,16 @@
-﻿interface ILoginScope extends ng.IScope {
+﻿/// <reference path="../typings/tsd.d.ts" />
+
+interface ILoginScope extends ng.IScope {
     //credentials: Credentials;
-    isAuthenticated();
-    login();
+    isAuthenticated(): boolean;
+    login(): any;
     userInfo: IUser;
+    blockchainAccounts: IBlockchainAccountCollection;
     isGlobalAdmin: boolean;
+}
+
+interface IOVWindowService extends ng.IWindowService {
+    _: UnderscoreStatic; // Extend with underscore.
 }
 
 /**
@@ -17,7 +24,9 @@ class LoginController {
         "$location",
         "$window",
         "$route",
-        "identityService"];
+        "identityService",
+        "blockchainService",
+        "configurationService"];
 
     constructor(
         private $scope: ILoginScope,
@@ -26,7 +35,11 @@ class LoginController {
         private $location: ng.ILocationService,
         private $window: ng.IWindowService,
         private $route: ng.route.IRouteService,
-        private identityService: IdentityService) {
+        private identityService: IdentityService,
+        private blockchainService: BlockchainService,
+        private configurationService: ConfigurationService) {
+
+        var t = this;
 
         $scope.isAuthenticated = function (): boolean {
             return identityService.isAuthenticated();
@@ -54,12 +67,14 @@ class LoginController {
 
             // Store in scope to show in view
             $scope.userInfo = userDataFromSession;
-        } else if (this.$location.path() == "/auth/uphold/callback"
-        // Don't handle a login attempt while already logged in
+
+            t.loadUserData();
+        } else if (this.$location.path() === "/auth/uphold/callback"
+            // Don't handle a login attempt while already logged in
             && !this.$scope.isAuthenticated()
             // The LoginController can be loaded twice. Make sure we don't process the login twice.
             && !this.$rootScope.isProcessingLogin
-            ) {
+        ) {
             this.$rootScope.isProcessingLogin = true;
 
             // Handle OAuth callback
@@ -105,6 +120,8 @@ class LoginController {
 
                 // Store in scope to show in view
                 $scope.userInfo = resultData.user;
+
+                t.loadUserData();
             }).error(function (error) {
                 // Handle error
                 console.log("Error on OAuth callback to API:");
@@ -119,12 +136,67 @@ class LoginController {
             });
         }
 
+        t.tryLoadBlockchainAccounts();
+
+        $rootScope.$on('blockchainConnected', e => {
+            t.tryLoadBlockchainAccounts();
+
+        });
+
+    }
+
+    tryLoadBlockchainAccounts() {
+        var t = this;
+
+        t.$scope.blockchainAccounts = t.blockchainService.getAccounts();
+
+        if (t.$scope.blockchainAccounts) {
+            // Load balance for each account.
+            _(t.$scope.blockchainAccounts.accounts).each(acc => {
+                acc.balance = web3.fromWei(web3.eth.getBalance(acc.address), 'ether').toNumber();
+            });
+        }
+    }
+
+    loadUserData() {
+        var t = this;
+        this.$http({
+            method: 'GET',
+            url: apiUrl + '/user',
+            headers: { AccessToken: t.$rootScope.userInfo.accessToken }
+        }).success(function (resultData: IUser) {
+            if (!resultData) {
+                // Login error. Token invalid? Refresh and relogin.
+                t.$window.sessionStorage.setItem("upholdToken", "");
+                t.$window.sessionStorage.setItem("upholdUserInfo", "");
+                t.$route.reload();
+                return;
+            }
+
+            t.$rootScope.userInfo = resultData;
+
+            // Homepage per perspective
+            if (t.$location.path() == "/") {
+                if (resultData.preferences && resultData.preferences.perspective) {
+                    if (resultData.preferences.perspective == "seller")
+                        t.$location.path('/seller-proposal/list');
+                }
+            }
+        }).error(function (error) {
+            // Handle error
+            console.log(error);
+        });
     }
 }
 
-interface IDashboardScope {
+angular.module("buyCoApp").controller("LoginController", LoginController);
+
+
+interface IDashboardScope extends ng.IScope {
     userInfo: IUser;
-    allCards: any;
+    allCards: IUpholdCard[];
+    cardsToShow: IUpholdCard[];
+    favoriteCardsOnly: boolean;
 }
 
 
@@ -133,13 +205,17 @@ class DashboardController {
         "$scope",
         "$rootScope",
         "$location",
-        "$http"];
+        "$http",
+        "$window",
+        "_"];
 
     constructor(
         private $scope: IDashboardScope,
         private $rootScope: BuyCoRootScope,
         private $location: ng.ILocationService,
-        private $http: ng.IHttpService) {
+        private $http: ng.IHttpService,
+        private $window: IOVWindowService,
+        private _: UnderscoreStatic) {
 
         var t = this;
 
@@ -155,15 +231,26 @@ class DashboardController {
             t.loadData();
         });
 
+        // Get underscore from global (TODO: inject!)
+        // t._ = t.$window._;
+
+        t.$scope.favoriteCardsOnly = false;
+        t.determineCardsToShow();
+
+        t.$scope.$watch("favoriteCardsOnly", (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                t.determineCardsToShow();
+            }
+        });
     }
 
     private loadData() {
         var t = this;
         t.$scope.userInfo = t.$rootScope.userInfo;
-        t.loadBitReserveData();
+        t.loadUpholdData();
     }
 
-    private loadBitReserveData() {
+    private loadUpholdData() {
         // Load Uphold data
         var t = this;
 
@@ -177,6 +264,7 @@ class DashboardController {
 
             // Store in scope to show in view
             t.$scope.allCards = cards;
+            t.determineCardsToShow();
         }).error(function (error) {
             // Handle error
             console.log("Error on Uphold call through our API:");
@@ -184,8 +272,27 @@ class DashboardController {
 
             // TODO: further handling
         });
-
     }
+
+    private determineCardsToShow() {
+        var t = this;
+        t.$scope.cardsToShow = !t.$scope.favoriteCardsOnly ?
+            // When favoriteCardsOnly then show only cards with settings.starred = true.
+            t.$scope.allCards : t._.filter(t.$scope.allCards, function (card: IUpholdCard) {
+                return card.settings.starred;
+            });
+        ;
+    }
+
+    private starredCards() {
+        var t = this;
+        var result = t._.filter<IUpholdCard>(t.$scope.allCards, (card) => {
+            return card.settings.starred;
+        });
+        return result;
+    }
+
+
 }
 
 class NavigationController {
@@ -199,26 +306,4 @@ class NavigationController {
     }
 }
 
-interface IUserAccountScope extends ng.IScope {
-    //credentials: Credentials;
-    isAuthenticated();
-    userInfo: IUser;
-}
-
-class UserAccountController {
-    public static $inject = [
-        "$scope",
-        "$rootScope",
-        "$location"];
-
-    constructor(
-        private $scope: IUserAccountScope,
-        private $rootScope: BuyCoRootScope,
-        private $location: ng.ILocationService) {
-
-        this.$rootScope.$on('loggedOn', function (event, data) {
-            $scope.userInfo = $rootScope.userInfo;
-        });
-
-    }
-}
+angular.module("buyCoApp").controller("NavigationController", NavigationController);

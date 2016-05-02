@@ -21,6 +21,9 @@
     },
     "ethereum": {
         "jsonRpcUrl": string,
+        "httpsProxy": {
+            "port": number,
+        }
         "nodeUrl": string,
         "contracts": {
             "proposalRegistry": string

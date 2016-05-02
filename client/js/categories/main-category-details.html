@@ -1,0 +1,28 @@
+﻿<div class="container">
+    <h2 class="page-heading">{{mainCategory.name}}</h2>
+    <!-- <img ng-show="mainCategory.imageUrl" class="img-responsive img-rounded" src="/data/{{mainCategory.imageUrl}}" /> -->
+    <div class="text-center info" ng-show="!mainCategory.subCategories">
+        <img src="/images/ajax-loader.gif">
+        <h3>Loading</h3>
+        <p>Loading the BuyCos...</p>
+    </div>
+    <div class="text-center info" ng-show="mainCategory.subCategories.length==0">
+        <i class="fa fa-times"></i>
+        <h3>No active BuyCos</h3>
+        <p>There are no active BuyCos in {{mainCategory.name}}.</p>
+    </div>
+    <div class="row" ng-show="mainCategory.subCategories.length>0">
+        <div class="col-lg-4 col-md-6" ng-repeat="category in mainCategory.subCategories track by category.name">
+            <div class="panel panel-default panel-link">
+                <div class="panel-body clearfix">
+                    <a href="/proposal/category/{{mainCategory.name}}/{{category.name}}">
+                        <img ng-show="category.imageUrl" class="img-responsive img-rounded" src="/data/{{category.imageUrl}}" />
+                    </a>
+                    <br />
+                    <p class="pull-left"><a href="/proposal/category/{{mainCategory.name}}/{{category.name}}">{{category.name}}</a></p>
+                    <p class="pull-right">{{category.totalProposalCount}} BuyCos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

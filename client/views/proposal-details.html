@@ -4,24 +4,121 @@
         <div class="panel-heading">There was an error processing your request.</div>
         <div class="panel-body">{{errorMessage}}</div>
     </div>
-    <div class="jumbotron">
-        <h2>{{proposal.productName}}</h2>
-        <p class="text-muted">{{proposal.productDescription}}</p>
-        <span class="small">
-            Maximum price: <span class="text-muted">{{(proposal.maxPrice / 100 || 0) | number: 2}}</span>
-        </span><br><br>
-        <span class="small">
-            End date: <span class="text-muted">{{proposal.endDate}}</span>
-        </span><br><br>
-        <span class="small">
-            Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate}}</span>
-        </span><br><br>
-        <span class="small pull-right text-right">Smart Contact Address:<br><span class="text-muted">{{proposal.id}}</span></span>
-        <form role="form" name="proposalForm" novalidate>
-            <a href="/proposal/{{proposal.id}}/join" class="btn btn-primary">
-                Join this BuyCo
+    <p class="text-muted small" ng-show="proposal.mainCategory">{{proposal.mainCategory}} - {{proposal.subCategory}}</p>
+    <div class="jumbotron-product clearfix">
+        <div class="half">
+            <a href="#" class="small" data-container="body" data-toggle="popover" data-placement="top" data-content="{{proposal.contractAddress}}">
+                Smart Contact Address
             </a>
-        </form>
+            <h2>
+                {{proposal.productName}}
+            </h2>
+            <p class="lead">{{proposal.productDescription}}</p>
+            <p ng-show="proposal.productSku">SKU: <span class="text-muted">{{proposal.productSku}}</span></p>
+            <p ng-show="proposal.productUnitSize">Unit size: <span class="text-muted">{{proposal.productUnitSize}}</span></p>
+            <p>
+                Maximum price: <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}} GBP</span>
+            </p>
+            <p>
+                End date: <span class="text-muted">{{proposal.endDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
+            </p>
+            <p ng-show="proposal.isClosed">
+                <strong>This BuyCo is closed.</strong><br />
+                <span ng-show="$root.userInfo.preferences.perspective=='buyer'">
+                    Did you miss out on a great deal? You can create a new BuyCo for the same product and conditions.<br />
+                    <a href="/proposal/new/{{proposal.contractAddress}}" class="btn btn-primary">
+                        <i class="fa fa-pencil"></i>&nbsp;&nbsp;Create proposal for {{proposal.productName}}
+                    </a>
+                </span>
+            </p>
+            <p>
+                Ultimate delivery date: <span class="text-muted">{{proposal.ultimateDeliveryDate | amDateFormat:'DD-MM-YYYY HH:mm:ss'}}</span>
+            </p>
+            <p class="small text-muted">
+                Promote this BuyCo in your network to get more people on board!
+            </p>
+            <a twitter data-lang="en" data-count='horizontal' data-url='{{pageUrl}}' data-size="medium" data-text='Join me to buy {{proposal.productName}} together using @buycoio!'></a>
+        </div>
+        <div class="half half-branded">
+            <!-- <img src="/data/category/{{proposal.mainCategory}}/{{proposal.subCategory}}/main.jpg"> -->
+            <div class="bgimage" style="background-image:url(../data/category/{{proposal.mainCategory | spaceless}}/{{proposal.subCategory | spaceless}}/main.jpg)"></div>
+            <p ng-cloak ng-show="!proposal.isClosed && proposal.endDate">Time left to get your orders in:</p>
+            <h1 class="timer" ng-cloak ng-show="!proposal.isClosed && proposal.endDate">
+                <timer max-time-unit="day" end-time="proposal.endDate">
+                    <div class="timer-labels">
+                        <span class="timer-time">
+                            {{ddays}}
+                            <span class="timer-label text-muted">Days</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                            {{hhours}}
+                            <span class="timer-label text-muted">Hours</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                            {{mminutes}}
+                            <span class="timer-label text-muted">Minutes</span>
+                        </span>
+                        <span class="timer-time timer-break">:</span>
+                        <span class="timer-time">
+                            {{sseconds}}
+                            <span class="timer-label text-muted">Seconds</span>
+                        </span>
+                    </div>
+                </timer>
+            </h1>
+            <form role="form" name="proposalForm" novalidate ng-show="proposal.contractAddress">
+                <a href="/proposal/{{proposal.contractAddress}}/back" class="btn btn-primary btn-block" ng-show="$root.userInfo.preferences.perspective=='buyer' && !proposal.isClosed">
+                    Buy together
+                </a>
+                <a href="/proposal/{{proposal.contractAddress}}/offer/new" class="btn btn-primary btn-block" ng-show="$root.userInfo.preferences.perspective=='seller' && !proposal.isClosed">
+                    Make an offer
+                </a>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default" ng-show="proposal.shouldClose || proposal.isClosed">
+        <div class="panel-heading">
+            Fulfilment
+        </div>
+        <div class="panel-body">
+            <div ng-show="backers.length > 0">
+                <p ng-show="proposal.isStartPaymentComplete"><i class="fa fa-check-square"></i> The start payments from the buyers for this BuyCo have been completed.</p>
+                <p ng-show="proposal.isPaymentComplete"><i class="fa fa-check-square"></i> All buyer payments for this BuyCo have been completed.</p>
+                <div ng-show="proposal.acceptedOffer && proposal.isClosed">
+                    <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported to pay the seller.</p>
+                    <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported to pay the seller.</p>
+                </div>
+                <p ng-show="proposal.isPayoutComplete"><i class="fa fa-check-square"></i> All seller payments for this BuyCo have been completed.</p>
+            </div>
+            <div ng-show="proposal.shouldClose && !proposal.isClosed">
+                <p>The end date of the proposal has passed. You can request the BuyCo service to close it.</p>
+                <a ng-click="vm.processClose()" class="btn btn-primary">
+                    Request to close
+                </a>
+            </div>
+            <div ng-show="proposal.isClosed && (!proposal.isPaymentComplete || !proposal.isPayoutComplete)">
+                <p>The proposal is closed, but not all payments have been completed. You can request the BuyCo service to process the payments according to the smart contract rules.</p>
+                <a ng-click="vm.processPayments()" class="btn btn-primary">
+                    Request to process payments
+                </a>
+            </div>
+            <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
+                <div class="panel-heading">Processing</div>
+                <div class="panel-body"><img src="/images/ajax-loader.gif">&nbsp;&nbsp;{{processMessage}}</div>
+            </div>
+            <div class="panel panel-danger" style="margin-top:1em;" ng-show="errorMessage">
+                <div class="panel-heading">There was an error processing your request.</div>
+                <div class="panel-body">{{errorMessage}}</div>
+            </div>
+            <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
+                <div class="panel-heading">Success</div>
+                <div class="panel-body">
+                    <p>{{successMessage}}</p>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -30,8 +127,77 @@
         <div class="panel-body" ng-hide="backers">
             Loading the list of prospective buyers...
         </div>
-        <div class="list-group" ng-show="backers">
-            
+        <div class="panel-body" ng-show="backers.length == 0">
+            <p>You can be the first to back this proposal!</p>
+        </div>
+        <div class="panel-body" ng-show="backers.length > 0">
+            <div class="list-group">
+                <div ng-repeat="backer in backers track by backer.backerIndex" class="list-group-item">
+                    <div>
+                        Address <code>{{backer.address}}</code> (See payments:
+                        <span ng-show="backer.pledgePaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.pledgePaymentTransactionId}}" target="_blank">pledge</a></span>
+                        <span ng-show="backer.startPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">start</a></span>
+                        <span ng-show="backer.endPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.endPaymentTransactionId}}" target="_blank">end</a></span>):
+                        <span class="pull-right text-muted">{{backer.amount}} unit(s)</span>
+                        <span ng-show="backer.isDeliveryReported">
+                            <span class="pull-right text-muted" ng-show="backer.isDeliveryCorrect">&nbsp;<i class="fa fa-check-square"></i> <strong>correct delivery reported</strong>&nbsp;</span>
+                            <span class="pull-right text-warning" ng-show="!backer.isDeliveryCorrect">&nbsp;<i class="fa fa-exclamation-triangle"></i> <strong>problem with delivery reported</strong>&nbsp;</span>
+                        </span>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div ng-show="proposal.isClosed && !backer.pledgePaymentTransactionId">
+                        <p class="text-warning">This backer hasn't paid the pledge payment and does not take part in the BuyCo.</p>
+                    </div>
+                    <div ng-show="backer.isCurrentUser">
+                        <span><strong>This backing is yours.</strong></span>
+                        <span ng-show="proposal.acceptedOffer && !backer.isDeliveryCorrect && backer.pledgePaymentTransactionId" class="pull-right">
+                            <a class="btn btn-primary" href="/proposal/{{proposal.contractAddress}}/report-delivery/{{backer.backerIndex}}">Report delivery</a>
+                        </span>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Offers
+        </div>
+        <div class="panel-body" ng-hide="offers">
+            Loading the list of offers...
+        </div>
+        <div class="panel-body" ng-show="offers.length == 0">
+            <p>
+                We're waiting for the first offer. Promote this BuyCo in your network to get more people on board!
+            </p>
+            <p><a twitter data-lang="en" data-count='horizontal' data-url='{{pageUrl}}' data-size="medium" data-text='Join me to buy {{proposal.productName}} together using @buycoio!'></a></p>
+        </div>
+        <div class="panel-body" ng-show="offers.length > 0">
+            <div class="list-group">
+                <div href="#" ng-repeat="offer in offers track by offer.id" class="list-group-item">
+                    <div>
+                        {{offer.sellerName}} (<code>{{offer.owner}}</code>) offers {{(offer.price || 0) | number :2}} GBP <span class="pull-right text-muted">minimum amount {{offer.minimumAmount}} unit(s)</span>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div ng-show="offer.isCurrentUser">
+                        <span><strong>This is your offer.</strong></span>
+                    </div>
+                    <div>
+                        <span ng-show="offer.id == proposal.acceptedOffer"><strong>This is the accepted offer.</strong></span>
+                        <a href="/proposal/{{proposal.contractAddress}}/offer/{{offer.id}}" class="btn btn-primary pull-right">
+                            See the offer
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<script>
+    $(function () {
+        $('[data-toggle="popover"]').popover({
+            template: '<div class="popover popover-wide" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+        });
+    });
+</script>

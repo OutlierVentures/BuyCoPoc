@@ -1,0 +1,24 @@
+[{
+		"name" : "Food and drink",
+		"subCategories" : [{
+				"name" : "Coffee"
+			}
+		]
+	}, {
+		"name" : "Electronics",
+		"subCategories" : [{
+				"name" : "Camera"
+			}, {
+				"name" : "Mobile phone"
+			}
+		]
+	}, {
+		"name" : "Books",
+		"subCategories" : [{
+				"name" : "Fantasy books"
+			}, {
+				"name" : "Non-fiction books"
+			}
+		]
+	}
+]

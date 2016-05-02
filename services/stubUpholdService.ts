@@ -1,7 +1,10 @@
 ﻿import upholdService = require('./upholdService');
 import userModel = require('../models/userModel');
+import tools = require('../lib/tools');
+import serviceFactory = require('./serviceFactory');
+import { Promise } from 'q';
 
-export class StubUpholdService {
+export class StubUpholdService implements serviceFactory.IUpholdService {
     constructor(
         private authorizationToken: string) {
     }
@@ -67,7 +70,7 @@ export class StubUpholdService {
                 "message": "",
                 "status": "",
                 "RefundedById": "",
-                "createdAt": "",
+                "createdAt": "2016-02-15 15:00",
                 "denomination": {
                     "amount": 1,
                     "currency": "GBP",
@@ -114,7 +117,7 @@ export class StubUpholdService {
                 "message": "",
                 "status": "",
                 "RefundedById": "",
-                "createdAt": "",
+                "createdAt": "2016-02-03 13:22",
                 "denomination": {
                     "amount": 15,
                     "currency": "GBP",
@@ -154,9 +157,9 @@ export class StubUpholdService {
                     "type": ""
                 }
             }
-];
+        ];
 
-        
+
         callback(null, transactions);
     }
 
@@ -205,7 +208,7 @@ export class StubUpholdService {
         recipient: string,
         callback: upholdService.IUpholdTransactionCallback) => {
 
-        var newId = "tx" + Math.random() * 1000000;
+        var newId = tools.newGuid();
 
         var transaction: upholdService.IUpholdTransaction =
             {
@@ -260,5 +263,31 @@ export class StubUpholdService {
 
     commitTransaction = (transaction: upholdService.IUpholdTransaction, callback: upholdService.IUpholdTransactionCallback) => {
         callback(null, transaction);
+    }
+
+    /**
+    * Create a transaction and immediately commit it.
+    */
+    createAndCommitTransaction = (
+        fromCard: string,
+        amount: number,
+        currency: string,
+        recipient: string): Promise<IUpholdTransaction> => {
+        var t = this;
+        return Promise<IUpholdTransaction>((resolve, reject) => {
+            t.createTransaction(fromCard, amount, currency, recipient, (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                t.commitTransaction(res, (commitErr, commitRes) => {
+                    if (commitErr) {
+                        reject(commitErr);
+                        return;
+                    }
+                    resolve(commitRes);
+                });
+            });
+        });
     }
 }

@@ -1,9 +1,26 @@
 ﻿import request = require('request');
 import userModel = require('../models/userModel');
+import serviceFactory = require('./serviceFactory');
+
+import { Promise } from 'q';
 
 // Enable request debugging
 // TODO: make configurable (config debug option)
 require('request').debug = true;
+
+// TODO BW dd. 2015-12-7 Come up with decent name for this type.
+export interface IUpholdTransactionNode {
+    "CardId": string,
+    "amount": number,
+    "base": number,
+    "commission": number,
+    "currency": string,
+    "description": string,
+    "fee": number,
+    "rate": number,
+    "type": string,
+    "username": string
+}
 
 export interface IUpholdTransaction {
     "id": string,
@@ -18,30 +35,8 @@ export interface IUpholdTransaction {
         "pair": string,
         "rate": number
     },
-    "origin": {
-        "CardId": string,
-        "amount": number,
-        "base": number,
-        "commission": number,
-        "currency": string,
-        "description": string,
-        "fee": number,
-        "rate": number,
-        "type": string,
-        "username": string
-    },
-    "destination": {
-        "CardId": string,
-        "amount": number,
-        "base": number,
-        "commission": number,
-        "currency": string,
-        "description": string,
-        "fee": number,
-        "rate": number,
-        "type": string,
-        "username": string
-    },
+    "origin": IUpholdTransactionNode,
+    "destination": IUpholdTransactionNode,
     "params": {
         "currency": string,
         "margin": number,
@@ -127,7 +122,8 @@ function isSuccessStatusCode(statusCode: number): boolean {
     return false;
 }
 
-export class UpholdService {
+
+export class UpholdService implements serviceFactory.IUpholdService {
     constructor(
         private authorizationToken: string) {
     }
@@ -277,5 +273,31 @@ export class UpholdService {
                 }
             });
 
+    }
+
+    /**
+     * Create a transaction and immediately commit it.
+     */
+    createAndCommitTransaction = (
+        fromCard: string,
+        amount: number,
+        currency: string,
+        recipient: string): Promise<IUpholdTransaction> => {
+        var t = this;
+        return Promise<IUpholdTransaction>((resolve, reject) => {
+            t.createTransaction(fromCard, amount, currency, recipient, (err, res) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                t.commitTransaction(res, (commitErr, commitRes) => {
+                    if (commitErr) {
+                        reject(commitErr);
+                        return;
+                    }
+                    resolve(commitRes);
+                });
+            });
+        });
     }
 }

@@ -1,9 +1,10 @@
 ﻿{
     "__comment": "This is the default configuration file. If you want custom configuration, copy this file to 'config.json' and adapt.",
+    "useStubs": false,
     "server": {
         "httpPort": 4123,
         "httpsPort": 4124,
-        "baseUrl": "https://buyco-poc-dev.projects.blockstars.io"
+        "baseUrl": "https://selfsigned.blockstars.io"
     },
     "database": {
         "url": "mongodb://buyco-poc-dev-user:Uiwjde84ybeqwZEJWho2@ds027505.mongolab.com:27505/buyco-poc-dev"
@@ -21,11 +22,14 @@
         }
     },
     "ethereum": {
-        "__comment" : "This configuration uses the development Ethereum node on blockstars.io.",
-        "jsonRpcUrl": "http://blockstars.io:9001",
+        "__comment": "This configuration uses the development Ethereum node on blockstars.io.",
+        "jsonRpcUrl": "http://latte.servers.blockstars.io:9001",
+        "httpsProxy": {
+            "port": 4125
+        },
         "nodeUrl": "blockstars.io:30301",
         "contracts": {
-            "proposalRegistry": "0x0b97c62080f2654bcf7204c242769d1062c31065"
+            "proposalRegistry": "0xc6822e9643738d1a6e86c4ec01a34f08f72ea3dc"
         }
     }
 }

@@ -1,18 +1,22 @@
-﻿import assert = require('assert');
+﻿import chai = require('chai'); var assert = chai.assert;
 import web3config = require('./web3config');
 import fs = require('fs');
+
+import contractInterfaces = require('../../contracts/contractInterfaces');
+import contractService = require('../../services/contractService');
+import serviceFactory = require('../../services/serviceFactory');
+import tools = require('../../lib/tools');
 
 var web3plus = web3config.web3plus;
 var web3 = web3plus.web3;
 
-describe("ProposalRegistry", () => {
+describe("ProposalRegistry closing", () => {
     /**
      * The Solidity web3 contract.
      */
-    var registryContract;
+    var registryContract: contractInterfaces.IProposalRegistryContract;
 
-    var proposalContractDefinition;
-    var offerContractDefinition;
+    var contractService: contractService.ContractService;
 
     var timeBeforeDeployment: number;
     var timeAfterDeployment: number;
@@ -34,11 +38,11 @@ describe("ProposalRegistry", () => {
                 timeAfterDeployment = Date.now();
                 registryContract = res;
 
-                // Save the sub contract definitions to variables for easy access.
-                proposalContractDefinition = registryContract.allContractTypes.Proposal.contractDefinition;
-                offerContractDefinition = registryContract.allContractTypes.Offer.contractDefinition;
-
-                done(err);
+                serviceFactory.getContractService()
+                    .then(cs => {
+                        contractService = cs;
+                        done();
+                    }, err => done(err));
             },
             testRegistryName);
     });
@@ -60,21 +64,30 @@ describe("ProposalRegistry", () => {
         // also that address.
         var sellerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        registryContract.addProposal(name1, "A very special product", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc => {
+                proposalContract = pc;
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                // Set pledge paid.
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
 
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
@@ -83,7 +96,7 @@ describe("ProposalRegistry", () => {
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
-                var acceptedOfferAddress = proposalContract.acceptedOffer();               
+                var acceptedOfferAddress = proposalContract.acceptedOffer();
 
                 // The offer should not have been accepted.
                 assert.equal(acceptedOfferAddress, "0x0000000000000000000000000000000000000000");
@@ -109,35 +122,49 @@ describe("ProposalRegistry", () => {
         // also that address.
         var sellerAddress1 = web3.eth.coinbase;
 
-        var proposalContract;
+        var proposalContract: contractInterfaces.IProposalContract;
 
-        registryContract.addProposal(name1, "A very special product", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+
+        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
             .then(web3plus.promiseCommital)
             .then(function testGetProposal(tx) {
                 var newProposalAddress = registryContract.proposals(1);
 
-                proposalContract = proposalContractDefinition.at(newProposalAddress);
-                return proposalContract.back(askAmount1, { gas: 2500000 });
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc => {
+                proposalContract = pc;
+
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetTotalBackedAmount(tx) {
 
                 // Make an offer
-                return proposalContract.offer(sellPrice1, sellAmount1, { gas: 2500000 });
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                // Set backer pledge paid
+                return proposalContract.setPaid(1, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(1), { gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testCloseProposal(tx) {
-                var tot = proposalContract.getTotalBackedAmount().toNumber();
-
                 return proposalContract.close({ gas: 2500000 });
             })
             .then(web3plus.promiseCommital)
             .then(function testGetLatestOffer(tx) {
                 var acceptedOfferAddress = proposalContract.acceptedOffer();
-                var acceptedOffer = offerContractDefinition.at(acceptedOfferAddress);
 
+                assert.ok(proposalContract.isClosed());
+                assert.notEqual(acceptedOfferAddress, "0x0000000000000000000000000000000000000000", "Accepted offer is not empty");
+
+                return contractService.getOfferContractAt(acceptedOfferAddress);
+            })
+            .then(acceptedOffer => {
                 // Offer address should be unchanged.
-                assert.equal(acceptedOffer.sellerAddress(), sellerAddress1);
+                assert.equal(acceptedOffer.owner(), sellerAddress1, "Seller address is registered correctly");
 
                 var acceptedPrice = acceptedOffer.price().toNumber();
                 var acceptedAmount = acceptedOffer.minimumAmount().toNumber();
@@ -146,6 +173,76 @@ describe("ProposalRegistry", () => {
 
                 done();
             })
+            .catch((reason) => {
+                done(reason);
+            });
+    });
+
+    it("should only count backers that have made the pledge payment on close", function (done) {
+        // It can take quite a while til transactions are processed.
+        this.timeout(180000);
+
+        var name1 = "Ethiopia Adado Coop";
+        var askPrice1 = 10100;
+        var askAmount1 = 10;
+        var askAmount2 = 5;
+        var sellPrice1 = 10000;
+        var sellAmount1 = 10;
+
+        // Currently all transactions are sent from a single address. Hence the "backer" is
+        // also that address.
+        var sellerAddress1 = web3.eth.coinbase;
+
+        var proposalContract: contractInterfaces.IProposalContract;
+
+
+        registryContract.addProposal(name1, "Food and drink", "Coffee", askPrice1, "2016-03-01", "2016-05-01", { gas: 2500000 })
+            .then(web3plus.promiseCommital)
+            .then(function testGetProposal(tx) {
+                var newProposalAddress = registryContract.proposals(1);
+
+                return contractService.getProposalContractAt(newProposalAddress);
+            })
+            .then(pc => {
+                proposalContract = pc;
+
+                // First backer
+                return proposalContract.back(askAmount1, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function addBacking2(tx) {
+
+                // Second backer
+                return proposalContract.back(askAmount2, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function setPaid(tx) {
+
+                // Set second backer pledge paid. This amount is not enough to accept the offer.
+                return proposalContract.setPaid(2, 1, tools.newGuid(true), proposalContract.getPledgePaymentAmount(2), { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function makeOffer(tx) {
+                // Make an offer
+                return proposalContract.offer(sellPrice1, sellAmount1, "cardId12345", { gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testCloseProposal(tx) {
+
+                return proposalContract.close({ gas: 2500000 });
+            })
+            .then(web3plus.promiseCommital)
+            .then(function testGetLatestOffer(tx) {
+                var acceptedOfferAddress = proposalContract.acceptedOffer();
+
+                assert.ok(proposalContract.isClosed());
+
+                // The offer should not be accepted, because less than the required amount have paid the
+                // pledge payment.
+                assert.equal(acceptedOfferAddress, "0x0000000000000000000000000000000000000000", "Accepted offer is empty");
+
+                done();
+            })            
             .catch((reason) => {
                 done(reason);
             });

@@ -15,6 +15,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+dist/
 
 # Roslyn cache directories
 *.ide/
@@ -202,13 +203,17 @@ models/*.js
 controllers/*.js
 services/*.js
 routes/*.js
+contracts/*.js
 lib/*.js
 test/**/*.js
+offers/*.js
+api/**/*.js
 **/.node*
 
 /*.js
 !GruntFile.js
 client/js/**/*.js
+!client/js/lib/*.js
 
 # TSD typings
 typings/

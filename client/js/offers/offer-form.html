@@ -1,0 +1,86 @@
+﻿﻿<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>Make an offer</h2>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>
+                                Do you want to make an offer for <strong>{{proposal.productName}}</strong>?
+                            </p>
+                            <p>
+                                The maximum price is <span class="text-muted">{{(proposal.maxPrice || 0) | number: 2}}</span> GBP. The sale will only go through if a deal with a seller is closed.
+                            </p>
+                            <p>
+                                <h3>Payment conditions</h3>
+                                The payment schedule for this BuyCo is:
+                            </p>
+                            <p>
+                                <ul>
+                                    <li>{{proposal.startPayoutPercentage}}% of the maximum price on closing (GBP {{proposal.startPayoutPerProduct}} per product)</li>
+                                    <li>The remaining amount after {{proposal.minimumReportedCorrectDeliveryPercentage}}% of the buyers have reported successful delivery</li>
+                                </ul>
+                            </p>
+
+                            <form role="form" name="offerForm" novalidate>
+                                <div class="form-group">
+                                    <label>Minimum amount</label>
+                                    <p class="help-block">
+                                        What is the minimum amount of units of <strong>{{proposal.productName}}</strong> you want to sell for your offer to be valid?
+                                    </p>
+                                    <input class="form-control" type="text" ng-model="offer.minimumAmount" required min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Price</label>
+                                    <p class="help-block">
+                                        Which price are you willing to receive per unit of <strong>{{proposal.productName}}</strong>?
+                                    </p>
+                                    <input class="form-control" type="text" ng-model="offer.price" required min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Card to pay to</label>
+                                    <p class="help-block">
+                                        If your offer is accepted, the amount will be transferred to your account according to the payment schedule.
+                                        <br /> Which Uphold card do you want to be paid to?
+                                    </p>
+                                    <select class="form-control" ng-model="toCard" required>
+                                        <option ng-hide="cards.length > 0">Loading your cards...</option>
+                                        <option ng-repeat="card in cards track by card.id" value="{{card.id}}">{{card.label}} ({{card.currency}} {{card.available}})</option>
+                                    </select>
+                                </div>
+                                <fieldset ng-disabled="processMessage || successMessage">
+                                    <button name="saveButton" ng-click="vm.createConfirm()" ng-disabled="offerForm.$invalid" class="btn btn-primary">
+                                        Make the offer
+                                    </button>
+                                </fieldset>
+                            </form>
+                            <div class="panel panel-default" style="margin-top:1em;" ng-show="processMessage">
+                                <div class="panel-heading">Processing</div>
+                                <div class="panel-body"><img src="/images/ajax-loader.gif">&nbsp;&nbsp;{{processMessage}}</div>
+                            </div>
+                            <div class="panel panel-danger" style="margin-top:1em;" ng-show="errorMessage">
+                                <div class="panel-heading">There was an error processing your request.</div>
+                                <div class="panel-body">{{errorMessage}}</div>
+                            </div>
+                            <div class="panel panel-success" style="margin-top:1em;" ng-show="successMessage">
+                                <div class="panel-heading">Success</div>
+                                <div class="panel-body">
+                                    <p>{{successMessage}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-lg-8 (nested) -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+</div>
