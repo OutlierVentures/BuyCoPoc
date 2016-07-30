@@ -23,13 +23,13 @@
     },
     "ethereum": {
         "__comment": "This configuration uses the development Ethereum node on blockstars.io.",
-        "jsonRpcUrl": "http://blockstars.io:9001",
+        "jsonRpcUrl": "http://latte.servers.blockstars.io:9001",
         "httpsProxy": {
             "port": 4125
         },
         "nodeUrl": "blockstars.io:30301",
         "contracts": {
-            "proposalRegistry": "0x17f118b4efb225e8d911d837512a2dcc0caf9392"
+            "proposalRegistry": "0xc6822e9643738d1a6e86c4ec01a34f08f72ea3dc"
         }
     }
 }
