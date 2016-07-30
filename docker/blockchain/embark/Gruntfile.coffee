@@ -1,7 +1,8 @@
 module.exports = (grunt) ->
 
-  grunt.loadNpmTasks "grunt-embark"
+  grunt.option 'stack', true
   grunt.loadTasks "tasks"
+  grunt.loadTasks "node_modules/embark-framework/grunt-embark/tasks"
 
   grunt.initConfig(
     files:
@@ -109,6 +110,8 @@ module.exports = (grunt) ->
   # Loads all plugins that match "grunt-", in this case all of our current plugins
   require('matchdep').filterAll('grunt-*').forEach(grunt.loadNpmTasks)
 
-  grunt.registerTask "deploy", ["coffee", "deploy_contracts", "concat", "copy", "server", "watch"]
-  grunt.registerTask "build", ["clean", "deploy_contracts", "coffee", "concat", "uglify", "copy"]
+  env = grunt.option('env')
+
+  grunt.registerTask "deploy", ["coffee", "deploy_contracts:"+env, "concat", "copy", "server", "watch"]
+  grunt.registerTask "build", ["clean", "deploy_contracts:"+env, "coffee", "concat", "uglify", "copy"]
 
