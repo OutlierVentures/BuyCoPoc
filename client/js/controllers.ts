@@ -132,7 +132,7 @@ class LoginController {
                 // * The only visible part is a static template (<div ng-include="'views/login.html'" ng-hide="isLoggedIn"></div>)
                 // * The logon controller loads its template in the <div ng-view></div> like any other controller. This div
                 //   is NOT visible while not logged on.
-                $rootScope.loginErrorMessage = "There was an error processing your login. Please try again. Details: " + error.error.error;
+                $rootScope.loginErrorMessage = "There was an error processing your login. Please try again. Details: " + error.error;
             });
         }
 
