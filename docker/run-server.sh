@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTAINER_BASE_NAME=buyco_server
+CONTAINER_BASE_NAME=bcpoc_server
 ENVIRONMENT=$1
 
 if [[ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]]; then
@@ -21,4 +21,4 @@ fi
 docker run -p 4124-4125:4124-4125 \
 	-v /`pwd`/..:/app \
 	--link buyco_blockchain_$ENVIRONMENT:blockchain \
-	--name $CONTAINER_NAME -t -i blockstars/buyco_server:1.0.0 bash
+	--name $CONTAINER_NAME -t -i blockstars/bcpoc_server:1.0.0 bash
