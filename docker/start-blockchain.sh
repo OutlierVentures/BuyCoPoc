@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTAINER_BASE_NAME=buyco_blockchain
+CONTAINER_BASE_NAME=bcpoc_blockchain
 ENVIRONMENT=$1
 
 if [[ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]]; then
