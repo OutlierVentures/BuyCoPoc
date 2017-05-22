@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTAINER_BASE_NAME=buyco_blockchain
+CONTAINER_BASE_NAME=bcpoc_blockchain
 ENVIRONMENT=$1
 
 if [[ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]]; then
@@ -19,4 +19,4 @@ fi
 docker run -p 9101:9101 -p 9001:9001 -p 9002:9002 \
 	-e "BCPOC_ENVIRONMENT=$ENVIRONMENT" \
  	-v /`pwd`/../../buyco_blockchain_data:/blockchain \
-	--name $CONTAINER_NAME -t -i blockstars/buyco_blockchain:1.0.0 bash
+	--name $CONTAINER_NAME -t -i blockstars/bcpoc_blockchain:1.0.0 bash
