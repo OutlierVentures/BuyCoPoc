@@ -87,8 +87,8 @@
                 <p ng-show="proposal.isStartPaymentComplete"><i class="fa fa-check-square"></i> The start payments from the buyers for this BuyCo have been completed.</p>
                 <p ng-show="proposal.isPaymentComplete"><i class="fa fa-check-square"></i> All buyer payments for this BuyCo have been completed.</p>
                 <div ng-show="proposal.acceptedOffer && proposal.isClosed">
-                    <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough succesful deliveries have been reported to pay the seller.</p>
-                    <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough succesful deliveries have been reported to pay the seller.</p>
+                    <p ng-show="proposal.isDeliveryComplete"><i class="fa fa-check-square"></i> Enough successful deliveries have been reported to pay the seller.</p>
+                    <p ng-show="!proposal.isDeliveryComplete"><i class="fa fa-clock-o"></i> Not enough successful deliveries have been reported to pay the seller.</p>
                 </div>
                 <p ng-show="proposal.isPayoutComplete"><i class="fa fa-check-square"></i> All seller payments for this BuyCo have been completed.</p>
             </div>
@@ -136,8 +136,8 @@
                     <div>
                         Address <code>{{backer.address}}</code> (See payments:
                         <span ng-show="backer.pledgePaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.pledgePaymentTransactionId}}" target="_blank">pledge</a></span>
-                        <span ng-show="backer.startPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">start</a></span>
-                        <span ng-show="backer.endPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.endPaymentTransactionId}}" target="_blank">end</a></span>):
+                        <span ng-show="backer.startPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.startPaymentTransactionId}}" target="_blank">initial</a></span>
+                        <span ng-show="backer.endPaymentTransactionId"><a href="https://uphold.com/reserve/transactions/{{backer.endPaymentTransactionId}}" target="_blank">closing</a></span>):
                         <span class="pull-right text-muted">{{backer.amount}} unit(s)</span>
                         <span ng-show="backer.isDeliveryReported">
                             <span class="pull-right text-muted" ng-show="backer.isDeliveryCorrect">&nbsp;<i class="fa fa-check-square"></i> <strong>correct delivery reported</strong>&nbsp;</span>

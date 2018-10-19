@@ -218,6 +218,7 @@ export class OAuthController {
                     "status": "Error",
                     "error": "Error returned by OAuth provider on callback: " + reqData.error
                 });
+            return;
         }
 
         var code = reqData.code;

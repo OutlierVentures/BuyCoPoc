@@ -33,12 +33,12 @@
             <h4>Payment details</h4>
             <div class="list-group">
                 <p class="list-group-item">
-                    Start payment (GBP {{proposal.startPayoutAmount | number : 2 }}):
+                    Initial payment (GBP {{proposal.startPayoutAmount | number : 2 }}):
                     <span ng-show="!proposal.startPayoutTransactionID">not paid yet</span>
                     <span ng-show="proposal.startPayoutTransactionID"><a href="https://uphold.com/reserve/transactions/{{proposal.startPayoutTransactionID}}" target="_blank">see transaction info</a></span>
                 </p>
                 <p class="list-group-item">
-                    End payment (GBP {{proposal.endPayoutAmount | number : 2 }}):
+                    Closing payment (GBP {{proposal.endPayoutAmount | number : 2 }}):
                     <span ng-show="!proposal.endPayoutTransactionID">not paid yet</span>
                     <span ng-show="proposal.endPayoutTransactionID"><a href="https://uphold.com/reserve/transactions/{{proposal.endPayoutTransactionID}}" target="_blank">see transaction info</a></span>
                 </p>
